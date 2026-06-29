@@ -9,38 +9,186 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ExplorerRouteImport } from './routes/explorer'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TokensIndexRouteImport } from './routes/tokens.index'
+import { Route as NftIndexRouteImport } from './routes/nft.index'
+import { Route as MerchantsIndexRouteImport } from './routes/merchants.index'
+import { Route as WalletAddressRouteImport } from './routes/wallet.$address'
+import { Route as TxHashRouteImport } from './routes/tx.$hash'
+import { Route as TokensSymbolRouteImport } from './routes/tokens.$symbol'
+import { Route as NftSlugRouteImport } from './routes/nft.$slug'
+import { Route as MerchantsIdRouteImport } from './routes/merchants.$id'
 
+const ExplorerRoute = ExplorerRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TokensIndexRoute = TokensIndexRouteImport.update({
+  id: '/tokens/',
+  path: '/tokens/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NftIndexRoute = NftIndexRouteImport.update({
+  id: '/nft/',
+  path: '/nft/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchantsIndexRoute = MerchantsIndexRouteImport.update({
+  id: '/merchants/',
+  path: '/merchants/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletAddressRoute = WalletAddressRouteImport.update({
+  id: '/wallet/$address',
+  path: '/wallet/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TxHashRoute = TxHashRouteImport.update({
+  id: '/tx/$hash',
+  path: '/tx/$hash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TokensSymbolRoute = TokensSymbolRouteImport.update({
+  id: '/tokens/$symbol',
+  path: '/tokens/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NftSlugRoute = NftSlugRouteImport.update({
+  id: '/nft/$slug',
+  path: '/nft/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchantsIdRoute = MerchantsIdRouteImport.update({
+  id: '/merchants/$id',
+  path: '/merchants/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/explorer': typeof ExplorerRoute
+  '/merchants/$id': typeof MerchantsIdRoute
+  '/nft/$slug': typeof NftSlugRoute
+  '/tokens/$symbol': typeof TokensSymbolRoute
+  '/tx/$hash': typeof TxHashRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/merchants/': typeof MerchantsIndexRoute
+  '/nft/': typeof NftIndexRoute
+  '/tokens/': typeof TokensIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/explorer': typeof ExplorerRoute
+  '/merchants/$id': typeof MerchantsIdRoute
+  '/nft/$slug': typeof NftSlugRoute
+  '/tokens/$symbol': typeof TokensSymbolRoute
+  '/tx/$hash': typeof TxHashRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/merchants': typeof MerchantsIndexRoute
+  '/nft': typeof NftIndexRoute
+  '/tokens': typeof TokensIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/explorer': typeof ExplorerRoute
+  '/merchants/$id': typeof MerchantsIdRoute
+  '/nft/$slug': typeof NftSlugRoute
+  '/tokens/$symbol': typeof TokensSymbolRoute
+  '/tx/$hash': typeof TxHashRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/merchants/': typeof MerchantsIndexRoute
+  '/nft/': typeof NftIndexRoute
+  '/tokens/': typeof TokensIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/explorer'
+    | '/merchants/$id'
+    | '/nft/$slug'
+    | '/tokens/$symbol'
+    | '/tx/$hash'
+    | '/wallet/$address'
+    | '/merchants/'
+    | '/nft/'
+    | '/tokens/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/analytics'
+    | '/explorer'
+    | '/merchants/$id'
+    | '/nft/$slug'
+    | '/tokens/$symbol'
+    | '/tx/$hash'
+    | '/wallet/$address'
+    | '/merchants'
+    | '/nft'
+    | '/tokens'
+  id:
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/explorer'
+    | '/merchants/$id'
+    | '/nft/$slug'
+    | '/tokens/$symbol'
+    | '/tx/$hash'
+    | '/wallet/$address'
+    | '/merchants/'
+    | '/nft/'
+    | '/tokens/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  ExplorerRoute: typeof ExplorerRoute
+  MerchantsIdRoute: typeof MerchantsIdRoute
+  NftSlugRoute: typeof NftSlugRoute
+  TokensSymbolRoute: typeof TokensSymbolRoute
+  TxHashRoute: typeof TxHashRoute
+  WalletAddressRoute: typeof WalletAddressRoute
+  MerchantsIndexRoute: typeof MerchantsIndexRoute
+  NftIndexRoute: typeof NftIndexRoute
+  TokensIndexRoute: typeof TokensIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/explorer': {
+      id: '/explorer'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof ExplorerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +196,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tokens/': {
+      id: '/tokens/'
+      path: '/tokens'
+      fullPath: '/tokens/'
+      preLoaderRoute: typeof TokensIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nft/': {
+      id: '/nft/'
+      path: '/nft'
+      fullPath: '/nft/'
+      preLoaderRoute: typeof NftIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchants/': {
+      id: '/merchants/'
+      path: '/merchants'
+      fullPath: '/merchants/'
+      preLoaderRoute: typeof MerchantsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet/$address': {
+      id: '/wallet/$address'
+      path: '/wallet/$address'
+      fullPath: '/wallet/$address'
+      preLoaderRoute: typeof WalletAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tx/$hash': {
+      id: '/tx/$hash'
+      path: '/tx/$hash'
+      fullPath: '/tx/$hash'
+      preLoaderRoute: typeof TxHashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tokens/$symbol': {
+      id: '/tokens/$symbol'
+      path: '/tokens/$symbol'
+      fullPath: '/tokens/$symbol'
+      preLoaderRoute: typeof TokensSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nft/$slug': {
+      id: '/nft/$slug'
+      path: '/nft/$slug'
+      fullPath: '/nft/$slug'
+      preLoaderRoute: typeof NftSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchants/$id': {
+      id: '/merchants/$id'
+      path: '/merchants/$id'
+      fullPath: '/merchants/$id'
+      preLoaderRoute: typeof MerchantsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  ExplorerRoute: ExplorerRoute,
+  MerchantsIdRoute: MerchantsIdRoute,
+  NftSlugRoute: NftSlugRoute,
+  TokensSymbolRoute: TokensSymbolRoute,
+  TxHashRoute: TxHashRoute,
+  WalletAddressRoute: WalletAddressRoute,
+  MerchantsIndexRoute: MerchantsIndexRoute,
+  NftIndexRoute: NftIndexRoute,
+  TokensIndexRoute: TokensIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
