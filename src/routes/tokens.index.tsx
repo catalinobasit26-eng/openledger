@@ -8,7 +8,7 @@ import { formatInt, formatNumber, formatUsd } from "@/lib/format";
 export const Route = createFileRoute("/tokens/")({
   head: () => ({
     meta: [
-      { title: "Tokens — OpenPay Ledger" },
+      { title: "Tokens — OpenLedger" },
       { name: "description", content: "OUSD, OPEN, and ecosystem tokens tracked on the OpenPay ledger." },
     ],
   }),

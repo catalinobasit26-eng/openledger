@@ -108,7 +108,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
       <footer className="mt-16 border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div>OpenPay Ledger — the public transaction explorer and audit layer for the OpenPay ecosystem.</div>
+          <div>OpenLedger — the public transaction explorer and audit layer for the OpenPay ecosystem.</div>
           <div className="font-mono">SHA-256 hash chain · Immutable audit</div>
         </div>
       </footer>
