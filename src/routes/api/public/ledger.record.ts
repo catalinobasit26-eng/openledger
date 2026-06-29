@@ -42,14 +42,14 @@ export const Route = createFileRoute("/api/public/ledger/record")({
         const { data, error } = await supabaseAdmin.rpc("record_transaction", {
           p_source: d.source,
           p_type: d.type,
-          p_from: d.from_address ?? null,
-          p_to: d.to_address ?? null,
+          p_from: d.from_address ?? undefined,
+          p_to: d.to_address ?? undefined,
           p_amount: d.amount,
           p_currency: d.currency,
           p_fee: d.network_fee ?? 0,
           p_status: d.status,
-          p_merchant_id: d.merchant_id ?? null,
-          p_external_ref: d.external_ref ?? null,
+          p_merchant_id: d.merchant_id ?? undefined,
+          p_external_ref: d.external_ref ?? undefined,
           p_metadata: d.metadata ?? {},
           p_ts: d.timestamp ?? new Date().toISOString(),
         });
