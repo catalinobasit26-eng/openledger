@@ -9,7 +9,7 @@ import { Pill } from "@/components/badges";
 export const Route = createFileRoute("/merchants/")({
   head: () => ({
     meta: [
-      { title: "Merchants — OpenPay Ledger" },
+      { title: "Merchants — OpenLedger" },
       { name: "description", content: "Browse merchants accepting payments through OpenPay and OpenPay Pro." },
     ],
   }),

@@ -10,7 +10,7 @@ import { formatInt, fullDate, shortHash, timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
-    meta: [{ title: "Admin — OpenPay Ledger" }],
+    meta: [{ title: "Admin — OpenLedger" }],
   }),
   component: AdminPage,
 });

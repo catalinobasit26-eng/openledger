@@ -13,7 +13,7 @@ export const Route = createFileRoute("/explorer")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Explorer — OpenPay Ledger" },
+      { title: "Explorer — OpenLedger" },
       { name: "description", content: "Search OpenPay transactions, wallets, merchants, tokens and NFTs across the OpenPay public ledger." },
     ],
   }),

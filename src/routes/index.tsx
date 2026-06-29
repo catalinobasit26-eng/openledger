@@ -13,9 +13,9 @@ import { formatInt, formatUsd } from "@/lib/format";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "OpenPay Ledger — Dashboard" },
+      { title: "OpenLedger — Dashboard" },
       { name: "description", content: "Live transparent ledger for the OpenPay ecosystem: volume, transactions, merchants, NFTs and swaps across OpenPay and OpenPay Pro." },
-      { property: "og:title", content: "OpenPay Ledger — Dashboard" },
+      { property: "og:title", content: "OpenLedger — Dashboard" },
       { property: "og:description", content: "Live transparent ledger for the OpenPay ecosystem." },
     ],
   }),

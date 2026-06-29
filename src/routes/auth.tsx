@@ -10,8 +10,8 @@ import { BrandLogo } from "@/components/brand-logo";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — OpenPay Ledger" },
-      { name: "description", content: "Sign in to the OpenPay Ledger admin panel." },
+      { title: "Sign in — OpenLedger" },
+      { name: "description", content: "Sign in to the OpenLedger admin panel." },
     ],
   }),
   component: AuthPage,
@@ -71,7 +71,7 @@ function AuthPage() {
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <div className="flex justify-center"><BrandLogo /></div>
         <h1 className="mt-4 text-center text-xl font-bold tracking-tight">
-          {mode === "signin" ? "Sign in to OpenPay Ledger" : "Create your account"}
+          {mode === "signin" ? "Sign in to OpenLedger" : "Create your account"}
         </h1>
         <p className="mt-1 text-center text-sm text-muted-foreground">
           Admin and auditor access to the ledger backend.

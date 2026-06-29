@@ -7,7 +7,7 @@ import { formatInt, formatNumber } from "@/lib/format";
 export const Route = createFileRoute("/nft/")({
   head: () => ({
     meta: [
-      { title: "NFTs — OpenPay Ledger" },
+      { title: "NFTs — OpenLedger" },
       { name: "description", content: "NFT collections, mints, sales, and transfers on the OpenPay ledger." },
     ],
   }),

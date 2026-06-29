@@ -10,7 +10,7 @@ import { formatAmount, formatNumber, fullDate, shortHash, timeAgo } from "@/lib/
 export const Route = createFileRoute("/tx/$hash")({
   head: ({ params }) => ({
     meta: [
-      { title: `Transaction ${shortHash(params.hash, 6, 4)} — OpenPay Ledger` },
+      { title: `Transaction ${shortHash(params.hash, 6, 4)} — OpenLedger` },
       { name: "description", content: "Transaction detail on the OpenPay public ledger." },
     ],
   }),
@@ -117,7 +117,7 @@ function TxDetailPage() {
             <div className="font-mono text-[10px] break-all rounded-md bg-primary/10 text-primary p-2">{tx.hash}</div>
           </div>
           <div className="rounded-md border border-border p-3 text-xs text-muted-foreground">
-            Every entry on the OpenPay Ledger is sealed with SHA-256, chained to its predecessor, and immutable.
+            Every entry on the OpenLedger is sealed with SHA-256, chained to its predecessor, and immutable.
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { formatInt, formatNumber, formatUsd } from "@/lib/format";
 export const Route = createFileRoute("/tokens/$symbol")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.symbol} — OpenPay Ledger` },
+      { title: `${params.symbol} — OpenLedger` },
       { name: "description", content: `${params.symbol} token activity on the OpenPay ledger.` },
     ],
   }),

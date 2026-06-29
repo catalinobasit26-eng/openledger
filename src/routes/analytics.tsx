@@ -10,7 +10,7 @@ import { formatInt, formatUsd, shortAddress } from "@/lib/format";
 export const Route = createFileRoute("/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics — OpenPay Ledger" },
+      { title: "Analytics — OpenLedger" },
       { name: "description", content: "Volume trends, transaction breakdown, top wallets, merchants and tokens on the OpenPay ledger." },
     ],
   }),

@@ -10,7 +10,7 @@ import { formatInt, fullDate, timeAgo } from "@/lib/format";
 export const Route = createFileRoute("/wallet/$address")({
   head: ({ params }) => ({
     meta: [
-      { title: `Wallet ${params.address.slice(0, 8)}… — OpenPay Ledger` },
+      { title: `Wallet ${params.address.slice(0, 8)}… — OpenLedger` },
       { name: "description", content: "Wallet activity, holdings, and transaction history on the OpenPay ledger." },
     ],
   }),
