@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/public/ledger/bulk")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         let ok = 0; let failed = 0; const errors: string[] = [];
         for (const d of parsed.data.transactions) {
-          const { error } = await supabaseAdmin.rpc("record_transaction", {
+          const { error } = await supabaseAdmin.rpc("record_transaction" as any, {
             p_source: d.source, p_type: d.type,
             p_from: d.from_address ?? undefined, p_to: d.to_address ?? undefined,
             p_amount: d.amount, p_currency: d.currency,

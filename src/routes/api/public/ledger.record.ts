@@ -39,7 +39,7 @@ export const Route = createFileRoute("/api/public/ledger/record")({
         }
         const d = parsed.data;
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin.rpc("record_transaction", {
+        const { data, error } = await supabaseAdmin.rpc("record_transaction" as any, {
           p_source: d.source,
           p_type: d.type,
           p_from: d.from_address ?? undefined,
