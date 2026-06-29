@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
 import { TxTable } from "@/components/tx-table";
 import { StatusBadge } from "@/components/badges";
-import { formatInt, fullDate, shortHash, timeAgo } from "@/lib/format";
+import { IntegrationsPanel } from "@/components/integrations-panel";
+import { formatInt, shortHash, timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -25,7 +26,9 @@ function AdminPage() {
       return data ?? [];
     },
   });
-  const isStaff = (roles.data?.length ?? 0) > 0;
+  const roleNames = (roles.data ?? []).map((r: any) => r.role);
+  const isStaff = roleNames.length > 0;
+  const isSuperAdmin = roleNames.includes("super_admin");
 
   const recent = useQuery({
     queryKey: ["admin-recent-tx"],
@@ -111,8 +114,10 @@ function AdminPage() {
         <StatCard label="Active Alerts" value={formatInt(fraud.data?.filter((f: any) => !f.resolved).length ?? 0)} icon={<AlertTriangle className="h-4 w-4" />} />
         <StatCard label="API Logs (50)" value={formatInt(apiLogs.data?.length ?? 0)} icon={<Activity className="h-4 w-4" />} />
         <StatCard label="Audit Events" value={formatInt(auditLogs.data?.length ?? 0)} icon={<FileText className="h-4 w-4" />} />
-        <StatCard label="Ledger Live" value="Streaming" sub="Realtime via WS" icon={<Database className="h-4 w-4" />} />
+        <StatCard label="Recent Tx (50)" value={formatInt(recent.data?.length ?? 0)} icon={<Database className="h-4 w-4" />} />
       </div>
+
+      <IntegrationsPanel isSuperAdmin={isSuperAdmin} />
 
       <section>
         <h2 className="mb-3 text-sm font-semibold">Live ledger feed</h2>
