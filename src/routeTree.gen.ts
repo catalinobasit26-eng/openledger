@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ExplorerRouteImport } from './routes/explorer'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TokensIndexRouteImport } from './routes/tokens.index'
 import { Route as NftIndexRouteImport } from './routes/nft.index'
@@ -20,15 +22,25 @@ import { Route as TxHashRouteImport } from './routes/tx.$hash'
 import { Route as TokensSymbolRouteImport } from './routes/tokens.$symbol'
 import { Route as NftSlugRouteImport } from './routes/nft.$slug'
 import { Route as MerchantsIdRouteImport } from './routes/merchants.$id'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const ExplorerRoute = ExplorerRouteImport.update({
   id: '/explorer',
   path: '/explorer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -76,11 +88,18 @@ const MerchantsIdRoute = MerchantsIdRouteImport.update({
   path: '/merchants/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
+  '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
   '/tokens/$symbol': typeof TokensSymbolRoute
@@ -93,7 +112,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
+  '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
   '/tokens/$symbol': typeof TokensSymbolRoute
@@ -106,8 +127,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
   '/tokens/$symbol': typeof TokensSymbolRoute
@@ -122,7 +146,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/analytics'
+    | '/auth'
     | '/explorer'
+    | '/admin'
     | '/merchants/$id'
     | '/nft/$slug'
     | '/tokens/$symbol'
@@ -135,7 +161,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/analytics'
+    | '/auth'
     | '/explorer'
+    | '/admin'
     | '/merchants/$id'
     | '/nft/$slug'
     | '/tokens/$symbol'
@@ -147,8 +175,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/analytics'
+    | '/auth'
     | '/explorer'
+    | '/_authenticated/admin'
     | '/merchants/$id'
     | '/nft/$slug'
     | '/tokens/$symbol'
@@ -161,7 +192,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
+  AuthRoute: typeof AuthRoute
   ExplorerRoute: typeof ExplorerRoute
   MerchantsIdRoute: typeof MerchantsIdRoute
   NftSlugRoute: typeof NftSlugRoute
@@ -182,11 +215,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExplorerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/analytics': {
       id: '/analytics'
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -252,12 +299,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MerchantsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
+  AuthRoute: AuthRoute,
   ExplorerRoute: ExplorerRoute,
   MerchantsIdRoute: MerchantsIdRoute,
   NftSlugRoute: NftSlugRoute,
