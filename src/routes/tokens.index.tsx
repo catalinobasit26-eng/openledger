@@ -1,0 +1,71 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { TrendingDown, TrendingUp } from "lucide-react";
+
+import { supabase } from "@/integrations/supabase/client";
+import { formatInt, formatNumber, formatUsd } from "@/lib/format";
+
+export const Route = createFileRoute("/tokens/")({
+  head: () => ({
+    meta: [
+      { title: "Tokens — OpenPay Ledger" },
+      { name: "description", content: "OUSD, OPEN, and ecosystem tokens tracked on the OpenPay ledger." },
+    ],
+  }),
+  component: TokensIndex,
+});
+
+function TokensIndex() {
+  const { data } = useQuery({
+    queryKey: ["tokens"],
+    queryFn: async () => {
+      const { data } = await supabase.from("tokens").select("*").order("volume_24h", { ascending: false });
+      return data ?? [];
+    },
+  });
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Tokens</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Tokens active on the OpenPay ecosystem.</p>
+      </div>
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="px-4 py-3 font-medium">Symbol</th>
+              <th className="px-4 py-3 font-medium">Name</th>
+              <th className="px-4 py-3 font-medium text-right">Price</th>
+              <th className="px-4 py-3 font-medium text-right">24h</th>
+              <th className="px-4 py-3 font-medium text-right">Volume 24h</th>
+              <th className="px-4 py-3 font-medium text-right">Holders</th>
+              <th className="px-4 py-3 font-medium text-right">Transfers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(data ?? []).map((t: any) => (
+              <tr key={t.symbol} className="border-t border-border hover:bg-muted/30">
+                <td className="px-4 py-3">
+                  <Link to="/tokens/$symbol" params={{ symbol: t.symbol }} className="font-semibold text-primary hover:underline">
+                    {t.symbol}
+                  </Link>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">{t.name}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{formatUsd(t.price_usd)}</td>
+                <td className={`px-4 py-3 text-right tabular-nums ${Number(t.change_24h) >= 0 ? "text-success" : "text-destructive"}`}>
+                  <span className="inline-flex items-center gap-1">
+                    {Number(t.change_24h) >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    {Number(t.change_24h).toFixed(2)}%
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums">{formatUsd(t.volume_24h)}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{formatInt(t.holders)}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{formatInt(t.transfers_count)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

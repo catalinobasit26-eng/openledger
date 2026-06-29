@@ -1,29 +1,191 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Activity, ArrowLeftRight, DollarSign, Image, ShoppingBag, TrendingUp, Users, Zap } from "lucide-react";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, Pie, PieChart } from "recharts";
+import { format, subDays } from "date-fns";
+
+import { supabase } from "@/integrations/supabase/client";
+import { StatCard } from "@/components/stat-card";
+import { SearchBar } from "@/components/search-bar";
+import { TxTable } from "@/components/tx-table";
+import { formatInt, formatUsd } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "OpenPay Ledger — Dashboard" },
+      { name: "description", content: "Live transparent ledger for the OpenPay ecosystem: volume, transactions, merchants, NFTs and swaps across OpenPay and OpenPay Pro." },
+      { property: "og:title", content: "OpenPay Ledger — Dashboard" },
+      { property: "og:description", content: "Live transparent ledger for the OpenPay ecosystem." },
     ],
   }),
-  component: Index,
+  component: DashboardPage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function DashboardPage() {
+  const stats = useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: async () => {
+      const [tx, vol, merch, wallets, nft, swaps, openpay, openpaypro] = await Promise.all([
+        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }),
+        supabase.from("ledger_transactions").select("amount"),
+        supabase.from("merchants").select("*", { count: "exact", head: true }),
+        supabase.from("wallets").select("*", { count: "exact", head: true }),
+        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("type", "nft_sale"),
+        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("type", "swap"),
+        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("source", "openpay"),
+        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("source", "openpay_pro"),
+      ]);
+      const totalVolume = (vol.data ?? []).reduce((acc, r: any) => acc + Number(r.amount ?? 0), 0);
+      return {
+        totalTx: tx.count ?? 0,
+        totalVolume,
+        totalMerchants: merch.count ?? 0,
+        totalWallets: wallets.count ?? 0,
+        nftSales: nft.count ?? 0,
+        swaps: swaps.count ?? 0,
+        openpay: openpay.count ?? 0,
+        openpaypro: openpaypro.count ?? 0,
+      };
+    },
+  });
+
+  const daily = useQuery({
+    queryKey: ["analytics-daily-14"],
+    queryFn: async () => {
+      const since = subDays(new Date(), 14).toISOString().slice(0, 10);
+      const { data } = await supabase.from("analytics_daily").select("*").gte("day", since).order("day", { ascending: true });
+      return (data ?? []).map((r: any) => ({
+        day: format(new Date(r.day), "MMM d"),
+        Transactions: r.transactions,
+        Volume: Number(r.volume),
+        OpenPay: r.openpay_tx,
+        Pro: r.openpaypro_tx,
+      }));
+    },
+  });
+
+  const typeBreakdown = useQuery({
+    queryKey: ["type-breakdown"],
+    queryFn: async () => {
+      const { data } = await supabase.from("ledger_transactions").select("type");
+      const counts: Record<string, number> = {};
+      (data ?? []).forEach((r: any) => { counts[r.type] = (counts[r.type] ?? 0) + 1; });
+      return Object.entries(counts).map(([name, value]) => ({ name: name.replace("_", " "), value }));
+    },
+  });
+
+  const recent = useQuery({
+    queryKey: ["recent-tx-dashboard"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("ledger_transactions")
+        .select("hash,ts,source,type,from_address,to_address,amount,currency,status,block_number")
+        .order("ts", { ascending: false })
+        .limit(10);
+      return data ?? [];
+    },
+    refetchInterval: 8000,
+  });
+
+  const s = stats.data;
+  const pieColors = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "var(--primary)", "var(--success)"];
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="space-y-8">
+      <section className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-10">
+        <div className="max-w-3xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+            Live ledger · SHA-256 hash chain
+          </div>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+            The public explorer for the OpenPay ecosystem
+          </h1>
+          <p className="mt-3 text-muted-foreground">
+            Search and verify every transaction from OpenPay and OpenPay Pro. Track wallets, merchants, tokens, NFTs, and the daily pulse of the network.
+          </p>
+          <div className="mt-6"><SearchBar size="lg" /></div>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Total Transactions" value={formatInt(s?.totalTx)} icon={<Activity className="h-4 w-4" />} />
+        <StatCard label="Total Volume" value={formatUsd(s?.totalVolume)} sub="All currencies normalized" icon={<DollarSign className="h-4 w-4" />} />
+        <StatCard label="Total Wallets" value={formatInt(s?.totalWallets)} icon={<Users className="h-4 w-4" />} />
+        <StatCard label="Total Merchants" value={formatInt(s?.totalMerchants)} icon={<ShoppingBag className="h-4 w-4" />} />
+        <StatCard label="NFT Sales" value={formatInt(s?.nftSales)} icon={<Image className="h-4 w-4" />} />
+        <StatCard label="Swaps" value={formatInt(s?.swaps)} icon={<ArrowLeftRight className="h-4 w-4" />} />
+        <StatCard label="OpenPay Tx" value={formatInt(s?.openpay)} icon={<Zap className="h-4 w-4" />} />
+        <StatCard label="OpenPay Pro Tx" value={formatInt(s?.openpaypro)} icon={<TrendingUp className="h-4 w-4" />} />
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2 rounded-xl border border-border bg-card p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold">Daily Volume (14d)</h2>
+            <div className="text-xs text-muted-foreground">All sources</div>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={daily.data ?? []}>
+                <defs>
+                  <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={11} />
+                <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+                <Area type="monotone" dataKey="Volume" stroke="var(--primary)" fill="url(#g1)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-5">
+          <h2 className="mb-4 text-sm font-semibold">Transaction Types</h2>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={typeBreakdown.data ?? []} dataKey="value" nameKey="name" outerRadius={80} innerRadius={45}>
+                  {(typeBreakdown.data ?? []).map((_, i) => (
+                    <Cell key={i} fill={pieColors[i % pieColors.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-5">
+        <h2 className="mb-4 text-sm font-semibold">OpenPay vs OpenPay Pro — daily transactions</h2>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={daily.data ?? []}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={11} />
+              <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="OpenPay" stackId="a" fill="var(--primary)" />
+              <Bar dataKey="Pro" stackId="a" fill="var(--chart-2)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold">Latest Transactions</h2>
+          <Link to="/explorer" className="text-xs font-medium text-primary hover:underline">View all →</Link>
+        </div>
+        <TxTable rows={(recent.data ?? []) as any} dense />
+      </section>
     </div>
   );
 }

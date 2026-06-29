@@ -9,38 +9,371 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ExplorerRouteImport } from './routes/explorer'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TokensIndexRouteImport } from './routes/tokens.index'
+import { Route as NftIndexRouteImport } from './routes/nft.index'
+import { Route as MerchantsIndexRouteImport } from './routes/merchants.index'
+import { Route as WalletAddressRouteImport } from './routes/wallet.$address'
+import { Route as TxHashRouteImport } from './routes/tx.$hash'
+import { Route as TokensSymbolRouteImport } from './routes/tokens.$symbol'
+import { Route as NftSlugRouteImport } from './routes/nft.$slug'
+import { Route as MerchantsIdRouteImport } from './routes/merchants.$id'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicTransactionsRouteImport } from './routes/api/public/transactions'
+import { Route as ApiPublicAnalyticsRouteImport } from './routes/api/public/analytics'
+import { Route as ApiPublicWalletAddressRouteImport } from './routes/api/public/wallet.$address'
+import { Route as ApiPublicTransactionHashRouteImport } from './routes/api/public/transaction.$hash'
+import { Route as ApiPublicTokenSymbolRouteImport } from './routes/api/public/token.$symbol'
+import { Route as ApiPublicNftSlugRouteImport } from './routes/api/public/nft.$slug'
+import { Route as ApiPublicMerchantIdRouteImport } from './routes/api/public/merchant.$id'
+import { Route as ApiPublicLedgerRecordRouteImport } from './routes/api/public/ledger.record'
+import { Route as ApiPublicLedgerBulkRouteImport } from './routes/api/public/ledger.bulk'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExplorerRoute = ExplorerRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TokensIndexRoute = TokensIndexRouteImport.update({
+  id: '/tokens/',
+  path: '/tokens/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NftIndexRoute = NftIndexRouteImport.update({
+  id: '/nft/',
+  path: '/nft/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchantsIndexRoute = MerchantsIndexRouteImport.update({
+  id: '/merchants/',
+  path: '/merchants/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletAddressRoute = WalletAddressRouteImport.update({
+  id: '/wallet/$address',
+  path: '/wallet/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TxHashRoute = TxHashRouteImport.update({
+  id: '/tx/$hash',
+  path: '/tx/$hash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TokensSymbolRoute = TokensSymbolRouteImport.update({
+  id: '/tokens/$symbol',
+  path: '/tokens/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NftSlugRoute = NftSlugRouteImport.update({
+  id: '/nft/$slug',
+  path: '/nft/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchantsIdRoute = MerchantsIdRouteImport.update({
+  id: '/merchants/$id',
+  path: '/merchants/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicTransactionsRoute = ApiPublicTransactionsRouteImport.update({
+  id: '/api/public/transactions',
+  path: '/api/public/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAnalyticsRoute = ApiPublicAnalyticsRouteImport.update({
+  id: '/api/public/analytics',
+  path: '/api/public/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicWalletAddressRoute = ApiPublicWalletAddressRouteImport.update({
+  id: '/api/public/wallet/$address',
+  path: '/api/public/wallet/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTransactionHashRoute =
+  ApiPublicTransactionHashRouteImport.update({
+    id: '/api/public/transaction/$hash',
+    path: '/api/public/transaction/$hash',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTokenSymbolRoute = ApiPublicTokenSymbolRouteImport.update({
+  id: '/api/public/token/$symbol',
+  path: '/api/public/token/$symbol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicNftSlugRoute = ApiPublicNftSlugRouteImport.update({
+  id: '/api/public/nft/$slug',
+  path: '/api/public/nft/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicMerchantIdRoute = ApiPublicMerchantIdRouteImport.update({
+  id: '/api/public/merchant/$id',
+  path: '/api/public/merchant/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicLedgerRecordRoute = ApiPublicLedgerRecordRouteImport.update({
+  id: '/api/public/ledger/record',
+  path: '/api/public/ledger/record',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicLedgerBulkRoute = ApiPublicLedgerBulkRouteImport.update({
+  id: '/api/public/ledger/bulk',
+  path: '/api/public/ledger/bulk',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/auth': typeof AuthRoute
+  '/explorer': typeof ExplorerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/merchants/$id': typeof MerchantsIdRoute
+  '/nft/$slug': typeof NftSlugRoute
+  '/tokens/$symbol': typeof TokensSymbolRoute
+  '/tx/$hash': typeof TxHashRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/merchants/': typeof MerchantsIndexRoute
+  '/nft/': typeof NftIndexRoute
+  '/tokens/': typeof TokensIndexRoute
+  '/api/public/analytics': typeof ApiPublicAnalyticsRoute
+  '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
+  '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
+  '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
+  '/api/public/nft/$slug': typeof ApiPublicNftSlugRoute
+  '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
+  '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
+  '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
+  '/auth': typeof AuthRoute
+  '/explorer': typeof ExplorerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/merchants/$id': typeof MerchantsIdRoute
+  '/nft/$slug': typeof NftSlugRoute
+  '/tokens/$symbol': typeof TokensSymbolRoute
+  '/tx/$hash': typeof TxHashRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/merchants': typeof MerchantsIndexRoute
+  '/nft': typeof NftIndexRoute
+  '/tokens': typeof TokensIndexRoute
+  '/api/public/analytics': typeof ApiPublicAnalyticsRoute
+  '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
+  '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
+  '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
+  '/api/public/nft/$slug': typeof ApiPublicNftSlugRoute
+  '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
+  '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
+  '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/analytics': typeof AnalyticsRoute
+  '/auth': typeof AuthRoute
+  '/explorer': typeof ExplorerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/merchants/$id': typeof MerchantsIdRoute
+  '/nft/$slug': typeof NftSlugRoute
+  '/tokens/$symbol': typeof TokensSymbolRoute
+  '/tx/$hash': typeof TxHashRoute
+  '/wallet/$address': typeof WalletAddressRoute
+  '/merchants/': typeof MerchantsIndexRoute
+  '/nft/': typeof NftIndexRoute
+  '/tokens/': typeof TokensIndexRoute
+  '/api/public/analytics': typeof ApiPublicAnalyticsRoute
+  '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
+  '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
+  '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
+  '/api/public/nft/$slug': typeof ApiPublicNftSlugRoute
+  '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
+  '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
+  '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/auth'
+    | '/explorer'
+    | '/sitemap.xml'
+    | '/admin'
+    | '/merchants/$id'
+    | '/nft/$slug'
+    | '/tokens/$symbol'
+    | '/tx/$hash'
+    | '/wallet/$address'
+    | '/merchants/'
+    | '/nft/'
+    | '/tokens/'
+    | '/api/public/analytics'
+    | '/api/public/transactions'
+    | '/api/public/ledger/bulk'
+    | '/api/public/ledger/record'
+    | '/api/public/merchant/$id'
+    | '/api/public/nft/$slug'
+    | '/api/public/token/$symbol'
+    | '/api/public/transaction/$hash'
+    | '/api/public/wallet/$address'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/analytics'
+    | '/auth'
+    | '/explorer'
+    | '/sitemap.xml'
+    | '/admin'
+    | '/merchants/$id'
+    | '/nft/$slug'
+    | '/tokens/$symbol'
+    | '/tx/$hash'
+    | '/wallet/$address'
+    | '/merchants'
+    | '/nft'
+    | '/tokens'
+    | '/api/public/analytics'
+    | '/api/public/transactions'
+    | '/api/public/ledger/bulk'
+    | '/api/public/ledger/record'
+    | '/api/public/merchant/$id'
+    | '/api/public/nft/$slug'
+    | '/api/public/token/$symbol'
+    | '/api/public/transaction/$hash'
+    | '/api/public/wallet/$address'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/analytics'
+    | '/auth'
+    | '/explorer'
+    | '/sitemap.xml'
+    | '/_authenticated/admin'
+    | '/merchants/$id'
+    | '/nft/$slug'
+    | '/tokens/$symbol'
+    | '/tx/$hash'
+    | '/wallet/$address'
+    | '/merchants/'
+    | '/nft/'
+    | '/tokens/'
+    | '/api/public/analytics'
+    | '/api/public/transactions'
+    | '/api/public/ledger/bulk'
+    | '/api/public/ledger/record'
+    | '/api/public/merchant/$id'
+    | '/api/public/nft/$slug'
+    | '/api/public/token/$symbol'
+    | '/api/public/transaction/$hash'
+    | '/api/public/wallet/$address'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AnalyticsRoute: typeof AnalyticsRoute
+  AuthRoute: typeof AuthRoute
+  ExplorerRoute: typeof ExplorerRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  MerchantsIdRoute: typeof MerchantsIdRoute
+  NftSlugRoute: typeof NftSlugRoute
+  TokensSymbolRoute: typeof TokensSymbolRoute
+  TxHashRoute: typeof TxHashRoute
+  WalletAddressRoute: typeof WalletAddressRoute
+  MerchantsIndexRoute: typeof MerchantsIndexRoute
+  NftIndexRoute: typeof NftIndexRoute
+  TokensIndexRoute: typeof TokensIndexRoute
+  ApiPublicAnalyticsRoute: typeof ApiPublicAnalyticsRoute
+  ApiPublicTransactionsRoute: typeof ApiPublicTransactionsRoute
+  ApiPublicLedgerBulkRoute: typeof ApiPublicLedgerBulkRoute
+  ApiPublicLedgerRecordRoute: typeof ApiPublicLedgerRecordRoute
+  ApiPublicMerchantIdRoute: typeof ApiPublicMerchantIdRoute
+  ApiPublicNftSlugRoute: typeof ApiPublicNftSlugRoute
+  ApiPublicTokenSymbolRoute: typeof ApiPublicTokenSymbolRoute
+  ApiPublicTransactionHashRoute: typeof ApiPublicTransactionHashRoute
+  ApiPublicWalletAddressRoute: typeof ApiPublicWalletAddressRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorer': {
+      id: '/explorer'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof ExplorerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +381,171 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tokens/': {
+      id: '/tokens/'
+      path: '/tokens'
+      fullPath: '/tokens/'
+      preLoaderRoute: typeof TokensIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nft/': {
+      id: '/nft/'
+      path: '/nft'
+      fullPath: '/nft/'
+      preLoaderRoute: typeof NftIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchants/': {
+      id: '/merchants/'
+      path: '/merchants'
+      fullPath: '/merchants/'
+      preLoaderRoute: typeof MerchantsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet/$address': {
+      id: '/wallet/$address'
+      path: '/wallet/$address'
+      fullPath: '/wallet/$address'
+      preLoaderRoute: typeof WalletAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tx/$hash': {
+      id: '/tx/$hash'
+      path: '/tx/$hash'
+      fullPath: '/tx/$hash'
+      preLoaderRoute: typeof TxHashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tokens/$symbol': {
+      id: '/tokens/$symbol'
+      path: '/tokens/$symbol'
+      fullPath: '/tokens/$symbol'
+      preLoaderRoute: typeof TokensSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nft/$slug': {
+      id: '/nft/$slug'
+      path: '/nft/$slug'
+      fullPath: '/nft/$slug'
+      preLoaderRoute: typeof NftSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchants/$id': {
+      id: '/merchants/$id'
+      path: '/merchants/$id'
+      fullPath: '/merchants/$id'
+      preLoaderRoute: typeof MerchantsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/transactions': {
+      id: '/api/public/transactions'
+      path: '/api/public/transactions'
+      fullPath: '/api/public/transactions'
+      preLoaderRoute: typeof ApiPublicTransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/analytics': {
+      id: '/api/public/analytics'
+      path: '/api/public/analytics'
+      fullPath: '/api/public/analytics'
+      preLoaderRoute: typeof ApiPublicAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/wallet/$address': {
+      id: '/api/public/wallet/$address'
+      path: '/api/public/wallet/$address'
+      fullPath: '/api/public/wallet/$address'
+      preLoaderRoute: typeof ApiPublicWalletAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/transaction/$hash': {
+      id: '/api/public/transaction/$hash'
+      path: '/api/public/transaction/$hash'
+      fullPath: '/api/public/transaction/$hash'
+      preLoaderRoute: typeof ApiPublicTransactionHashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/token/$symbol': {
+      id: '/api/public/token/$symbol'
+      path: '/api/public/token/$symbol'
+      fullPath: '/api/public/token/$symbol'
+      preLoaderRoute: typeof ApiPublicTokenSymbolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/nft/$slug': {
+      id: '/api/public/nft/$slug'
+      path: '/api/public/nft/$slug'
+      fullPath: '/api/public/nft/$slug'
+      preLoaderRoute: typeof ApiPublicNftSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/merchant/$id': {
+      id: '/api/public/merchant/$id'
+      path: '/api/public/merchant/$id'
+      fullPath: '/api/public/merchant/$id'
+      preLoaderRoute: typeof ApiPublicMerchantIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ledger/record': {
+      id: '/api/public/ledger/record'
+      path: '/api/public/ledger/record'
+      fullPath: '/api/public/ledger/record'
+      preLoaderRoute: typeof ApiPublicLedgerRecordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ledger/bulk': {
+      id: '/api/public/ledger/bulk'
+      path: '/api/public/ledger/bulk'
+      fullPath: '/api/public/ledger/bulk'
+      preLoaderRoute: typeof ApiPublicLedgerBulkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AnalyticsRoute: AnalyticsRoute,
+  AuthRoute: AuthRoute,
+  ExplorerRoute: ExplorerRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  MerchantsIdRoute: MerchantsIdRoute,
+  NftSlugRoute: NftSlugRoute,
+  TokensSymbolRoute: TokensSymbolRoute,
+  TxHashRoute: TxHashRoute,
+  WalletAddressRoute: WalletAddressRoute,
+  MerchantsIndexRoute: MerchantsIndexRoute,
+  NftIndexRoute: NftIndexRoute,
+  TokensIndexRoute: TokensIndexRoute,
+  ApiPublicAnalyticsRoute: ApiPublicAnalyticsRoute,
+  ApiPublicTransactionsRoute: ApiPublicTransactionsRoute,
+  ApiPublicLedgerBulkRoute: ApiPublicLedgerBulkRoute,
+  ApiPublicLedgerRecordRoute: ApiPublicLedgerRecordRoute,
+  ApiPublicMerchantIdRoute: ApiPublicMerchantIdRoute,
+  ApiPublicNftSlugRoute: ApiPublicNftSlugRoute,
+  ApiPublicTokenSymbolRoute: ApiPublicTokenSymbolRoute,
+  ApiPublicTransactionHashRoute: ApiPublicTransactionHashRoute,
+  ApiPublicWalletAddressRoute: ApiPublicWalletAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
