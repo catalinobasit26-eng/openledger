@@ -179,6 +179,54 @@ export type Database = {
         }
         Relationships: []
       }
+      integrations: {
+        Row: {
+          api_key: string | null
+          base_url: string | null
+          created_at: string
+          display_name: string
+          enabled: boolean
+          id: string
+          last_sync_at: string | null
+          last_sync_count: number
+          last_sync_error: string | null
+          last_sync_status: string | null
+          slug: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          base_url?: string | null
+          created_at?: string
+          display_name: string
+          enabled?: boolean
+          id?: string
+          last_sync_at?: string | null
+          last_sync_count?: number
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          slug: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          base_url?: string | null
+          created_at?: string
+          display_name?: string
+          enabled?: boolean
+          id?: string
+          last_sync_at?: string | null
+          last_sync_count?: number
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          slug?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       ledger_blocks: {
         Row: {
           block_number: number
