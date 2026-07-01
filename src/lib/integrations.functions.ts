@@ -43,23 +43,62 @@ type TxType =
   | "merchant_payment" | "withdrawal" | "deposit" | "refund";
 type SourcePlatform = "openpay" | "openpay_pro";
 
-function mapIncoming(item: any, source: SourcePlatform) {
+// OpenPay Pro ledger types → our internal enum
+const PRO_TYPE_MAP: Record<string, TxType> = {
+  send: "transfer",
+  receive: "transfer",
+  buy: "deposit",
+  sell: "withdrawal",
+  swap: "swap",
+  mint: "nft_mint",
+};
+
+function mapProEntry(item: any): Record<string, any> {
+  const typeRaw = String(item.type ?? "send").toLowerCase();
+  const type = PRO_TYPE_MAP[typeRaw] ?? "transfer";
+  const statusRaw = String(item.status ?? "confirmed").toLowerCase();
+  const status = (["pending", "confirmed", "failed", "reversed"].includes(statusRaw)
+    ? statusRaw : "confirmed") as "pending" | "confirmed" | "failed" | "reversed";
+  return {
+    p_source: "openpay_pro",
+    p_type: type,
+    p_from: item.from_address ?? null,
+    p_to: item.to_address ?? null,
+    p_amount: Number(item.amount ?? 0),
+    p_currency: String(item.asset ?? "OPEN"),
+    p_fee: 0,
+    p_status: status,
+    p_merchant_id: null,
+    p_external_ref: String(item.id ?? item.sequence ?? item.tx_id ?? ""),
+    p_metadata: {
+      sequence: item.sequence,
+      tx_id: item.tx_id,
+      tx_hash: item.tx_hash,
+      usd_value: item.usd_value,
+      memo: item.memo,
+      original_type: typeRaw,
+    },
+    p_ts: item.occurred_at ?? new Date().toISOString(),
+  };
+}
+
+function mapGeneric(item: any, source: SourcePlatform): Record<string, any> {
   const typeRaw = String(item.type ?? item.kind ?? "payment").toLowerCase();
   const allowedTypes: TxType[] = [
-    "payment","transfer","swap","nft_mint","nft_sale",
-    "merchant_payment","withdrawal","deposit","refund",
+    "payment", "transfer", "swap", "nft_mint", "nft_sale",
+    "merchant_payment", "withdrawal", "deposit", "refund",
   ];
   const type = (allowedTypes.includes(typeRaw as TxType) ? typeRaw : "payment") as TxType;
   const statusRaw = String(item.status ?? "confirmed").toLowerCase();
-  const status = (["pending","confirmed","failed","reversed"].includes(statusRaw) ? statusRaw : "confirmed") as
-    "pending" | "confirmed" | "failed" | "reversed";
+  const status = (["pending", "confirmed", "failed", "reversed"].includes(statusRaw)
+    ? statusRaw : "confirmed") as "pending" | "confirmed" | "failed" | "reversed";
   return {
     p_source: source,
     p_type: type,
     p_from: item.from ?? item.from_address ?? item.sender ?? null,
     p_to: item.to ?? item.to_address ?? item.recipient ?? null,
     p_amount: Number(item.amount ?? item.value ?? 0),
-    p_currency: String(item.currency ?? item.token ?? item.symbol ?? "OPEN"),
+    p_currency: String(item.currency ?? item.token ?? item.symbol ?? item.asset ?? "OPEN"),
     p_fee: Number(item.fee ?? item.network_fee ?? 0),
     p_status: status,
     p_merchant_id: item.merchant_id ?? item.merchant ?? null,
@@ -67,6 +106,50 @@ function mapIncoming(item: any, source: SourcePlatform) {
     p_metadata: item.metadata ?? {},
     p_ts: item.timestamp ?? item.created_at ?? item.ts ?? new Date().toISOString(),
   };
+}
+
+async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
+  const base = baseUrl.replace(/\/$/, "");
+  const items: any[] = [];
+  const headers = { "x-api-key": apiKey, accept: "application/json" };
+  let cursor: string | null = null;
+  const maxPages = 20;
+  for (let i = 0; i < maxPages; i++) {
+    const u = new URL(`${base}/api/public/ledger/entries`);
+    u.searchParams.set("limit", "500");
+    if (cursor) u.searchParams.set("cursor", cursor);
+    else if (since) u.searchParams.set("since", since);
+    const res = await fetch(u.toString(), { headers });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
+    }
+    const body: any = await res.json();
+    const data: any[] = Array.isArray(body?.data) ? body.data : [];
+    items.push(...data);
+    cursor = body?.next_cursor ? String(body.next_cursor) : null;
+    if (!cursor || data.length === 0) break;
+  }
+  return items;
+}
+
+async function fetchGeneric(baseUrl: string, apiKey: string, since: string) {
+  const url = `${baseUrl.replace(/\/$/, "")}/api/transactions?since=${encodeURIComponent(since)}&limit=500`;
+  const res = await fetch(url, {
+    headers: {
+      authorization: `Bearer ${apiKey}`,
+      "x-api-key": apiKey,
+      accept: "application/json",
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
+  }
+  const payload: any = await res.json();
+  return Array.isArray(payload) ? payload
+    : Array.isArray(payload?.transactions) ? payload.transactions
+    : Array.isArray(payload?.data) ? payload.data : [];
 }
 
 export const syncIntegration = createServerFn({ method: "POST" })
@@ -86,52 +169,29 @@ export const syncIntegration = createServerFn({ method: "POST" })
     if (!integ.base_url || !integ.api_key) throw new Error("base_url and api_key are required before syncing");
     if (!integ.enabled) throw new Error("Integration is disabled");
 
-    const since = integ.last_sync_at ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const url = `${integ.base_url.replace(/\/$/, "")}/api/transactions?since=${encodeURIComponent(since)}&limit=200`;
+    const since = integ.last_sync_at ?? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    let res: Response;
+    let items: any[] = [];
     try {
-      res = await fetch(url, {
-        headers: {
-          "authorization": `Bearer ${integ.api_key}`,
-          "accept": "application/json",
-        },
-      });
+      items = data.slug === "openpay_pro"
+        ? await fetchOpenPayPro(integ.base_url, integ.api_key, since)
+        : await fetchGeneric(integ.base_url, integ.api_key, since);
     } catch (e: any) {
       await supabaseAdmin.from("integrations").update({
         last_sync_at: new Date().toISOString(),
         last_sync_status: "error",
-        last_sync_error: `fetch failed: ${e?.message ?? e}`,
+        last_sync_error: `${e?.message ?? e}`.slice(0, 500),
         last_sync_count: 0,
       }).eq("id", integ.id);
-      throw new Error(`Could not reach ${integ.display_name}: ${e?.message ?? e}`);
+      throw new Error(`${integ.display_name}: ${e?.message ?? e}`);
     }
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      await supabaseAdmin.from("integrations").update({
-        last_sync_at: new Date().toISOString(),
-        last_sync_status: "error",
-        last_sync_error: `HTTP ${res.status}: ${text.slice(0, 200)}`,
-        last_sync_count: 0,
-      }).eq("id", integ.id);
-      throw new Error(`${integ.display_name} returned HTTP ${res.status}`);
-    }
-
-    let payload: any;
-    try { payload = await res.json(); } catch {
-      throw new Error(`${integ.display_name} returned non-JSON response`);
-    }
-    const items: any[] = Array.isArray(payload)
-      ? payload
-      : Array.isArray(payload.transactions)
-      ? payload.transactions
-      : Array.isArray(payload.data) ? payload.data : [];
 
     let ok = 0, failed = 0;
     const errors: string[] = [];
     for (const item of items) {
-      const args = mapIncoming(item, data.slug as SourcePlatform);
+      const args = data.slug === "openpay_pro"
+        ? mapProEntry(item)
+        : mapGeneric(item, data.slug as SourcePlatform);
       const { error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any);
       if (rerr) { failed++; if (errors.length < 5) errors.push(rerr.message); }
       else ok++;
@@ -139,10 +199,11 @@ export const syncIntegration = createServerFn({ method: "POST" })
 
     await supabaseAdmin.from("integrations").update({
       last_sync_at: new Date().toISOString(),
-      last_sync_status: failed === 0 ? "ok" : "partial",
+      last_sync_status: failed === 0 ? "ok" : ok === 0 ? "error" : "partial",
       last_sync_error: errors[0] ?? null,
       last_sync_count: ok,
     }).eq("id", integ.id);
 
     return { ok, failed, total: items.length, errors };
   });
+
