@@ -1,0 +1,1 @@
+UPDATE public.integrations SET base_url = 'https://araojncyittkahvvpdrn.supabase.co/functions/v1/ledger-api' WHERE slug = 'openpay';

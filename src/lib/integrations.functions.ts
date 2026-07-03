@@ -133,23 +133,61 @@ async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
   return items;
 }
 
-async function fetchGeneric(baseUrl: string, apiKey: string, since: string) {
-  const url = `${baseUrl.replace(/\/$/, "")}/api/transactions?since=${encodeURIComponent(since)}&limit=500`;
-  const res = await fetch(url, {
-    headers: {
-      authorization: `Bearer ${apiKey}`,
-      "x-api-key": apiKey,
-      accept: "application/json",
-    },
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
+async function fetchOpenPay(baseUrl: string, apiKey: string, since: string) {
+  const base = baseUrl.replace(/\/$/, "");
+  const items: any[] = [];
+  const headers = { authorization: `Bearer ${apiKey}`, accept: "application/json" };
+  let cursor: string | null = null;
+  const maxPages = 20;
+  for (let i = 0; i < maxPages; i++) {
+    const u = new URL(`${base}/transactions`);
+    u.searchParams.set("limit", "200");
+    if (cursor) u.searchParams.set("cursor", cursor);
+    else if (since) u.searchParams.set("since", since);
+    const res = await fetch(u.toString(), { headers });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
+    }
+    const body: any = await res.json();
+    const data: any[] = Array.isArray(body?.data) ? body.data
+      : Array.isArray(body?.transactions) ? body.transactions
+      : Array.isArray(body) ? body : [];
+    items.push(...data);
+    cursor = body?.next_cursor ? String(body.next_cursor) : null;
+    if (!cursor || data.length === 0) break;
   }
-  const payload: any = await res.json();
-  return Array.isArray(payload) ? payload
-    : Array.isArray(payload?.transactions) ? payload.transactions
-    : Array.isArray(payload?.data) ? payload.data : [];
+  return items;
+}
+
+function mapOpenPay(item: any): Record<string, any> {
+  const typeRaw = String(item.type ?? item.kind ?? "payment").toLowerCase();
+  const allowedTypes = [
+    "payment", "transfer", "swap", "nft_mint", "nft_sale",
+    "merchant_payment", "withdrawal", "deposit", "refund",
+  ];
+  const type = (allowedTypes.includes(typeRaw) ? typeRaw : "payment") as TxType;
+  const statusRaw = String(item.status ?? "confirmed").toLowerCase();
+  const status = (["pending", "confirmed", "failed", "reversed"].includes(statusRaw)
+    ? statusRaw : "confirmed") as "pending" | "confirmed" | "failed" | "reversed";
+  return {
+    p_source: "openpay",
+    p_type: type,
+    p_from: item.sender_id ?? item.from ?? item.from_address ?? null,
+    p_to: item.receiver_id ?? item.to ?? item.to_address ?? null,
+    p_amount: Number(item.amount ?? 0),
+    p_currency: String(item.currency ?? item.asset ?? "OPEN"),
+    p_fee: Number(item.fee ?? item.network_fee ?? 0),
+    p_status: status,
+    p_merchant_id: item.merchant_id ?? null,
+    p_external_ref: String(item.id ?? ""),
+    p_metadata: {
+      note: item.note,
+      original_type: typeRaw,
+      ...(item.metadata ?? {}),
+    },
+    p_ts: item.created_at ?? item.occurred_at ?? item.timestamp ?? new Date().toISOString(),
+  };
 }
 
 export const syncIntegration = createServerFn({ method: "POST" })
@@ -175,7 +213,7 @@ export const syncIntegration = createServerFn({ method: "POST" })
     try {
       items = data.slug === "openpay_pro"
         ? await fetchOpenPayPro(integ.base_url, integ.api_key, since)
-        : await fetchGeneric(integ.base_url, integ.api_key, since);
+        : await fetchOpenPay(integ.base_url, integ.api_key, since);
     } catch (e: any) {
       await supabaseAdmin.from("integrations").update({
         last_sync_at: new Date().toISOString(),
@@ -191,7 +229,7 @@ export const syncIntegration = createServerFn({ method: "POST" })
     for (const item of items) {
       const args = data.slug === "openpay_pro"
         ? mapProEntry(item)
-        : mapGeneric(item, data.slug as SourcePlatform);
+        : mapOpenPay(item);
       const { error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any);
       if (rerr) { failed++; if (errors.length < 5) errors.push(rerr.message); }
       else ok++;
