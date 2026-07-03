@@ -229,7 +229,7 @@ export const syncIntegration = createServerFn({ method: "POST" })
     for (const item of items) {
       const args = data.slug === "openpay_pro"
         ? mapProEntry(item)
-        : mapGeneric(item, data.slug as SourcePlatform);
+        : mapOpenPay(item);
       const { error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any);
       if (rerr) { failed++; if (errors.length < 5) errors.push(rerr.message); }
       else ok++;
