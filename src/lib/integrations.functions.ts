@@ -238,8 +238,8 @@ export const syncIntegration = createServerFn({ method: "POST" })
     let items: any[] = [];
     try {
       items = data.slug === "openpay_pro"
-        ? await fetchOpenPayPro(integ.base_url, integ.api_key, since)
-        : await fetchOpenPay(integ.base_url, integ.api_key, since);
+        ? await fetchOpenPayPro(integ.base_url, integ.api_key ?? "", since)
+        : await fetchOpenPay(integ.base_url, integ.api_key ?? "", since);
     } catch (e: any) {
       await supabaseAdmin.from("integrations").update({
         last_sync_at: new Date().toISOString(),
