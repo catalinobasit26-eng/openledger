@@ -133,15 +133,16 @@ async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
   return items;
 }
 
-async function fetchOpenPay(baseUrl: string, apiKey: string, since: string) {
+async function fetchOpenPay(baseUrl: string, _apiKey: string, since: string) {
+  // OpenPay public ledger — no auth required. Cursor pagination via next_cursor.
   const base = baseUrl.replace(/\/$/, "");
   const items: any[] = [];
-  const headers = { authorization: `Bearer ${apiKey}`, accept: "application/json" };
+  const headers = { accept: "application/json" };
   let cursor: string | null = null;
   const maxPages = 20;
   for (let i = 0; i < maxPages; i++) {
-    const u = new URL(`${base}/transactions`);
-    u.searchParams.set("limit", "200");
+    const u = new URL(`${base}/public`);
+    u.searchParams.set("limit", "100");
     if (cursor) u.searchParams.set("cursor", cursor);
     else if (since) u.searchParams.set("since", since);
     const res = await fetch(u.toString(), { headers });
@@ -151,7 +152,7 @@ async function fetchOpenPay(baseUrl: string, apiKey: string, since: string) {
     }
     const body: any = await res.json();
     const data: any[] = Array.isArray(body?.data) ? body.data
-      : Array.isArray(body?.transactions) ? body.transactions
+      : Array.isArray(body?.events) ? body.events
       : Array.isArray(body) ? body : [];
     items.push(...data);
     cursor = body?.next_cursor ? String(body.next_cursor) : null;
@@ -160,33 +161,57 @@ async function fetchOpenPay(baseUrl: string, apiKey: string, since: string) {
   return items;
 }
 
+// OpenPay public-feed category → OpenLedger tx_type
+const OPENPAY_CATEGORY_MAP: Record<string, TxType> = {
+  topup: "deposit",
+  withdraw: "withdrawal",
+  swap: "swap",
+  nft: "nft_sale",
+  staking: "transfer",
+  loan: "transfer",
+  affiliate: "payment",
+  mining: "deposit",
+  other: "payment",
+};
+
 function mapOpenPay(item: any): Record<string, any> {
-  const typeRaw = String(item.type ?? item.kind ?? "payment").toLowerCase();
-  const allowedTypes = [
-    "payment", "transfer", "swap", "nft_mint", "nft_sale",
-    "merchant_payment", "withdrawal", "deposit", "refund",
-  ];
-  const type = (allowedTypes.includes(typeRaw) ? typeRaw : "payment") as TxType;
+  const category = String(item.category ?? "other").toLowerCase();
+  const eventType = String(item.event_type ?? "").toLowerCase();
+  const type: TxType = OPENPAY_CATEGORY_MAP[category] ??
+    (eventType.includes("nft") ? "nft_sale" : "payment");
+
   const statusRaw = String(item.status ?? "confirmed").toLowerCase();
-  const status = (["pending", "confirmed", "failed", "reversed"].includes(statusRaw)
-    ? statusRaw : "confirmed") as "pending" | "confirmed" | "failed" | "reversed";
+  const statusMap: Record<string, "pending" | "confirmed" | "failed" | "reversed"> = {
+    completed: "confirmed", confirmed: "confirmed",
+    pending: "pending", failed: "failed", reversed: "reversed",
+  };
+  const status = statusMap[statusRaw] ?? "confirmed";
+
+  const sender = item.sender ?? {};
+  const receiver = item.receiver ?? {};
+  const from = sender.username ?? sender.name ?? item.from_address ?? item.sender_id ?? null;
+  const to = receiver.username ?? receiver.name ?? item.to_address ?? item.receiver_id ?? null;
+
   return {
     p_source: "openpay",
     p_type: type,
-    p_from: item.sender_id ?? item.from ?? item.from_address ?? null,
-    p_to: item.receiver_id ?? item.to ?? item.to_address ?? null,
+    p_from: from,
+    p_to: to,
     p_amount: Number(item.amount ?? 0),
-    p_currency: String(item.currency ?? item.asset ?? "OPEN"),
-    p_fee: Number(item.fee ?? item.network_fee ?? 0),
+    p_currency: String(item.currency_code ?? item.currency ?? "OPEN"),
+    p_fee: 0,
     p_status: status,
-    p_merchant_id: item.merchant_id ?? null,
+    p_merchant_id: null,
     p_external_ref: String(item.id ?? ""),
     p_metadata: {
+      source_table: item.source_table,
+      event_type: item.event_type,
+      category,
       note: item.note,
-      original_type: typeRaw,
-      ...(item.metadata ?? {}),
+      sender,
+      receiver,
     },
-    p_ts: item.created_at ?? item.occurred_at ?? item.timestamp ?? new Date().toISOString(),
+    p_ts: item.occurred_at ?? item.created_at ?? new Date().toISOString(),
   };
 }
 
