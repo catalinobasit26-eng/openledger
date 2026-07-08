@@ -229,7 +229,8 @@ export const syncIntegration = createServerFn({ method: "POST" })
       .from("integrations").select("*").eq("slug", data.slug).maybeSingle();
     if (ierr) throw new Error(ierr.message);
     if (!integ) throw new Error("Integration not found");
-    if (!integ.base_url || !integ.api_key) throw new Error("base_url and api_key are required before syncing");
+    if (!integ.base_url) throw new Error("base_url is required before syncing");
+    if (data.slug !== "openpay" && !integ.api_key) throw new Error("api_key is required before syncing");
     if (!integ.enabled) throw new Error("Integration is disabled");
 
     const since = integ.last_sync_at ?? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
