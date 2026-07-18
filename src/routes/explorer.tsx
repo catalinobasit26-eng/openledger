@@ -23,8 +23,11 @@ export const Route = createFileRoute("/explorer")({
 });
 
 function ExplorerPage() {
+  useLedgerRealtime();
   const { q } = Route.useSearch();
   const query = (q ?? "").trim();
+
+
 
   // Routing logic — if q looks like a hash/address/known id, navigate via results.
   const txResults = useQuery({
