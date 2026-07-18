@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "@/components/search-bar";
 import { TxTable } from "@/components/tx-table";
 import { shortAddress } from "@/lib/format";
+import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
+
 
 const searchSchema = z.object({ q: z.string().optional().catch("") });
 
