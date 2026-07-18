@@ -33,6 +33,7 @@ import { Route as ApiPublicNftSlugRouteImport } from './routes/api/public/nft.$s
 import { Route as ApiPublicMerchantIdRouteImport } from './routes/api/public/merchant.$id'
 import { Route as ApiPublicLedgerRecordRouteImport } from './routes/api/public/ledger.record'
 import { Route as ApiPublicLedgerBulkRouteImport } from './routes/api/public/ledger.bulk'
+import { Route as ApiPublicHooksSyncAllRouteImport } from './routes/api/public/hooks/sync-all'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -154,6 +155,11 @@ const ApiPublicLedgerBulkRoute = ApiPublicLedgerBulkRouteImport.update({
   path: '/api/public/ledger/bulk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksSyncAllRoute = ApiPublicHooksSyncAllRouteImport.update({
+  id: '/api/public/hooks/sync-all',
+  path: '/api/public/hooks/sync-all',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/tokens/': typeof TokensIndexRoute
   '/api/public/analytics': typeof ApiPublicAnalyticsRoute
   '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/tokens': typeof TokensIndexRoute
   '/api/public/analytics': typeof ApiPublicAnalyticsRoute
   '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/tokens/': typeof TokensIndexRoute
   '/api/public/analytics': typeof ApiPublicAnalyticsRoute
   '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/tokens/'
     | '/api/public/analytics'
     | '/api/public/transactions'
+    | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
     | '/api/public/merchant/$id'
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/tokens'
     | '/api/public/analytics'
     | '/api/public/transactions'
+    | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
     | '/api/public/merchant/$id'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '/tokens/'
     | '/api/public/analytics'
     | '/api/public/transactions'
+    | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
     | '/api/public/merchant/$id'
@@ -328,6 +340,7 @@ export interface RootRouteChildren {
   TokensIndexRoute: typeof TokensIndexRoute
   ApiPublicAnalyticsRoute: typeof ApiPublicAnalyticsRoute
   ApiPublicTransactionsRoute: typeof ApiPublicTransactionsRoute
+  ApiPublicHooksSyncAllRoute: typeof ApiPublicHooksSyncAllRoute
   ApiPublicLedgerBulkRoute: typeof ApiPublicLedgerBulkRoute
   ApiPublicLedgerRecordRoute: typeof ApiPublicLedgerRecordRoute
   ApiPublicMerchantIdRoute: typeof ApiPublicMerchantIdRoute
@@ -507,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicLedgerBulkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sync-all': {
+      id: '/api/public/hooks/sync-all'
+      path: '/api/public/hooks/sync-all'
+      fullPath: '/api/public/hooks/sync-all'
+      preLoaderRoute: typeof ApiPublicHooksSyncAllRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -538,6 +558,7 @@ const rootRouteChildren: RootRouteChildren = {
   TokensIndexRoute: TokensIndexRoute,
   ApiPublicAnalyticsRoute: ApiPublicAnalyticsRoute,
   ApiPublicTransactionsRoute: ApiPublicTransactionsRoute,
+  ApiPublicHooksSyncAllRoute: ApiPublicHooksSyncAllRoute,
   ApiPublicLedgerBulkRoute: ApiPublicLedgerBulkRoute,
   ApiPublicLedgerRecordRoute: ApiPublicLedgerRecordRoute,
   ApiPublicMerchantIdRoute: ApiPublicMerchantIdRoute,
@@ -549,13 +570,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

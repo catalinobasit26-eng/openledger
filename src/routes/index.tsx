@@ -9,6 +9,8 @@ import { StatCard } from "@/components/stat-card";
 import { SearchBar } from "@/components/search-bar";
 import { TxTable } from "@/components/tx-table";
 import { formatInt, formatUsd } from "@/lib/format";
+import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,8 +25,10 @@ export const Route = createFileRoute("/")({
 });
 
 function DashboardPage() {
+  useLedgerRealtime();
   const stats = useQuery({
     queryKey: ["dashboard-stats"],
+
     queryFn: async () => {
       const [tx, vol, merch, wallets, nft, swaps, openpay, openpaypro] = await Promise.all([
         supabase.from("ledger_transactions").select("*", { count: "exact", head: true }),

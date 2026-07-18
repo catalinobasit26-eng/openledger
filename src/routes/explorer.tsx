@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "@/components/search-bar";
 import { TxTable } from "@/components/tx-table";
 import { shortAddress } from "@/lib/format";
+import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
+
 
 const searchSchema = z.object({ q: z.string().optional().catch("") });
 
@@ -21,8 +23,11 @@ export const Route = createFileRoute("/explorer")({
 });
 
 function ExplorerPage() {
+  useLedgerRealtime();
   const { q } = Route.useSearch();
   const query = (q ?? "").trim();
+
+
 
   // Routing logic — if q looks like a hash/address/known id, navigate via results.
   const txResults = useQuery({
