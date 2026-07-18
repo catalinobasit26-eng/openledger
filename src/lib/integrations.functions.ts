@@ -223,51 +223,9 @@ export const syncIntegration = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: integ, error: ierr } = await supabaseAdmin
-      .from("integrations").select("*").eq("slug", data.slug).maybeSingle();
-    if (ierr) throw new Error(ierr.message);
-    if (!integ) throw new Error("Integration not found");
-    if (!integ.base_url) throw new Error("base_url is required before syncing");
-    if (data.slug !== "openpay" && !integ.api_key) throw new Error("api_key is required before syncing");
-    if (!integ.enabled) throw new Error("Integration is disabled");
-
-    const since = integ.last_sync_at ?? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-    let items: any[] = [];
-    try {
-      items = data.slug === "openpay_pro"
-        ? await fetchOpenPayPro(integ.base_url, integ.api_key ?? "", since)
-        : await fetchOpenPay(integ.base_url, integ.api_key ?? "", since);
-    } catch (e: any) {
-      await supabaseAdmin.from("integrations").update({
-        last_sync_at: new Date().toISOString(),
-        last_sync_status: "error",
-        last_sync_error: `${e?.message ?? e}`.slice(0, 500),
-        last_sync_count: 0,
-      }).eq("id", integ.id);
-      throw new Error(`${integ.display_name}: ${e?.message ?? e}`);
-    }
-
-    let ok = 0, failed = 0;
-    const errors: string[] = [];
-    for (const item of items) {
-      const args = data.slug === "openpay_pro"
-        ? mapProEntry(item)
-        : mapOpenPay(item);
-      const { error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any);
-      if (rerr) { failed++; if (errors.length < 5) errors.push(rerr.message); }
-      else ok++;
-    }
-
-    await supabaseAdmin.from("integrations").update({
-      last_sync_at: new Date().toISOString(),
-      last_sync_status: failed === 0 ? "ok" : ok === 0 ? "error" : "partial",
-      last_sync_error: errors[0] ?? null,
-      last_sync_count: ok,
-    }).eq("id", integ.id);
-
-    return { ok, failed, total: items.length, errors };
+    const { runSync } = await import("./integrations-sync.server");
+    const r = await runSync(data.slug);
+    return { ok: r.ok, failed: r.failed, total: r.total, errors: r.errors };
   });
+
 
