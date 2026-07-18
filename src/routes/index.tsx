@@ -9,6 +9,8 @@ import { StatCard } from "@/components/stat-card";
 import { SearchBar } from "@/components/search-bar";
 import { TxTable } from "@/components/tx-table";
 import { formatInt, formatUsd } from "@/lib/format";
+import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
