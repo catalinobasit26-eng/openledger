@@ -140,13 +140,22 @@ async function fetchOpenPayNft(baseUrl: string, since: string) {
   const items: any[] = [];
   const headers: Record<string, string> = { accept: "application/json" };
   const sinceMs = since ? new Date(since).getTime() : 0;
-  for (let offset = 0; offset < 5000; offset += 100) {
+  const PAGE = 10; // upstream 546s (WORKER_RESOURCE_LIMIT) on larger limits
+  for (let offset = 0; offset < 2000; offset += PAGE) {
     const u = new URL(`${base}/activity`);
-    u.searchParams.set("limit", "100");
+    u.searchParams.set("limit", String(PAGE));
     u.searchParams.set("offset", String(offset));
-    const res = await fetch(u.toString(), { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
-    const body: any = await res.json();
+    let body: any = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const res = await fetch(u.toString(), { headers });
+      if (res.ok) { body = await res.json(); break; }
+      if (res.status === 546 || res.status === 503 || res.status === 429) {
+        await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+        continue;
+      }
+      throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    }
+    if (!body) break; // upstream exhausted; stop gracefully with what we have
     const data: any[] = Array.isArray(body?.activity) ? body.activity
       : Array.isArray(body?.data) ? body.data
       : Array.isArray(body) ? body : [];
@@ -157,7 +166,7 @@ async function fetchOpenPayNft(baseUrl: string, since: string) {
       if (sinceMs && ts <= sinceMs) { stop = true; continue; }
       items.push(ev);
     }
-    if (stop || data.length < 100) break;
+    if (stop || data.length < PAGE) break;
   }
   return items;
 }
@@ -193,7 +202,7 @@ function mapNftActivity(item: any): Record<string, any> {
 async function syncNftCollections(baseUrl: string, admin: any) {
   const base = baseUrl.replace(/\/$/, "");
   try {
-    const res = await fetch(`${base}/collections?limit=200`, { headers: { accept: "application/json" } });
+    const res = await fetch(`${base}/collections?limit=20`, { headers: { accept: "application/json" } });
     if (!res.ok) return;
     const body: any = await res.json();
     const list: any[] = Array.isArray(body?.collections) ? body.collections
