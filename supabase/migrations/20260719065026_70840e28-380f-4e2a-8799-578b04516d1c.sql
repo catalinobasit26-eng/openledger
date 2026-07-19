@@ -1,0 +1,1 @@
+ALTER TYPE public.source_platform ADD VALUE IF NOT EXISTS 'openpay_nft';

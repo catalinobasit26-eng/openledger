@@ -632,7 +632,7 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "auditor" | "support"
-      source_platform: "openpay" | "openpay_pro"
+      source_platform: "openpay" | "openpay_pro" | "openpay_nft"
       tx_status: "pending" | "confirmed" | "failed" | "reversed"
       tx_type:
         | "payment"
@@ -772,7 +772,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "auditor", "support"],
-      source_platform: ["openpay", "openpay_pro"],
+      source_platform: ["openpay", "openpay_pro", "openpay_nft"],
       tx_status: ["pending", "confirmed", "failed", "reversed"],
       tx_type: [
         "payment",
