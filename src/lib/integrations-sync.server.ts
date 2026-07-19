@@ -202,7 +202,7 @@ function mapNftActivity(item: any): Record<string, any> {
 async function syncNftCollections(baseUrl: string, admin: any) {
   const base = baseUrl.replace(/\/$/, "");
   try {
-    const res = await fetch(`${base}/collections?limit=200`, { headers: { accept: "application/json" } });
+    const res = await fetch(`${base}/collections?limit=20`, { headers: { accept: "application/json" } });
     if (!res.ok) return;
     const body: any = await res.json();
     const list: any[] = Array.isArray(body?.collections) ? body.collections
