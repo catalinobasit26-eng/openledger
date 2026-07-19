@@ -628,6 +628,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      refresh_analytics_daily: { Args: { _day: string }; Returns: undefined }
     }
     Enums: {
       app_role: "super_admin" | "auditor" | "support"
