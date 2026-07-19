@@ -121,6 +121,128 @@ async function fetchOpenPay(baseUrl: string, apiKey: string, since: string) {
   return items;
 }
 
+// ============ OpenPay NFT (public marketplace API) ============
+
+const NFT_TYPE_MAP: Record<string, TxType> = {
+  mint: "nft_mint",
+  sale: "nft_sale",
+  primary_sale: "nft_sale",
+  resale: "nft_sale",
+  auction: "nft_sale",
+  auction_settlement: "nft_sale",
+  bid: "nft_sale",
+  gift: "transfer",
+  transfer: "transfer",
+};
+
+async function fetchOpenPayNft(baseUrl: string, since: string) {
+  const base = baseUrl.replace(/\/$/, "");
+  const items: any[] = [];
+  const headers: Record<string, string> = { accept: "application/json" };
+  const sinceMs = since ? new Date(since).getTime() : 0;
+  for (let offset = 0; offset < 5000; offset += 100) {
+    const u = new URL(`${base}/activity`);
+    u.searchParams.set("limit", "100");
+    u.searchParams.set("offset", String(offset));
+    const res = await fetch(u.toString(), { headers });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    const body: any = await res.json();
+    const data: any[] = Array.isArray(body?.activity) ? body.activity
+      : Array.isArray(body?.data) ? body.data
+      : Array.isArray(body) ? body : [];
+    if (data.length === 0) break;
+    let stop = false;
+    for (const ev of data) {
+      const ts = new Date(ev.created_at ?? ev.ts ?? Date.now()).getTime();
+      if (sinceMs && ts <= sinceMs) { stop = true; continue; }
+      items.push(ev);
+    }
+    if (stop || data.length < 100) break;
+  }
+  return items;
+}
+
+function mapNftActivity(item: any): Record<string, any> {
+  const typeRaw = String(item.type ?? "sale").toLowerCase();
+  const type: TxType = NFT_TYPE_MAP[typeRaw] ?? "nft_sale";
+  return {
+    p_source: "openpay_nft",
+    p_type: type,
+    p_from: item.seller_id ?? item.from ?? item.item?.creator_id ?? null,
+    p_to: item.buyer_id ?? item.to ?? null,
+    p_amount: Number(item.total ?? item.price_each ?? 0),
+    p_currency: String(item.currency ?? "OUSD"),
+    p_fee: Number(item.platform_fee ?? 0) + Number(item.royalty_amount ?? 0),
+    p_status: "confirmed" as const,
+    p_merchant_id: null,
+    p_external_ref: String(item.id ?? ""),
+    p_metadata: {
+      original_type: typeRaw,
+      quantity: item.quantity,
+      price_each: item.price_each,
+      royalty_amount: item.royalty_amount,
+      platform_fee: item.platform_fee,
+      payment_method: item.payment_method,
+      item: item.item,
+      collection_id: item.item?.collection_id,
+    },
+    p_ts: item.created_at ?? new Date().toISOString(),
+  };
+}
+
+async function syncNftCollections(baseUrl: string, admin: any) {
+  const base = baseUrl.replace(/\/$/, "");
+  try {
+    const res = await fetch(`${base}/collections?limit=200`, { headers: { accept: "application/json" } });
+    if (!res.ok) return;
+    const body: any = await res.json();
+    const list: any[] = Array.isArray(body?.collections) ? body.collections
+      : Array.isArray(body?.data) ? body.data
+      : Array.isArray(body) ? body : [];
+    for (const c of list) {
+      const slug = String(c.code ?? c.slug ?? c.id ?? "").toLowerCase();
+      if (!slug) continue;
+      await admin.from("nft_collections").upsert({
+        slug,
+        name: String(c.name ?? slug),
+        description: c.description ?? null,
+        image_url: c.image_url ?? null,
+        creator_address: c.creator_id ?? c.creator_address ?? null,
+        total_supply: Number(c.total_supply ?? c.item_count ?? 0),
+        owners: Number(c.owners ?? 0),
+        floor_price: Number(c.floor_price ?? 0),
+        volume: Number(c.volume ?? 0),
+      }, { onConflict: "slug" });
+    }
+  } catch { /* best-effort */ }
+}
+
+async function recordNftEvent(admin: any, ev: any) {
+  const collId = ev.item?.collection_id;
+  if (!collId) return;
+  // Find or create collection by external id
+  let { data: coll } = await admin.from("nft_collections").select("id").eq("slug", String(collId).toLowerCase()).maybeSingle();
+  if (!coll) {
+    const { data: created } = await admin.from("nft_collections").upsert({
+      slug: String(collId).toLowerCase(),
+      name: ev.item?.collection_name ?? `Collection ${String(collId).slice(0, 8)}`,
+    }, { onConflict: "slug" }).select("id").maybeSingle();
+    coll = created;
+  }
+  if (!coll) return;
+  await admin.from("nft_transactions").upsert({
+    collection_id: coll.id,
+    token_id: String(ev.item?.code ?? ev.item?.id ?? ev.id),
+    event_type: String(ev.type ?? "sale"),
+    from_address: ev.seller_id ?? null,
+    to_address: ev.buyer_id ?? null,
+    price: Number(ev.total ?? 0),
+    currency: String(ev.currency ?? "OUSD"),
+    tx_hash: String(ev.id ?? ""),
+    ts: ev.created_at ?? new Date().toISOString(),
+  });
+}
+
 export async function runSync(slug: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: integ, error: ierr } = await supabaseAdmin
@@ -128,16 +250,18 @@ export async function runSync(slug: string) {
   if (ierr) throw new Error(ierr.message);
   if (!integ) throw new Error("Integration not found");
   if (!integ.base_url) throw new Error("base_url is required before syncing");
-  if (slug !== "openpay" && !integ.api_key) throw new Error("api_key is required before syncing");
+  if (slug !== "openpay" && slug !== "openpay_nft" && !integ.api_key) throw new Error("api_key is required before syncing");
   if (!integ.enabled) throw new Error("Integration is disabled");
 
   const since = integ.last_sync_at ?? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   let items: any[] = [];
   try {
-    items = slug === "openpay_pro"
-      ? await fetchOpenPayPro(integ.base_url, integ.api_key ?? "", since)
-      : await fetchOpenPay(integ.base_url, integ.api_key ?? "", since);
+    if (slug === "openpay_pro") items = await fetchOpenPayPro(integ.base_url, integ.api_key ?? "", since);
+    else if (slug === "openpay_nft") {
+      await syncNftCollections(integ.base_url, supabaseAdmin);
+      items = await fetchOpenPayNft(integ.base_url, since);
+    } else items = await fetchOpenPay(integ.base_url, integ.api_key ?? "", since);
   } catch (e: any) {
     await supabaseAdmin.from("integrations").update({
       last_sync_at: new Date().toISOString(),
@@ -151,10 +275,17 @@ export async function runSync(slug: string) {
   let ok = 0, failed = 0;
   const errors: string[] = [];
   for (const item of items) {
-    const args = slug === "openpay_pro" ? mapProEntry(item) : mapOpenPay(item);
+    const args = slug === "openpay_pro" ? mapProEntry(item)
+      : slug === "openpay_nft" ? mapNftActivity(item)
+      : mapOpenPay(item);
     const { error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any);
     if (rerr) { failed++; if (errors.length < 5) errors.push(rerr.message); }
-    else ok++;
+    else {
+      ok++;
+      if (slug === "openpay_nft") {
+        try { await recordNftEvent(supabaseAdmin, item); } catch { /* best-effort */ }
+      }
+    }
   }
 
   await supabaseAdmin.from("integrations").update({
@@ -166,6 +297,7 @@ export async function runSync(slug: string) {
 
   return { slug, ok, failed, total: items.length, errors };
 }
+
 
 export async function runSyncAll() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
