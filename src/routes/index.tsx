@@ -93,23 +93,23 @@ function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 sm:p-10">
+      <section className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-5 sm:p-10">
         <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] sm:text-xs font-medium text-primary">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
             Live ledger · SHA-256 hash chain
           </div>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-4xl">
             The public explorer for the OpenPay ecosystem
           </h1>
-          <p className="mt-3 text-muted-foreground">
+          <p className="mt-3 text-sm sm:text-base text-muted-foreground">
             Search and verify every transaction from OpenPay and OpenPay Pro. Track wallets, merchants, tokens, NFTs, and the daily pulse of the network.
           </p>
           <div className="mt-6"><SearchBar size="lg" /></div>
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Total Transactions" value={formatInt(s?.totalTx)} icon={<Activity className="h-4 w-4" />} />
         <StatCard label="Total Volume" value={formatUsd(s?.totalVolume)} sub="All currencies normalized" icon={<DollarSign className="h-4 w-4" />} />
         <StatCard label="Total Wallets" value={formatInt(s?.totalWallets)} icon={<Users className="h-4 w-4" />} />
