@@ -215,7 +215,7 @@ async function syncNftCollections(baseUrl: string, admin: any) {
         slug,
         name: String(c.name ?? slug),
         description: c.description ?? null,
-        image_url: c.image_url ?? null,
+        image_url: c.cover_url ?? c.image_url ?? c.banner_url ?? c.thumbnail_url ?? null,
         creator_address: c.creator_id ?? c.creator_address ?? null,
         total_supply: Number(c.total_supply ?? c.item_count ?? 0),
         owners: Number(c.owners ?? 0),
