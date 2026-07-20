@@ -124,19 +124,84 @@ function TxDetailPage() {
 
       {tx.metadata && Object.keys(tx.metadata as object).length > 0 && (
         <div className="rounded-xl border border-border bg-card p-5">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Metadata</div>
-          <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs">{JSON.stringify(tx.metadata, null, 2)}</pre>
+          <div className="mb-3 flex items-center justify-between">
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Metadata</div>
+            <div className="text-[10px] text-muted-foreground">Enriched fields from source event</div>
+          </div>
+          <MetadataGrid data={tx.metadata as Record<string, unknown>} />
+          <details className="mt-4 group">
+            <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground select-none">View raw JSON</summary>
+            <pre className="mt-2 overflow-x-auto rounded-md bg-muted p-3 text-[11px]">{JSON.stringify(tx.metadata, null, 2)}</pre>
+          </details>
         </div>
       )}
     </div>
   );
 }
 
+function MetadataGrid({ data }: { data: Record<string, unknown> }) {
+  const entries = Object.entries(data).filter(([, v]) => v !== null && v !== undefined && v !== "");
+  if (!entries.length) return null;
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {entries.map(([k, v]) => (
+        <div key={k} className="rounded-lg border border-border/70 bg-muted/30 p-3 min-w-0">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k.replace(/_/g, " ")}</div>
+          <div className="mt-1 text-sm break-all min-w-0">
+            <MetaValue value={v} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MetaValue({ value }: { value: unknown }) {
+  if (value === null || value === undefined) return <span className="text-muted-foreground">—</span>;
+  if (typeof value === "boolean") {
+    return <span className={value ? "text-success font-medium" : "text-muted-foreground"}>{value ? "Yes" : "No"}</span>;
+  }
+  if (typeof value === "number") return <span className="font-mono tabular-nums">{formatNumber(value)}</span>;
+  if (typeof value === "string") {
+    if (/^https?:\/\//i.test(value)) {
+      return <a href={value} target="_blank" rel="noreferrer" className="text-primary hover:underline break-all">{value}</a>;
+    }
+    if (/^\d{4}-\d{2}-\d{2}T/.test(value)) {
+      return <span className="text-sm">{fullDate(value)}</span>;
+    }
+    return <span>{value}</span>;
+  }
+  if (Array.isArray(value)) {
+    return (
+      <div className="flex flex-wrap gap-1">
+        {value.slice(0, 20).map((item, i) => (
+          <span key={i} className="inline-block rounded-md bg-background px-2 py-0.5 text-xs font-mono border border-border">
+            {typeof item === "object" ? JSON.stringify(item) : String(item)}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  if (typeof value === "object") {
+    return (
+      <div className="space-y-1">
+        {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
+          <div key={k} className="flex gap-2 text-xs">
+            <span className="text-muted-foreground shrink-0">{k}:</span>
+            <span className="break-all"><MetaValue value={v} /></span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return <span>{String(value)}</span>;
+}
+
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-3 gap-3 border-b border-border pb-3 last:border-0 last:pb-0">
       <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className="col-span-2">{children}</div>
+      <div className="col-span-2 min-w-0">{children}</div>
     </div>
   );
 }
