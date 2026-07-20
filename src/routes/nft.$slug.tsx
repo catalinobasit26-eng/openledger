@@ -36,10 +36,17 @@ function NftDetail() {
   if (!c) return <div className="text-sm text-muted-foreground">Collection not found.</div>;
   return (
     <div className="space-y-6">
-      <div>
-        <div className="text-xs uppercase tracking-wider text-muted-foreground">NFT Collection</div>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight">{c.name}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{c.description}</p>
+      <div className="grid gap-6 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start">
+        {c.image_url ? (
+          <img src={c.image_url} alt={c.name} loading="lazy" className="aspect-square w-full max-w-[160px] rounded-xl border border-border object-cover" />
+        ) : (
+          <div className="aspect-square w-full max-w-[160px] rounded-xl border border-dashed border-border bg-muted" />
+        )}
+        <div className="min-w-0">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">NFT Collection</div>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight break-words">{c.name}</h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{c.description}</p>
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Supply" value={formatInt(c.total_supply)} />
