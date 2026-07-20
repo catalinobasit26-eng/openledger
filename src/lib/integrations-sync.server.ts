@@ -229,14 +229,19 @@ async function syncNftCollections(baseUrl: string, admin: any) {
 async function recordNftEvent(admin: any, ev: any) {
   const collId = ev.item?.collection_id;
   if (!collId) return;
+  const slug = String(collId).toLowerCase();
+  const itemImg = ev.item?.image_url ?? ev.item?.cover_url ?? null;
   // Find or create collection by external id
-  let { data: coll } = await admin.from("nft_collections").select("id").eq("slug", String(collId).toLowerCase()).maybeSingle();
+  let { data: coll } = await admin.from("nft_collections").select("id,image_url").eq("slug", slug).maybeSingle();
   if (!coll) {
     const { data: created } = await admin.from("nft_collections").upsert({
-      slug: String(collId).toLowerCase(),
-      name: ev.item?.collection_name ?? `Collection ${String(collId).slice(0, 8)}`,
-    }, { onConflict: "slug" }).select("id").maybeSingle();
+      slug,
+      name: ev.item?.collection_name ?? ev.item?.name ?? `Collection ${slug.slice(0, 8)}`,
+      image_url: itemImg,
+    }, { onConflict: "slug" }).select("id,image_url").maybeSingle();
     coll = created;
+  } else if (!coll.image_url && itemImg) {
+    await admin.from("nft_collections").update({ image_url: itemImg }).eq("id", coll.id);
   }
   if (!coll) return;
   await admin.from("nft_transactions").upsert({
