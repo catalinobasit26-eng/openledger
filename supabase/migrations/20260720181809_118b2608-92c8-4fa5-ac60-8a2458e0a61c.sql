@@ -1,0 +1,1 @@
+UPDATE public.integrations SET last_sync_at = NULL WHERE slug = 'openpay_nft';
