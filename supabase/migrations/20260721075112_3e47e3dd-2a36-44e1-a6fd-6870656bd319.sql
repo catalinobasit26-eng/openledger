@@ -1,0 +1,1 @@
+TRUNCATE TABLE public.nft_transactions; TRUNCATE TABLE public.nft_collections CASCADE; UPDATE public.integrations SET last_sync_at = NULL, last_sync_error = NULL WHERE slug = 'openpay_nft';
