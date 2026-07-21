@@ -629,6 +629,7 @@ export type Database = {
         }
       }
       refresh_analytics_daily: { Args: { _day: string }; Returns: undefined }
+      refresh_nft_collection_stats: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "super_admin" | "auditor" | "support"

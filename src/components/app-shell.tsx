@@ -9,6 +9,7 @@ const navItems = [
   { to: "/", label: "Dashboard" },
   { to: "/explorer", label: "Explorer" },
   { to: "/tokens", label: "Tokens" },
+  { to: "/stable", label: "OUSD" },
   { to: "/nft", label: "NFTs" },
   { to: "/merchants", label: "Merchants" },
   { to: "/analytics", label: "Analytics" },

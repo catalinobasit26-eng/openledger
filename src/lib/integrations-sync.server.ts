@@ -201,27 +201,40 @@ function mapNftActivity(item: any): Record<string, any> {
 
 async function syncNftCollections(baseUrl: string, admin: any) {
   const base = baseUrl.replace(/\/$/, "");
+  const PAGE = 20;
   try {
-    const res = await fetch(`${base}/collections?limit=20`, { headers: { accept: "application/json" } });
-    if (!res.ok) return;
-    const body: any = await res.json();
-    const list: any[] = Array.isArray(body?.collections) ? body.collections
-      : Array.isArray(body?.data) ? body.data
-      : Array.isArray(body) ? body : [];
-    for (const c of list) {
-      const slug = String(c.code ?? c.slug ?? c.id ?? "").toLowerCase();
-      if (!slug) continue;
-      await admin.from("nft_collections").upsert({
-        slug,
-        name: String(c.name ?? slug),
-        description: c.description ?? null,
-        image_url: c.cover_url ?? c.image_url ?? c.banner_url ?? c.thumbnail_url ?? null,
-        creator_address: c.creator_id ?? c.creator_address ?? null,
-        total_supply: Number(c.total_supply ?? c.item_count ?? 0),
-        owners: Number(c.owners ?? 0),
-        floor_price: Number(c.floor_price ?? 0),
-        volume: Number(c.volume ?? 0),
-      }, { onConflict: "slug" });
+    for (let offset = 0; offset < 2000; offset += PAGE) {
+      const u = new URL(`${base}/collections`);
+      u.searchParams.set("limit", String(PAGE));
+      u.searchParams.set("offset", String(offset));
+      let body: any = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const res = await fetch(u.toString(), { headers: { accept: "application/json" } });
+        if (res.ok) { body = await res.json(); break; }
+        if (res.status === 546 || res.status === 503 || res.status === 429) {
+          await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+          continue;
+        }
+        return;
+      }
+      if (!body) break;
+      const list: any[] = Array.isArray(body?.collections) ? body.collections
+        : Array.isArray(body?.data) ? body.data
+        : Array.isArray(body) ? body : [];
+      if (list.length === 0) break;
+      for (const c of list) {
+        // Use collection id as slug so activity events (which carry collection_id) match on upsert.
+        const slug = String(c.id ?? c.code ?? "").toLowerCase();
+        if (!slug) continue;
+        await admin.from("nft_collections").upsert({
+          slug,
+          name: String(c.name ?? c.code ?? slug),
+          description: c.description ?? null,
+          image_url: c.cover_url ?? c.image_url ?? c.banner_url ?? c.thumbnail_url ?? null,
+          creator_address: c.creator_id ?? c.creator_address ?? null,
+        }, { onConflict: "slug" });
+      }
+      if (list.length < PAGE) break;
     }
   } catch { /* best-effort */ }
 }
@@ -231,12 +244,11 @@ async function recordNftEvent(admin: any, ev: any) {
   if (!collId) return;
   const slug = String(collId).toLowerCase();
   const itemImg = ev.item?.image_url ?? ev.item?.cover_url ?? null;
-  // Find or create collection by external id
   let { data: coll } = await admin.from("nft_collections").select("id,image_url").eq("slug", slug).maybeSingle();
   if (!coll) {
     const { data: created } = await admin.from("nft_collections").upsert({
       slug,
-      name: ev.item?.collection_name ?? ev.item?.name ?? `Collection ${slug.slice(0, 8)}`,
+      name: ev.item?.collection_name ?? `Collection ${slug.slice(0, 8)}`,
       image_url: itemImg,
     }, { onConflict: "slug" }).select("id,image_url").maybeSingle();
     coll = created;
@@ -250,7 +262,7 @@ async function recordNftEvent(admin: any, ev: any) {
     event_type: String(ev.type ?? "sale"),
     from_address: ev.seller_id ?? null,
     to_address: ev.buyer_id ?? null,
-    price: Number(ev.total ?? 0),
+    price: Number(ev.total ?? ev.price_each ?? 0),
     currency: String(ev.currency ?? "OUSD"),
     tx_hash: String(ev.id ?? ""),
     ts: ev.created_at ?? new Date().toISOString(),
@@ -300,6 +312,10 @@ export async function runSync(slug: string) {
         try { await recordNftEvent(supabaseAdmin, item); } catch { /* best-effort */ }
       }
     }
+  }
+
+  if (slug === "openpay_nft") {
+    try { await supabaseAdmin.rpc("refresh_nft_collection_stats" as any); } catch { /* best-effort */ }
   }
 
   await supabaseAdmin.from("integrations").update({
