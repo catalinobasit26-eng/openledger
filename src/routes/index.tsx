@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, ArrowLeftRight, DollarSign, Image, ShoppingBag, TrendingUp, Users, Zap } from "lucide-react";
+import { Activity, ArrowLeftRight, DollarSign, ExternalLink, Image, MessageCircle, ShoppingBag, TrendingUp, Users, Zap } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, Pie, PieChart } from "recharts";
 import { format, subDays } from "date-fns";
 
@@ -179,6 +179,27 @@ function DashboardPage() {
         </div>
       </section>
 
+      <section className="rounded-xl border border-border bg-card p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </span>
+          <h2 className="text-sm font-semibold">OpenPay Ecosystem</h2>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <EcosystemCard href="https://openpy.space" label="Try it today" sub="Pi Browser" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://openpyledger.space" label="OpenLedger" sub="Public explorer" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://openappdev.space" label="OpenApp" sub="Mobile app" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://openpy.space/blog" label="Read Our Blogs" sub="News & updates" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://t.me/openpayofficialbot" label="Telegram Mini App" sub="@openpayofficialbot" icon={<MessageCircle className="h-4 w-4" />} />
+          <EcosystemCard href="https://openpy.space/signin" label="External Browser" sub="Web sign-in" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://droplinkpi.space/@openpay" label="Follow Us" sub="droplinkpi.space" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://openpy.space/whitepaper" label="Whitepaper" sub="OpenPay docs" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://openpy.space/pitch-deck" label="Pitch Deck" sub="Investor deck" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://openpy.space/web3/nft" label="OpenNFT Marketplace" sub="NFTs & collectibles" icon={<ExternalLink className="h-4 w-4" />} />
+        </div>
+      </section>
+
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-semibold">Latest Transactions</h2>
@@ -187,5 +208,22 @@ function DashboardPage() {
         <TxTable rows={(recent.data ?? []) as any} dense />
       </section>
     </div>
+  );
+}
+
+function EcosystemCard({ href, label, sub, icon }: { href: string; label: string; sub: string; icon: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-center gap-3 rounded-lg border border-border bg-background p-3 transition hover:border-primary/30 hover:bg-primary/5"
+    >
+      <span className="shrink-0 text-muted-foreground group-hover:text-primary">{icon}</span>
+      <div className="min-w-0">
+        <div className="truncate text-sm font-medium text-foreground">{label}</div>
+        <div className="truncate text-xs text-muted-foreground">{sub}</div>
+      </div>
+    </a>
   );
 }
