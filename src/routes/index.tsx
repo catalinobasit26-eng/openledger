@@ -191,7 +191,7 @@ function DashboardPage() {
           <EcosystemCard href="https://openpy.space" label="Try it today" sub="Pi Browser" icon={<ExternalLink className="h-4 w-4" />} />
           <EcosystemCard href="https://openpyledger.space" label="OpenLedger" sub="Public explorer" icon={<ExternalLink className="h-4 w-4" />} />
           <EcosystemCard href="https://openappdev.space" label="OpenApp" sub="Mobile app" icon={<ExternalLink className="h-4 w-4" />} />
-          <EcosystemCard href="https://openpy.space/blog" label="Read Our Blogs" sub="News & updates" icon={<ExternalLink className="h-4 w-4" />} />
+          <EcosystemCard href="https://www.openpy.space/blog" label="Read Our Blogs" sub="News & updates" icon={<ExternalLink className="h-4 w-4" />} />
           <EcosystemCard href="https://t.me/openpayofficialbot" label="Telegram Mini App" sub="@openpayofficialbot" icon={<MessageCircle className="h-4 w-4" />} />
           <EcosystemCard href="https://openpy.space/signin" label="External Browser" sub="Web sign-in" icon={<ExternalLink className="h-4 w-4" />} />
           <EcosystemCard href="https://droplinkpi.space/@openpay" label="Follow Us" sub="droplinkpi.space" icon={<ExternalLink className="h-4 w-4" />} />
