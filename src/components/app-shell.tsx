@@ -124,7 +124,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div>
               <div className="mb-2 text-sm font-semibold text-foreground">Resources</div>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
-                <li><a href="https://openpy.space/blog" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Blog</a></li>
+                <li><a href="https://www.openpy.space/blog" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Blog</a></li>
                 <li><a href="https://openpy.space/whitepaper" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Whitepaper</a></li>
                 <li><a href="https://openpy.space/pitch-deck" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Pitch Deck</a></li>
                 <li><a href="https://openpy.space/web3/nft" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenNFT Marketplace</a></li>
