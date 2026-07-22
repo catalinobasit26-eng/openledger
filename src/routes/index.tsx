@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Activity, ArrowLeftRight, DollarSign, ExternalLink, Image, MessageCircle, ShoppingBag, TrendingUp, Users, Zap } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, Pie, PieChart } from "recharts";
 import { format, subDays } from "date-fns";
+import type { ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
@@ -211,7 +212,7 @@ function DashboardPage() {
   );
 }
 
-function EcosystemCard({ href, label, sub, icon }: { href: string; label: string; sub: string; icon: React.ReactNode }) {
+function EcosystemCard({ href, label, sub, icon }: { href: string; label: string; sub: string; icon: ReactNode }) {
   return (
     <a
       href={href}
