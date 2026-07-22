@@ -134,7 +134,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <div className="mb-2 text-sm font-semibold text-foreground">Community</div>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
                 <li><a href="https://droplinkpi.space/@openpay" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Follow Us · droplinkpi</a></li>
-                <li><a href="https://openpyledger.space" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenLedger</a></li>
+                <li><a href="https://openpy.space/ledger" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenLedger</a></li>
               </ul>
             </div>
             <div>
