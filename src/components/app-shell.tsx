@@ -84,12 +84,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </button>
               </>
             ) : !isAuth ? (
-              <Link
-                to="/auth"
+              <a
+                href="https://www.openpy.space/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
               >
                 Sign in
-              </Link>
+              </a>
             ) : null}
           </div>
         </div>
@@ -108,9 +110,41 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
       <footer className="mt-16 border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div>OpenLedger — the public transaction explorer and audit layer for the OpenPay ecosystem.</div>
-          <div className="font-mono">SHA-256 hash chain · Immutable audit</div>
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <div className="mb-2 text-sm font-semibold text-foreground">OpenPay Ecosystem</div>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
+                <li><a href="https://openpy.space" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Pi Browser · openpy.space</a></li>
+                <li><a href="https://t.me/openpayofficialbot" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Telegram Mini App</a></li>
+                <li><a href="https://openpy.space/signin" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">External Browser</a></li>
+                <li><a href="https://openappdev.space" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenApp</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="mb-2 text-sm font-semibold text-foreground">Resources</div>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
+                <li><a href="https://openpy.space/blog" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Blog</a></li>
+                <li><a href="https://openpy.space/whitepaper" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Whitepaper</a></li>
+                <li><a href="https://openpy.space/pitch-deck" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Pitch Deck</a></li>
+                <li><a href="https://openpy.space/web3/nft" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenNFT Marketplace</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="mb-2 text-sm font-semibold text-foreground">Community</div>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
+                <li><a href="https://droplinkpi.space/@openpay" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Follow Us · droplinkpi</a></li>
+                <li><a href="https://openpyledger.space" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenLedger</a></li>
+              </ul>
+            </div>
+            <div>
+              <div className="mb-2 text-sm font-semibold text-foreground">About</div>
+              <div className="text-xs text-muted-foreground">
+                OpenLedger — the public transaction explorer and audit layer for the OpenPay ecosystem.
+              </div>
+              <div className="mt-2 font-mono text-[10px] text-muted-foreground">SHA-256 hash chain · Immutable audit</div>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
