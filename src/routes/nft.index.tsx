@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { LayoutGrid, List as ListIcon, ImageOff } from "lucide-react";
+import { LayoutGrid, List as ListIcon } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { NftCover } from "@/components/nft-cover";
 import { PageLoader } from "@/components/page-loader";
 import { formatInt, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -23,27 +24,6 @@ type View = "grid" | "list";
 const COLLECTION_COLS =
   "id, slug, name, description, total_supply, owners, floor_price, volume, creator_address";
 
-function CoverImage({ src, alt, className }: { src?: string | null; alt: string; className?: string }) {
-  const [errored, setErrored] = useState(false);
-  const safe = src && /^https?:\/\//i.test(src) ? src : null;
-  if (!safe || errored) {
-    return (
-      <div className={cn("grid place-items-center bg-muted text-muted-foreground", className)}>
-        <ImageOff className="h-6 w-6 opacity-50" />
-      </div>
-    );
-  }
-  return (
-    <img
-      src={safe}
-      alt={alt}
-      loading="lazy"
-      onError={() => setErrored(true)}
-      className={cn("h-full w-full object-cover", className)}
-    />
-  );
-}
-
 function NftIndex() {
   const [view, setView] = useState<View>("grid");
   useEffect(() => {
@@ -55,7 +35,7 @@ function NftIndex() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["nft-collections"],
     queryFn: async () => {
-      // Prefer RPC that strips data-URLs; fall back to a light column select (avoid SELECT * timeouts).
+      // Prefer RPC that strips data-URLs from bulk payload; fall back to light columns.
       const rpc = await supabase.rpc("list_nft_collections" as any);
       if (!rpc.error && Array.isArray(rpc.data)) return rpc.data;
 
@@ -115,7 +95,7 @@ function NftIndex() {
               params={{ slug: c.slug }}
               className="group overflow-hidden rounded-xl border border-border bg-card transition hover:border-primary/40 hover:shadow-lg animate-fade-up"
             >
-              <CoverImage src={c.image_url} alt={c.name} className="aspect-square transition group-hover:scale-[1.02]" />
+              <NftCover slug={c.slug} collectionId={c.id} name={c.name} className="aspect-square transition group-hover:scale-[1.02]" />
               <div className="p-4">
                 <div className="truncate font-semibold">{c.name}</div>
                 {c.description ? (
@@ -150,7 +130,7 @@ function NftIndex() {
                   params={{ slug: c.slug }}
                   className="grid grid-cols-[48px_minmax(0,1fr)] items-center gap-3 px-4 py-3 transition hover:bg-muted/40 sm:grid-cols-[64px_minmax(0,1fr)_repeat(4,minmax(0,120px))]"
                 >
-                  <CoverImage src={c.image_url} alt={c.name} className="aspect-square shrink-0 rounded-md" />
+                  <NftCover slug={c.slug} collectionId={c.id} name={c.name} className="aspect-square shrink-0 rounded-md" />
                   <div className="min-w-0">
                     <div className="truncate font-medium">{c.name}</div>
                     {c.description ? (

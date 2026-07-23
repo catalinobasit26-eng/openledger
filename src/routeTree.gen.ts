@@ -35,6 +35,7 @@ import { Route as ApiPublicMerchantIdRouteImport } from './routes/api/public/mer
 import { Route as ApiPublicLedgerRecordRouteImport } from './routes/api/public/ledger.record'
 import { Route as ApiPublicLedgerBulkRouteImport } from './routes/api/public/ledger.bulk'
 import { Route as ApiPublicHooksSyncAllRouteImport } from './routes/api/public/hooks/sync-all'
+import { Route as ApiPublicNftSlugCoverRouteImport } from './routes/api/public/nft.$slug.cover'
 
 const StableRoute = StableRouteImport.update({
   id: '/stable',
@@ -166,6 +167,11 @@ const ApiPublicHooksSyncAllRoute = ApiPublicHooksSyncAllRouteImport.update({
   path: '/api/public/hooks/sync-all',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNftSlugCoverRoute = ApiPublicNftSlugCoverRouteImport.update({
+  id: '/cover',
+  path: '/cover',
+  getParentRoute: () => ApiPublicNftSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -189,10 +195,11 @@ export interface FileRoutesByFullPath {
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
-  '/api/public/nft/$slug': typeof ApiPublicNftSlugRoute
+  '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
   '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
   '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
+  '/api/public/nft/$slug/cover': typeof ApiPublicNftSlugCoverRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -216,10 +223,11 @@ export interface FileRoutesByTo {
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
-  '/api/public/nft/$slug': typeof ApiPublicNftSlugRoute
+  '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
   '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
   '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
+  '/api/public/nft/$slug/cover': typeof ApiPublicNftSlugCoverRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -245,10 +253,11 @@ export interface FileRoutesById {
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
-  '/api/public/nft/$slug': typeof ApiPublicNftSlugRoute
+  '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
   '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
   '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
+  '/api/public/nft/$slug/cover': typeof ApiPublicNftSlugCoverRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/api/public/token/$symbol'
     | '/api/public/transaction/$hash'
     | '/api/public/wallet/$address'
+    | '/api/public/nft/$slug/cover'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/api/public/token/$symbol'
     | '/api/public/transaction/$hash'
     | '/api/public/wallet/$address'
+    | '/api/public/nft/$slug/cover'
   id:
     | '__root__'
     | '/'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/api/public/token/$symbol'
     | '/api/public/transaction/$hash'
     | '/api/public/wallet/$address'
+    | '/api/public/nft/$slug/cover'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -357,7 +369,7 @@ export interface RootRouteChildren {
   ApiPublicLedgerBulkRoute: typeof ApiPublicLedgerBulkRoute
   ApiPublicLedgerRecordRoute: typeof ApiPublicLedgerRecordRoute
   ApiPublicMerchantIdRoute: typeof ApiPublicMerchantIdRoute
-  ApiPublicNftSlugRoute: typeof ApiPublicNftSlugRoute
+  ApiPublicNftSlugRoute: typeof ApiPublicNftSlugRouteWithChildren
   ApiPublicTokenSymbolRoute: typeof ApiPublicTokenSymbolRoute
   ApiPublicTransactionHashRoute: typeof ApiPublicTransactionHashRoute
   ApiPublicWalletAddressRoute: typeof ApiPublicWalletAddressRoute
@@ -547,6 +559,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncAllRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/nft/$slug/cover': {
+      id: '/api/public/nft/$slug/cover'
+      path: '/cover'
+      fullPath: '/api/public/nft/$slug/cover'
+      preLoaderRoute: typeof ApiPublicNftSlugCoverRouteImport
+      parentRoute: typeof ApiPublicNftSlugRoute
+    }
   }
 }
 
@@ -560,6 +579,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface ApiPublicNftSlugRouteChildren {
+  ApiPublicNftSlugCoverRoute: typeof ApiPublicNftSlugCoverRoute
+}
+
+const ApiPublicNftSlugRouteChildren: ApiPublicNftSlugRouteChildren = {
+  ApiPublicNftSlugCoverRoute: ApiPublicNftSlugCoverRoute,
+}
+
+const ApiPublicNftSlugRouteWithChildren =
+  ApiPublicNftSlugRoute._addFileChildren(ApiPublicNftSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -583,7 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicLedgerBulkRoute: ApiPublicLedgerBulkRoute,
   ApiPublicLedgerRecordRoute: ApiPublicLedgerRecordRoute,
   ApiPublicMerchantIdRoute: ApiPublicMerchantIdRoute,
-  ApiPublicNftSlugRoute: ApiPublicNftSlugRoute,
+  ApiPublicNftSlugRoute: ApiPublicNftSlugRouteWithChildren,
   ApiPublicTokenSymbolRoute: ApiPublicTokenSymbolRoute,
   ApiPublicTransactionHashRoute: ApiPublicTransactionHashRoute,
   ApiPublicWalletAddressRoute: ApiPublicWalletAddressRoute,

@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ImageOff } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
+import { NftCover } from "@/components/nft-cover";
 import { PageLoader } from "@/components/page-loader";
 import { formatInt, formatNumber, shortAddress, timeAgo } from "@/lib/format";
 
@@ -25,27 +25,13 @@ function NftDetail() {
   const coll = useQuery({
     queryKey: ["nft-coll", slug],
     queryFn: async () => {
-      // Avoid SELECT * — image_url data-URLs are multi-MB and stall the page.
       const { data, error } = await supabase
         .from("nft_collections")
         .select(COLLECTION_COLS)
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
-      if (!data) return null;
-
-      // Only pull image_url when it is a normal http(s) link.
-      const { data: imgRow } = await supabase
-        .from("nft_collections")
-        .select("image_url")
-        .eq("slug", slug)
-        .like("image_url", "http%")
-        .maybeSingle();
-
-      return {
-        ...data,
-        image_url: imgRow?.image_url && imgRow.image_url.length <= 2048 ? imgRow.image_url : null,
-      };
+      return data;
     },
   });
   const events = useQuery({
@@ -70,16 +56,15 @@ function NftDetail() {
   return (
     <div className="space-y-6 animate-fade-up">
       <div className="grid gap-6 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start">
-        {c.image_url ? (
-          <img src={c.image_url} alt={c.name} loading="lazy" className="aspect-square w-full max-w-[160px] rounded-xl border border-border object-cover" />
-        ) : (
-          <div className="grid aspect-square w-full max-w-[160px] place-items-center rounded-xl border border-dashed border-border bg-muted text-muted-foreground">
-            <ImageOff className="h-8 w-8 opacity-50" />
-          </div>
-        )}
+        <NftCover
+          slug={c.slug}
+          collectionId={c.id}
+          name={c.name}
+          className="aspect-square w-full max-w-40 rounded-xl border border-border"
+        />
         <div className="min-w-0">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">NFT Collection</div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight break-words">{c.name}</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight wrap-break-word">{c.name}</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{c.description}</p>
         </div>
       </div>

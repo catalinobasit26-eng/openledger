@@ -37,7 +37,19 @@ export function sanitizeMetadataImages<T>(input: T, placeholder = "[inline image
   return input;
 }
 
-/** Prefer http(s) image URLs only — never persist data:/base64 (blows up PostgREST). */
+/** Prefer http(s); otherwise keep a data:/base64 cover for NFT display. */
+export function pickCollectionImageUrl(...candidates: Array<string | null | undefined>): string | null {
+  for (const c of candidates) {
+    if (!c) continue;
+    if (/^https?:\/\//i.test(c) && c.length <= 2048) return c;
+  }
+  for (const c of candidates) {
+    if (c && isDataImageUrl(c)) return toImageSrc(c);
+  }
+  return null;
+}
+
+/** Prefer http(s) image URLs only — for places that must stay small (API payloads, etc.). */
 export function pickRemoteImageUrl(...candidates: Array<string | null | undefined>): string | null {
   for (const c of candidates) {
     if (!c) continue;
