@@ -10,6 +10,7 @@ import { StatCard } from "@/components/stat-card";
 import { SearchBar } from "@/components/search-bar";
 import { TxTable } from "@/components/tx-table";
 import { formatInt, formatUsd } from "@/lib/format";
+import { isCurrencySwapNote } from "@/lib/tx-classify";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,24 +28,30 @@ function DashboardPage() {
   const stats = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
-      const [tx, vol, merch, wallets, nft, swaps, openpay, openpaypro] = await Promise.all([
-        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }),
+      // Prefer select("id") for counts — select("*", { head: true }) times out on this table (PostgREST 57014).
+      const [tx, vol, merch, wallets, nft, openpay, openpaypro, typed, payments] = await Promise.all([
+        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }),
         supabase.from("ledger_transactions").select("amount"),
-        supabase.from("merchants").select("*", { count: "exact", head: true }),
-        supabase.from("wallets").select("*", { count: "exact", head: true }),
-        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("type", "nft_sale"),
-        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("type", "swap"),
-        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("source", "openpay"),
-        supabase.from("ledger_transactions").select("*", { count: "exact", head: true }).eq("source", "openpay_pro"),
+        supabase.from("merchants").select("id", { count: "exact", head: true }),
+        supabase.from("wallets").select("address", { count: "exact", head: true }),
+        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "nft_sale"),
+        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("source", "openpay"),
+        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("source", "openpay_pro"),
+        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "swap"),
+        // OpenPay labels conversions as category "other"/type payment; detect via note.
+        // Only scan payments — selecting metadata->>note across NFT rows times out (huge base64).
+        supabase.from("ledger_transactions").select("metadata").eq("type", "payment").limit(5000),
       ]);
       const totalVolume = (vol.data ?? []).reduce((acc, r: any) => acc + Number(r.amount ?? 0), 0);
+      const noteSwaps = (payments.data ?? []).filter((r: any) => isCurrencySwapNote(r.metadata?.note)).length;
+      const swaps = (typed.count ?? 0) + noteSwaps;
       return {
         totalTx: tx.count ?? 0,
         totalVolume,
         totalMerchants: merch.count ?? 0,
         totalWallets: wallets.count ?? 0,
         nftSales: nft.count ?? 0,
-        swaps: swaps.count ?? 0,
+        swaps,
         openpay: openpay.count ?? 0,
         openpaypro: openpaypro.count ?? 0,
       };
@@ -69,10 +76,23 @@ function DashboardPage() {
   const typeBreakdown = useQuery({
     queryKey: ["type-breakdown"],
     queryFn: async () => {
-      const { data } = await supabase.from("ledger_transactions").select("type");
+      // Avoid metadata->>note over NFT rows (statement timeout). Reclassify payments client-side.
+      const [{ data: types }, { data: payments }] = await Promise.all([
+        supabase.from("ledger_transactions").select("type").limit(5000),
+        supabase.from("ledger_transactions").select("metadata").eq("type", "payment").limit(5000),
+      ]);
       const counts: Record<string, number> = {};
-      (data ?? []).forEach((r: any) => { counts[r.type] = (counts[r.type] ?? 0) + 1; });
-      return Object.entries(counts).map(([name, value]) => ({ name: name.replace("_", " "), value }));
+      (types ?? []).forEach((r: any) => {
+        counts[r.type] = (counts[r.type] ?? 0) + 1;
+      });
+      const noteSwaps = (payments ?? []).filter((r: any) => isCurrencySwapNote(r.metadata?.note)).length;
+      if (noteSwaps > 0) {
+        counts.payment = Math.max(0, (counts.payment ?? 0) - noteSwaps);
+        counts.swap = (counts.swap ?? 0) + noteSwaps;
+      }
+      return Object.entries(counts)
+        .filter(([, value]) => value > 0)
+        .map(([name, value]) => ({ name: name.replace("_", " "), value }));
     },
   });
 
@@ -180,6 +200,14 @@ function DashboardPage() {
         </div>
       </section>
 
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold">Latest Transactions</h2>
+          <Link to="/explorer" className="text-xs font-medium text-primary hover:underline">View all →</Link>
+        </div>
+        <TxTable rows={(recent.data ?? []) as any} dense />
+      </section>
+
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -199,14 +227,6 @@ function DashboardPage() {
           <EcosystemCard href="https://openpy.space/pitch-deck" label="Pitch Deck" sub="Investor deck" icon={<ExternalLink className="h-4 w-4" />} />
           <EcosystemCard href="https://openpy.space/web3/nft" label="OpenNFT Marketplace" sub="NFTs & collectibles" icon={<ExternalLink className="h-4 w-4" />} />
         </div>
-      </section>
-
-      <section>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Latest Transactions</h2>
-          <Link to="/explorer" className="text-xs font-medium text-primary hover:underline">View all →</Link>
-        </div>
-        <TxTable rows={(recent.data ?? []) as any} dense />
       </section>
     </div>
   );

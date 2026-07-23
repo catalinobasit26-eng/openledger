@@ -162,23 +162,11 @@ async function fetchOpenPay(baseUrl: string, _apiKey: string, since: string) {
 }
 
 // OpenPay public-feed category → OpenLedger tx_type
-const OPENPAY_CATEGORY_MAP: Record<string, TxType> = {
-  topup: "deposit",
-  withdraw: "withdrawal",
-  swap: "swap",
-  nft: "nft_sale",
-  staking: "transfer",
-  loan: "transfer",
-  affiliate: "payment",
-  mining: "deposit",
-  other: "payment",
-};
+import { inferOpenPayTxType } from "@/lib/tx-classify";
 
 function mapOpenPay(item: any): Record<string, any> {
   const category = String(item.category ?? "other").toLowerCase();
-  const eventType = String(item.event_type ?? "").toLowerCase();
-  const type: TxType = OPENPAY_CATEGORY_MAP[category] ??
-    (eventType.includes("nft") ? "nft_sale" : "payment");
+  const type = inferOpenPayTxType(item);
 
   const statusRaw = String(item.status ?? "confirmed").toLowerCase();
   const statusMap: Record<string, "pending" | "confirmed" | "failed" | "reversed"> = {
@@ -210,6 +198,10 @@ function mapOpenPay(item: any): Record<string, any> {
       note: item.note,
       sender,
       receiver,
+      sender_amount: item.sender_amount,
+      sender_currency_code: item.sender_currency_code,
+      receiver_amount: item.receiver_amount,
+      receiver_currency_code: item.receiver_currency_code,
     },
     p_ts: item.occurred_at ?? item.created_at ?? new Date().toISOString(),
   };
