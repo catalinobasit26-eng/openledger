@@ -4,6 +4,7 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { formatInt, formatUsd } from "@/lib/format";
+import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
 
 export const Route = createFileRoute("/tokens/")({
   head: () => ({
@@ -16,12 +17,14 @@ export const Route = createFileRoute("/tokens/")({
 });
 
 function TokensIndex() {
+  useLedgerRealtime();
   const { data } = useQuery({
     queryKey: ["tokens"],
     queryFn: async () => {
       const { data } = await supabase.from("tokens").select("*").order("volume_24h", { ascending: false });
       return data ?? [];
     },
+    refetchInterval: 15_000,
   });
   return (
     <div className="space-y-6">

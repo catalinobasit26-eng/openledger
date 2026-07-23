@@ -143,7 +143,7 @@ function AdminPage() {
                   {(fraud.data ?? []).map((a: any) => (
                     <tr key={a.id} className="border-t border-border">
                       <td className="px-4 py-3"><StatusBadge status={a.severity} /></td>
-                      <td className="px-4 py-3 text-sm break-words">{a.reason}</td>
+                      <td className="px-4 py-3 text-sm wrap-break-word">{a.reason}</td>
                       <td className="px-4 py-3 font-mono text-xs text-primary whitespace-nowrap">{a.transaction_hash ? shortHash(a.transaction_hash, 8, 6) : "—"}</td>
                       <td className="px-4 py-3 text-xs">{a.resolved ? "Resolved" : "Open"}</td>
                       <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(a.created_at)}</td>

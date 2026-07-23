@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, ArrowLeftRight, DollarSign, ExternalLink, Image, Layers, MessageCircle, ShoppingBag, Users, Zap } from "lucide-react";
+import { Activity, ArrowLeftRight, BadgeCheck, DollarSign, ExternalLink, Image, Layers, MessageCircle, Users, Zap } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, Pie, PieChart } from "recharts";
 import { format, subDays } from "date-fns";
 import type { CSSProperties, ReactNode } from "react";
@@ -12,6 +12,7 @@ import { TxTable } from "@/components/tx-table";
 import { ChartSkeleton, PieSkeleton } from "@/components/chart-skeleton";
 import { formatInt, formatUsd } from "@/lib/format";
 import { isCurrencySwapNote, isStakeTx } from "@/lib/tx-classify";
+import { fetchKycMetrics } from "@/lib/kyc-metrics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,10 +31,9 @@ function DashboardPage() {
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
       // Prefer select("id") for counts — select("*", { head: true }) times out on this table (PostgREST 57014).
-      const [tx, vol, merch, wallets, nft, openpay, stakeTyped, typed, payments, transfers] = await Promise.all([
+      const [tx, vol, wallets, nft, openpay, stakeTyped, typed, payments, transfers, kyc] = await Promise.all([
         supabase.from("ledger_transactions").select("id", { count: "exact", head: true }),
         supabase.from("ledger_transactions").select("amount"),
-        supabase.from("merchants").select("id", { count: "exact", head: true }),
         supabase.from("wallets").select("address", { count: "exact", head: true }),
         supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "nft_sale"),
         supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("source", "openpay"),
@@ -44,6 +44,7 @@ function DashboardPage() {
         supabase.from("ledger_transactions").select("type,metadata").eq("type", "payment").limit(5000),
         // Legacy staking rows were stored as transfers before the stake enum landed.
         supabase.from("ledger_transactions").select("type,metadata").eq("type", "transfer").limit(2000),
+        fetchKycMetrics().catch(() => null),
       ]);
       const totalVolume = (vol.data ?? []).reduce((acc, r: any) => acc + Number(r.amount ?? 0), 0);
       const noteSwaps = (payments.data ?? []).filter((r: any) => isCurrencySwapNote(r.metadata?.note)).length;
@@ -56,12 +57,13 @@ function DashboardPage() {
       return {
         totalTx: tx.count ?? 0,
         totalVolume,
-        totalMerchants: merch.count ?? 0,
         totalWallets: wallets.count ?? 0,
         nftSales: nft.count ?? 0,
         swaps,
         openpay: openpay.count ?? 0,
         stakes,
+        kycVerified: kyc?.users?.verified ?? 0,
+        kycRate: kyc?.users?.verification_rate_pct ?? 0,
       };
     },
   });
@@ -149,7 +151,7 @@ function DashboardPage() {
     { label: "Total Transactions", value: formatInt(s?.totalTx), icon: <Activity className="h-4 w-4" /> },
     { label: "Total Volume", value: formatUsd(s?.totalVolume), sub: "All currencies normalized", icon: <DollarSign className="h-4 w-4" /> },
     { label: "Total Wallets", value: formatInt(s?.totalWallets), icon: <Users className="h-4 w-4" /> },
-    { label: "Total Merchants", value: formatInt(s?.totalMerchants), icon: <ShoppingBag className="h-4 w-4" /> },
+    { label: "KYC Verified", value: formatInt(s?.kycVerified), sub: s?.kycRate != null ? `${Number(s.kycRate).toFixed(1)}% of users` : undefined, icon: <BadgeCheck className="h-4 w-4" /> },
     { label: "NFT Sales", value: formatInt(s?.nftSales), icon: <Image className="h-4 w-4" /> },
     { label: "Swaps", value: formatInt(s?.swaps), icon: <ArrowLeftRight className="h-4 w-4" /> },
     { label: "OpenPay Tx", value: formatInt(s?.openpay), icon: <Zap className="h-4 w-4" /> },

@@ -2,10 +2,6 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-type StatCardStyle = CSSProperties & {
-  ["--fade-delay"]?: string | number;
-};
-
 export function StatCard({
   label,
   value,
@@ -22,7 +18,7 @@ export function StatCard({
   icon?: ReactNode;
   loading?: boolean;
   className?: string;
-  style?: StatCardStyle;
+  style?: CSSProperties;
   delayMs?: number;
 }) {
   // Apply enter animation only after mount to avoid SSR/client hydration mismatches
@@ -32,20 +28,11 @@ export function StatCard({
     setAnimate(true);
   }, []);
 
-  const fadeDelay =
-    delayMs != null
-      ? `${delayMs}ms`
-      : style?.["--fade-delay"] != null
-        ? String(style["--fade-delay"])
-        : undefined;
-
-  const { ["--fade-delay"]: _ignored, ...restStyle } = (style ?? {}) as StatCardStyle & Record<string, unknown>;
-
   return (
     <div
       style={{
-        ...(restStyle as CSSProperties),
-        ...(fadeDelay ? { animationDelay: fadeDelay } : null),
+        ...style,
+        ...(delayMs != null ? { animationDelay: `${delayMs}ms` } : null),
       }}
       className={cn(
         "group rounded-xl border border-border bg-card p-3 sm:p-5 min-w-0",

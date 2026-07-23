@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StakeRouteImport } from './routes/stake'
 import { Route as StableRouteImport } from './routes/stable'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as KycRouteImport } from './routes/kyc'
 import { Route as ExplorerRouteImport } from './routes/explorer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
@@ -51,6 +52,11 @@ const StableRoute = StableRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KycRoute = KycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExplorerRoute = ExplorerRouteImport.update({
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRoute
+  '/kyc': typeof KycRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
   '/stake': typeof StakeRoute
@@ -213,6 +220,7 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRoute
+  '/kyc': typeof KycRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
   '/stake': typeof StakeRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRoute
   '/explorer': typeof ExplorerRoute
+  '/kyc': typeof KycRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
   '/stake': typeof StakeRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/auth'
     | '/explorer'
+    | '/kyc'
     | '/sitemap.xml'
     | '/stable'
     | '/stake'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/auth'
     | '/explorer'
+    | '/kyc'
     | '/sitemap.xml'
     | '/stable'
     | '/stake'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/auth'
     | '/explorer'
+    | '/kyc'
     | '/sitemap.xml'
     | '/stable'
     | '/stake'
@@ -365,6 +377,7 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   AuthRoute: typeof AuthRoute
   ExplorerRoute: typeof ExplorerRoute
+  KycRoute: typeof KycRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StableRoute: typeof StableRoute
   StakeRoute: typeof StakeRoute
@@ -409,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kyc': {
+      id: '/kyc'
+      path: '/kyc'
+      fullPath: '/kyc'
+      preLoaderRoute: typeof KycRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explorer': {
@@ -617,6 +637,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   AuthRoute: AuthRoute,
   ExplorerRoute: ExplorerRoute,
+  KycRoute: KycRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StableRoute: StableRoute,
   StakeRoute: StakeRoute,
