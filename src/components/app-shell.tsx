@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Moon, Sun, LogOut, Shield } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { BrandLogo } from "./brand-logo";
+import { RouteProgressBar } from "./page-loader";
 import { useTheme } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,6 +19,7 @@ const navItems = [
 export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isNavigating = useRouterState({ select: (s) => s.status === "pending" });
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
 
@@ -37,6 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
+      {isNavigating ? <RouteProgressBar /> : null}
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3 sm:px-6">
           <Link to="/" className="shrink-0"><BrandLogo /></Link>

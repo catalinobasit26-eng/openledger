@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { ImageOff } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
+import { PageLoader } from "@/components/page-loader";
 import { formatInt, formatNumber, shortAddress, timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/nft/$slug")({
@@ -15,32 +17,65 @@ export const Route = createFileRoute("/nft/$slug")({
   component: NftDetail,
 });
 
+const COLLECTION_COLS =
+  "id, slug, name, description, total_supply, owners, floor_price, volume, creator_address";
+
 function NftDetail() {
   const { slug } = Route.useParams();
   const coll = useQuery({
     queryKey: ["nft-coll", slug],
     queryFn: async () => {
-      const { data } = await supabase.from("nft_collections").select("*").eq("slug", slug).maybeSingle();
-      return data;
+      // Avoid SELECT * — image_url data-URLs are multi-MB and stall the page.
+      const { data, error } = await supabase
+        .from("nft_collections")
+        .select(COLLECTION_COLS)
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+
+      // Only pull image_url when it is a normal http(s) link.
+      const { data: imgRow } = await supabase
+        .from("nft_collections")
+        .select("image_url")
+        .eq("slug", slug)
+        .like("image_url", "http%")
+        .maybeSingle();
+
+      return {
+        ...data,
+        image_url: imgRow?.image_url && imgRow.image_url.length <= 2048 ? imgRow.image_url : null,
+      };
     },
   });
   const events = useQuery({
     enabled: !!coll.data?.id,
     queryKey: ["nft-events", coll.data?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("nft_transactions").select("*").eq("collection_id", coll.data!.id).order("ts", { ascending: false }).limit(100);
+      const { data, error } = await supabase
+        .from("nft_transactions")
+        .select("id, event_type, token_id, from_address, to_address, price, currency, ts")
+        .eq("collection_id", coll.data!.id)
+        .order("ts", { ascending: false })
+        .limit(100);
+      if (error) throw error;
       return data ?? [];
     },
   });
+
+  if (coll.isLoading) return <PageLoader label="Loading collection…" />;
   const c = coll.data;
   if (!c) return <div className="text-sm text-muted-foreground">Collection not found.</div>;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-up">
       <div className="grid gap-6 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start">
         {c.image_url ? (
           <img src={c.image_url} alt={c.name} loading="lazy" className="aspect-square w-full max-w-[160px] rounded-xl border border-border object-cover" />
         ) : (
-          <div className="aspect-square w-full max-w-[160px] rounded-xl border border-dashed border-border bg-muted" />
+          <div className="grid aspect-square w-full max-w-[160px] place-items-center rounded-xl border border-dashed border-border bg-muted text-muted-foreground">
+            <ImageOff className="h-8 w-8 opacity-50" />
+          </div>
         )}
         <div className="min-w-0">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">NFT Collection</div>
@@ -77,6 +112,13 @@ function NftDetail() {
                 <td className="px-4 py-3 text-xs text-muted-foreground">{timeAgo(e.ts)}</td>
               </tr>
             ))}
+            {!events.isLoading && (events.data ?? []).length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  No activity recorded yet.
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       </div>

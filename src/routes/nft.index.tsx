@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { LayoutGrid, List as ListIcon, ImageOff } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { PageLoader } from "@/components/page-loader";
 import { formatInt, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +20,13 @@ export const Route = createFileRoute("/nft/")({
 
 type View = "grid" | "list";
 
+const COLLECTION_COLS =
+  "id, slug, name, description, total_supply, owners, floor_price, volume, creator_address";
+
 function CoverImage({ src, alt, className }: { src?: string | null; alt: string; className?: string }) {
   const [errored, setErrored] = useState(false);
-  if (!src || errored) {
+  const safe = src && /^https?:\/\//i.test(src) ? src : null;
+  if (!safe || errored) {
     return (
       <div className={cn("grid place-items-center bg-muted text-muted-foreground", className)}>
         <ImageOff className="h-6 w-6 opacity-50" />
@@ -30,7 +35,7 @@ function CoverImage({ src, alt, className }: { src?: string | null; alt: string;
   }
   return (
     <img
-      src={src}
+      src={safe}
       alt={alt}
       loading="lazy"
       onError={() => setErrored(true)}
@@ -47,13 +52,23 @@ function NftIndex() {
   }, []);
   useEffect(() => { localStorage.setItem("nft-view", view); }, [view]);
 
-  const { data } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["nft-collections"],
     queryFn: async () => {
-      const { data } = await supabase.from("nft_collections").select("*").order("volume", { ascending: false });
+      // Prefer RPC that strips data-URLs; fall back to a light column select (avoid SELECT * timeouts).
+      const rpc = await supabase.rpc("list_nft_collections" as any);
+      if (!rpc.error && Array.isArray(rpc.data)) return rpc.data;
+
+      const { data, error } = await supabase
+        .from("nft_collections")
+        .select(COLLECTION_COLS)
+        .order("volume", { ascending: false });
+      if (error) throw error;
       return data ?? [];
     },
   });
+
+  const collections = data ?? [];
 
   return (
     <div className="space-y-6">
@@ -84,14 +99,21 @@ function NftIndex() {
         </div>
       </div>
 
-      {view === "grid" ? (
+      {isLoading ? <PageLoader label="Loading collections…" /> : null}
+      {error ? (
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          Failed to load collections. {(error as Error).message}
+        </div>
+      ) : null}
+
+      {!isLoading && !error && view === "grid" ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {(data ?? []).map((c: any) => (
+          {collections.map((c: any) => (
             <Link
               key={c.id}
               to="/nft/$slug"
               params={{ slug: c.slug }}
-              className="group overflow-hidden rounded-xl border border-border bg-card transition hover:border-primary/40 hover:shadow-lg"
+              className="group overflow-hidden rounded-xl border border-border bg-card transition hover:border-primary/40 hover:shadow-lg animate-fade-up"
             >
               <CoverImage src={c.image_url} alt={c.name} className="aspect-square transition group-hover:scale-[1.02]" />
               <div className="p-4">
@@ -108,8 +130,10 @@ function NftIndex() {
             </Link>
           ))}
         </div>
-      ) : (
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
+      ) : null}
+
+      {!isLoading && !error && view === "list" ? (
+        <div className="overflow-hidden rounded-xl border border-border bg-card animate-fade-up">
           <div className="hidden grid-cols-[64px_minmax(0,1fr)_repeat(4,minmax(0,120px))] gap-3 border-b border-border bg-muted/50 px-4 py-2 text-[11px] uppercase tracking-wider text-muted-foreground sm:grid">
             <div />
             <div>Collection</div>
@@ -119,7 +143,7 @@ function NftIndex() {
             <div className="text-right">Volume</div>
           </div>
           <ul className="divide-y divide-border">
-            {(data ?? []).map((c: any) => (
+            {collections.map((c: any) => (
               <li key={c.id}>
                 <Link
                   to="/nft/$slug"
@@ -147,9 +171,9 @@ function NftIndex() {
             ))}
           </ul>
         </div>
-      )}
+      ) : null}
 
-      {(data ?? []).length === 0 ? (
+      {!isLoading && !error && collections.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
           No collections yet. Auto-sync will populate this list from OpenPay NFT shortly.
         </div>

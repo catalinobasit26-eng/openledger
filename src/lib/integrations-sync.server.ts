@@ -3,6 +3,7 @@
 // authenticated super-admin session.
 
 import { inferOpenPayTxType, type TxType } from "@/lib/tx-classify";
+import { pickRemoteImageUrl, sanitizeMetadataImages } from "@/lib/media";
 
 const PRO_TYPE_MAP: Record<string, TxType> = {
   send: "transfer", receive: "transfer", buy: "deposit",
@@ -179,7 +180,7 @@ function mapNftActivity(item: any): Record<string, any> {
     p_status: "confirmed" as const,
     p_merchant_id: null,
     p_external_ref: String(item.id ?? ""),
-    p_metadata: {
+    p_metadata: sanitizeMetadataImages({
       original_type: typeRaw,
       quantity: item.quantity,
       price_each: item.price_each,
@@ -188,7 +189,7 @@ function mapNftActivity(item: any): Record<string, any> {
       payment_method: item.payment_method,
       item: item.item,
       collection_id: item.item?.collection_id,
-    },
+    }),
     p_ts: item.created_at ?? new Date().toISOString(),
   };
 }
@@ -224,7 +225,7 @@ async function syncNftCollections(baseUrl: string, admin: any) {
           slug,
           name: String(c.name ?? c.code ?? slug),
           description: c.description ?? null,
-          image_url: c.cover_url ?? c.image_url ?? c.banner_url ?? c.thumbnail_url ?? null,
+          image_url: pickRemoteImageUrl(c.cover_url, c.image_url, c.banner_url, c.thumbnail_url),
           creator_address: c.creator_id ?? c.creator_address ?? null,
         }, { onConflict: "slug" });
       }
@@ -237,7 +238,7 @@ async function recordNftEvent(admin: any, ev: any) {
   const collId = ev.item?.collection_id;
   if (!collId) return;
   const slug = String(collId).toLowerCase();
-  const itemImg = ev.item?.image_url ?? ev.item?.cover_url ?? null;
+  const itemImg = pickRemoteImageUrl(ev.item?.image_url, ev.item?.cover_url);
   let { data: coll } = await admin.from("nft_collections").select("id,image_url").eq("slug", slug).maybeSingle();
   if (!coll) {
     const { data: created } = await admin.from("nft_collections").upsert({
