@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, ArrowLeftRight, DollarSign, ExternalLink, Image, MessageCircle, ShoppingBag, TrendingUp, Users, Zap } from "lucide-react";
+import { Activity, ArrowLeftRight, DollarSign, ExternalLink, Image, Layers, MessageCircle, ShoppingBag, Users, Zap } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, Pie, PieChart } from "recharts";
 import { format, subDays } from "date-fns";
 import type { CSSProperties, ReactNode } from "react";
@@ -11,7 +11,7 @@ import { SearchBar } from "@/components/search-bar";
 import { TxTable } from "@/components/tx-table";
 import { ChartSkeleton, PieSkeleton } from "@/components/chart-skeleton";
 import { formatInt, formatUsd } from "@/lib/format";
-import { isCurrencySwapNote } from "@/lib/tx-classify";
+import { isCurrencySwapNote, isStakeTx } from "@/lib/tx-classify";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,22 +30,29 @@ function DashboardPage() {
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
       // Prefer select("id") for counts — select("*", { head: true }) times out on this table (PostgREST 57014).
-      const [tx, vol, merch, wallets, nft, openpay, openpaypro, typed, payments] = await Promise.all([
+      const [tx, vol, merch, wallets, nft, openpay, stakeTyped, typed, payments, transfers] = await Promise.all([
         supabase.from("ledger_transactions").select("id", { count: "exact", head: true }),
         supabase.from("ledger_transactions").select("amount"),
         supabase.from("merchants").select("id", { count: "exact", head: true }),
         supabase.from("wallets").select("address", { count: "exact", head: true }),
         supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "nft_sale"),
         supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("source", "openpay"),
-        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("source", "openpay_pro"),
+        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "stake"),
         supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "swap"),
         // OpenPay labels conversions as category "other"/type payment; detect via note.
         // Only scan payments — selecting metadata->>note across NFT rows times out (huge base64).
-        supabase.from("ledger_transactions").select("metadata").eq("type", "payment").limit(5000),
+        supabase.from("ledger_transactions").select("type,metadata").eq("type", "payment").limit(5000),
+        // Legacy staking rows were stored as transfers before the stake enum landed.
+        supabase.from("ledger_transactions").select("type,metadata").eq("type", "transfer").limit(2000),
       ]);
       const totalVolume = (vol.data ?? []).reduce((acc, r: any) => acc + Number(r.amount ?? 0), 0);
       const noteSwaps = (payments.data ?? []).filter((r: any) => isCurrencySwapNote(r.metadata?.note)).length;
       const swaps = (typed.count ?? 0) + noteSwaps;
+      const legacyStakes =
+        (payments.data ?? []).filter((r: any) => isStakeTx(r)).length +
+        (transfers.data ?? []).filter((r: any) => isStakeTx(r)).length;
+      // stakeTyped.error is fine if the enum isn't migrated yet — fall back to legacy only.
+      const stakes = (stakeTyped.error ? 0 : (stakeTyped.count ?? 0)) + legacyStakes;
       return {
         totalTx: tx.count ?? 0,
         totalVolume,
@@ -54,7 +61,7 @@ function DashboardPage() {
         nftSales: nft.count ?? 0,
         swaps,
         openpay: openpay.count ?? 0,
-        openpaypro: openpaypro.count ?? 0,
+        stakes,
       };
     },
   });
@@ -77,10 +84,11 @@ function DashboardPage() {
   const typeBreakdown = useQuery({
     queryKey: ["type-breakdown"],
     queryFn: async () => {
-      // Avoid metadata->>note over NFT rows (statement timeout). Reclassify payments client-side.
-      const [{ data: types }, { data: payments }] = await Promise.all([
+      // Avoid metadata->>note over NFT rows (statement timeout). Reclassify payments/transfers client-side.
+      const [{ data: types }, { data: payments }, { data: transfers }] = await Promise.all([
         supabase.from("ledger_transactions").select("type").limit(5000),
-        supabase.from("ledger_transactions").select("metadata").eq("type", "payment").limit(5000),
+        supabase.from("ledger_transactions").select("type,metadata").eq("type", "payment").limit(5000),
+        supabase.from("ledger_transactions").select("type,metadata").eq("type", "transfer").limit(2000),
       ]);
       const counts: Record<string, number> = {};
       (types ?? []).forEach((r: any) => {
@@ -90,6 +98,16 @@ function DashboardPage() {
       if (noteSwaps > 0) {
         counts.payment = Math.max(0, (counts.payment ?? 0) - noteSwaps);
         counts.swap = (counts.swap ?? 0) + noteSwaps;
+      }
+      const paymentStakes = (payments ?? []).filter((r: any) => isStakeTx(r)).length;
+      const transferStakes = (transfers ?? []).filter((r: any) => isStakeTx(r)).length;
+      if (paymentStakes > 0) {
+        counts.payment = Math.max(0, (counts.payment ?? 0) - paymentStakes);
+        counts.stake = (counts.stake ?? 0) + paymentStakes;
+      }
+      if (transferStakes > 0) {
+        counts.transfer = Math.max(0, (counts.transfer ?? 0) - transferStakes);
+        counts.stake = (counts.stake ?? 0) + transferStakes;
       }
       return Object.entries(counts)
         .filter(([, value]) => value > 0)
@@ -112,7 +130,20 @@ function DashboardPage() {
 
   const s = stats.data;
   const statsLoading = stats.isLoading;
-  const pieColors = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "var(--primary)", "var(--success)"];
+  const pieColorByType: Record<string, string> = {
+    payment: "var(--chart-1)",
+    "nft mint": "var(--chart-2)",
+    "nft sale": "var(--chart-3)",
+    deposit: "var(--chart-4)",
+    transfer: "var(--chart-5)",
+    swap: "var(--success)",
+    stake: "#ec4899",
+    withdrawal: "var(--warning)",
+    refund: "var(--destructive)",
+  };
+  const pieFallback = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "var(--primary)", "var(--success)"];
+  const pieFill = (name: string, i: number) =>
+    pieColorByType[name.toLowerCase()] ?? pieFallback[i % pieFallback.length];
 
   const statItems = [
     { label: "Total Transactions", value: formatInt(s?.totalTx), icon: <Activity className="h-4 w-4" /> },
@@ -122,7 +153,7 @@ function DashboardPage() {
     { label: "NFT Sales", value: formatInt(s?.nftSales), icon: <Image className="h-4 w-4" /> },
     { label: "Swaps", value: formatInt(s?.swaps), icon: <ArrowLeftRight className="h-4 w-4" /> },
     { label: "OpenPay Tx", value: formatInt(s?.openpay), icon: <Zap className="h-4 w-4" /> },
-    { label: "OpenPay Pro Tx", value: formatInt(s?.openpaypro), icon: <TrendingUp className="h-4 w-4" /> },
+    { label: "Stake", value: formatInt(s?.stakes), icon: <Layers className="h-4 w-4" /> },
   ];
 
   return (
@@ -223,8 +254,8 @@ function DashboardPage() {
                     isAnimationActive
                     animationDuration={800}
                   >
-                    {(typeBreakdown.data ?? []).map((_, i) => (
-                      <Cell key={i} fill={pieColors[i % pieColors.length]} />
+                    {(typeBreakdown.data ?? []).map((entry, i) => (
+                      <Cell key={entry.name} fill={pieFill(entry.name, i)} />
                     ))}
                   </Pie>
                   <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
