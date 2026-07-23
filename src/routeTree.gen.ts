@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StakeRouteImport } from './routes/stake'
 import { Route as StableRouteImport } from './routes/stable'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ExplorerRouteImport } from './routes/explorer'
@@ -37,6 +38,11 @@ import { Route as ApiPublicLedgerBulkRouteImport } from './routes/api/public/led
 import { Route as ApiPublicHooksSyncAllRouteImport } from './routes/api/public/hooks/sync-all'
 import { Route as ApiPublicNftSlugCoverRouteImport } from './routes/api/public/nft.$slug.cover'
 
+const StakeRoute = StakeRouteImport.update({
+  id: '/stake',
+  path: '/stake',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StableRoute = StableRouteImport.update({
   id: '/stable',
   path: '/stable',
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/explorer': typeof ExplorerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
+  '/stake': typeof StakeRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/explorer': typeof ExplorerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
+  '/stake': typeof StakeRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/explorer': typeof ExplorerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
+  '/stake': typeof StakeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/explorer'
     | '/sitemap.xml'
     | '/stable'
+    | '/stake'
     | '/admin'
     | '/merchants/$id'
     | '/nft/$slug'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/explorer'
     | '/sitemap.xml'
     | '/stable'
+    | '/stake'
     | '/admin'
     | '/merchants/$id'
     | '/nft/$slug'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/explorer'
     | '/sitemap.xml'
     | '/stable'
+    | '/stake'
     | '/_authenticated/admin'
     | '/merchants/$id'
     | '/nft/$slug'
@@ -355,6 +367,7 @@ export interface RootRouteChildren {
   ExplorerRoute: typeof ExplorerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StableRoute: typeof StableRoute
+  StakeRoute: typeof StakeRoute
   MerchantsIdRoute: typeof MerchantsIdRoute
   NftSlugRoute: typeof NftSlugRoute
   TokensSymbolRoute: typeof TokensSymbolRoute
@@ -377,6 +390,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/stake': {
+      id: '/stake'
+      path: '/stake'
+      fullPath: '/stake'
+      preLoaderRoute: typeof StakeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stable': {
       id: '/stable'
       path: '/stable'
@@ -599,6 +619,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExplorerRoute: ExplorerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StableRoute: StableRoute,
+  StakeRoute: StakeRoute,
   MerchantsIdRoute: MerchantsIdRoute,
   NftSlugRoute: NftSlugRoute,
   TokensSymbolRoute: TokensSymbolRoute,

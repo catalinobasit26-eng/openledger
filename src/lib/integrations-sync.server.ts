@@ -296,10 +296,15 @@ export async function runSync(slug: string) {
   let ok = 0, failed = 0;
   const errors: string[] = [];
   for (const item of items) {
-    const args = slug === "openpay_pro" ? mapProEntry(item)
+    let args = slug === "openpay_pro" ? mapProEntry(item)
       : slug === "openpay_nft" ? mapNftActivity(item)
       : mapOpenPay(item);
-    const { error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any);
+    let { error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any);
+    // Until the stake enum lands on remote, fall back to transfer while keeping staking metadata.
+    if (rerr && args.p_type === "stake" && /stake|enum|invalid input/i.test(rerr.message)) {
+      args = { ...args, p_type: "transfer", p_metadata: { ...(args.p_metadata ?? {}), category: "staking" } };
+      ({ error: rerr } = await supabaseAdmin.rpc("record_transaction" as any, args as any));
+    }
     if (rerr) { failed++; if (errors.length < 5) errors.push(rerr.message); }
     else {
       ok++;

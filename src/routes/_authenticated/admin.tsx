@@ -127,29 +127,31 @@ function AdminPage() {
       {isStaff && (
         <section>
           <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold"><ShieldAlert className="h-4 w-4 text-warning" /> Fraud alerts</h2>
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3">Severity</th>
-                  <th className="px-4 py-3">Reason</th>
-                  <th className="px-4 py-3">Tx</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">When</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(fraud.data ?? []).map((a: any) => (
-                  <tr key={a.id} className="border-t border-border">
-                    <td className="px-4 py-3"><StatusBadge status={a.severity} /></td>
-                    <td className="px-4 py-3 text-sm">{a.reason}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-primary">{a.transaction_hash ? shortHash(a.transaction_hash, 8, 6) : "—"}</td>
-                    <td className="px-4 py-3 text-xs">{a.resolved ? "Resolved" : "Open"}</td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{timeAgo(a.created_at)}</td>
+          <div className="rounded-xl border border-border bg-card">
+            <div className="table-scroll">
+              <table className="w-full min-w-140 text-sm">
+                <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3">Severity</th>
+                    <th className="px-4 py-3">Reason</th>
+                    <th className="px-4 py-3">Tx</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">When</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {(fraud.data ?? []).map((a: any) => (
+                    <tr key={a.id} className="border-t border-border">
+                      <td className="px-4 py-3"><StatusBadge status={a.severity} /></td>
+                      <td className="px-4 py-3 text-sm break-words">{a.reason}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-primary whitespace-nowrap">{a.transaction_hash ? shortHash(a.transaction_hash, 8, 6) : "—"}</td>
+                      <td className="px-4 py-3 text-xs">{a.resolved ? "Resolved" : "Open"}</td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(a.created_at)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
       )}

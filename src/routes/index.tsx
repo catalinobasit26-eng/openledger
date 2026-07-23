@@ -128,7 +128,7 @@ function DashboardPage() {
   return (
     <div className="space-y-8">
       <section
-        className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-5 sm:p-10 animate-fade-up"
+        className="relative overflow-hidden rounded-2xl border border-border bg-linear-to-br from-primary/10 via-card to-card p-5 sm:p-10 animate-fade-up"
         style={{ "--fade-delay": "0ms" } as CSSProperties}
       >
         <div
@@ -167,7 +167,7 @@ function DashboardPage() {
             sub={"sub" in item ? item.sub : undefined}
             icon={item.icon}
             loading={statsLoading}
-            style={{ "--fade-delay": `${280 + i * 45}ms` } as CSSProperties}
+            delayMs={280 + i * 45}
           />
         ))}
       </section>

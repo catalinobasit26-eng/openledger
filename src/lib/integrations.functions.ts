@@ -40,7 +40,7 @@ export const getIngestionConfig = createServerFn({ method: "GET" })
 
 type TxType =
   | "payment" | "transfer" | "swap" | "nft_mint" | "nft_sale"
-  | "merchant_payment" | "withdrawal" | "deposit" | "refund";
+  | "merchant_payment" | "withdrawal" | "deposit" | "refund" | "stake";
 type SourcePlatform = "openpay" | "openpay_pro";
 
 // OpenPay Pro ledger types → our internal enum
@@ -51,6 +51,7 @@ const PRO_TYPE_MAP: Record<string, TxType> = {
   sell: "withdrawal",
   swap: "swap",
   mint: "nft_mint",
+  stake: "stake",
 };
 
 function mapProEntry(item: any): Record<string, any> {
@@ -86,7 +87,7 @@ function mapGeneric(item: any, source: SourcePlatform): Record<string, any> {
   const typeRaw = String(item.type ?? item.kind ?? "payment").toLowerCase();
   const allowedTypes: TxType[] = [
     "payment", "transfer", "swap", "nft_mint", "nft_sale",
-    "merchant_payment", "withdrawal", "deposit", "refund",
+    "merchant_payment", "withdrawal", "deposit", "refund", "stake",
   ];
   const type = (allowedTypes.includes(typeRaw as TxType) ? typeRaw : "payment") as TxType;
   const statusRaw = String(item.status ?? "confirmed").toLowerCase();

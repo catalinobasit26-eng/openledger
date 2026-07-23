@@ -140,12 +140,28 @@
   * {
     border-color: var(--color-border);
   }
+  html {
+    overflow-x: clip;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01", "ss03";
+    min-height: 100%;
+  }
+  body {
+    overflow-x: clip;
   }
   .mono { font-family: var(--font-mono); }
+}
+
+@utility table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
 }
 
 @utility hash-pill {
@@ -193,7 +209,10 @@
 }
 
 @utility animate-fade-up {
-  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-name: fade-up;
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
   animation-delay: var(--fade-delay, 0ms);
 }
 

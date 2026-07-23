@@ -21,9 +21,9 @@ export interface TxRow {
 function TableSkeleton({ dense, rows = 6 }: { dense?: boolean; rows?: number }) {
   const cols = dense ? 9 : 10;
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card animate-fade-up">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+    <div className="rounded-xl border border-border bg-card animate-fade-up">
+      <div className="table-scroll">
+        <table className="w-full min-w-180 text-sm">
           <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Tx Hash</th>
@@ -55,6 +55,53 @@ function TableSkeleton({ dense, rows = 6 }: { dense?: boolean; rows?: number }) 
   );
 }
 
+function TxMobileCards({ rows }: { rows: TxRow[] }) {
+  return (
+    <ul className="divide-y divide-border sm:hidden">
+      {rows.map((r) => (
+        <li key={r.hash} className="space-y-2 px-4 py-3">
+          <div className="flex items-start justify-between gap-3">
+            <Link
+              to="/tx/$hash"
+              params={{ hash: r.hash }}
+              className="font-mono text-xs text-primary hover:underline break-all"
+            >
+              {shortHash(r.hash, 10, 8)}
+            </Link>
+            <span className="shrink-0 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(r.ts)}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <TypeBadge type={r.type} />
+            <SourceBadge source={r.source} />
+            <StatusBadge status={r.status} />
+          </div>
+          <div className="flex items-center gap-2 text-xs min-w-0">
+            {r.from_address ? (
+              <Link to="/wallet/$address" params={{ address: r.from_address }} className="font-mono text-muted-foreground hover:text-primary truncate">
+                {shortAddress(r.from_address)}
+              </Link>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )}
+            <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            {r.to_address ? (
+              <Link to="/wallet/$address" params={{ address: r.to_address }} className="font-mono text-muted-foreground hover:text-primary truncate">
+                {shortAddress(r.to_address)}
+              </Link>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )}
+          </div>
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="font-medium tabular-nums">{formatAmount(r.amount, r.currency)}</span>
+            <span className="font-mono text-xs text-muted-foreground">#{r.block_number}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function TxTable({
   rows,
   dense = false,
@@ -74,9 +121,10 @@ export function TxTable({
     );
   }
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card animate-fade-up">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+    <div className="rounded-xl border border-border bg-card animate-fade-up">
+      <TxMobileCards rows={rows} />
+      <div className="hidden table-scroll sm:block">
+        <table className="w-full min-w-180 text-sm">
           <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Tx Hash</th>
@@ -123,7 +171,7 @@ export function TxTable({
                     </Link>
                   ) : "—"}
                 </td>
-                <td className="px-4 py-3 text-right font-medium tabular-nums">{formatAmount(r.amount, r.currency)}</td>
+                <td className="px-4 py-3 text-right font-medium tabular-nums whitespace-nowrap">{formatAmount(r.amount, r.currency)}</td>
                 <td className="px-4 py-3"><SourceBadge source={r.source} /></td>
                 <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
                 {!dense && <td className="px-4 py-3 font-mono text-xs text-muted-foreground">#{r.block_number}</td>}

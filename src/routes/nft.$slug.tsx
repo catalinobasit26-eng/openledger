@@ -65,7 +65,7 @@ function NftDetail() {
         <div className="min-w-0">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">NFT Collection</div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight wrap-break-word">{c.name}</h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{c.description}</p>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground wrap-break-word whitespace-pre-wrap">{c.description}</p>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -74,38 +74,71 @@ function NftDetail() {
         <StatCard label="Floor" value={`${formatNumber(c.floor_price)} OUSD`} />
         <StatCard label="Volume" value={`${formatNumber(c.volume)} OUSD`} />
       </div>
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3">Event</th>
-              <th className="px-4 py-3">Token</th>
-              <th className="px-4 py-3">From</th>
-              <th className="px-4 py-3">To</th>
-              <th className="px-4 py-3 text-right">Price</th>
-              <th className="px-4 py-3">When</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(events.data ?? []).map((e: any) => (
-              <tr key={e.id} className="border-t border-border">
-                <td className="px-4 py-3 capitalize">{e.event_type}</td>
-                <td className="px-4 py-3 font-mono text-xs">#{e.token_id}</td>
-                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{shortAddress(e.from_address)}</td>
-                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{shortAddress(e.to_address)}</td>
-                <td className="px-4 py-3 text-right tabular-nums">{formatNumber(e.price)} {e.currency}</td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">{timeAgo(e.ts)}</td>
-              </tr>
-            ))}
-            {!events.isLoading && (events.data ?? []).length === 0 ? (
+      <div className="rounded-xl border border-border bg-card">
+        {/* Mobile: stacked cards so every field is visible without horizontal crush */}
+        <ul className="divide-y divide-border sm:hidden">
+          {(events.data ?? []).map((e: any) => (
+            <li key={e.id} className="space-y-2 px-4 py-3 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="capitalize font-medium">{e.event_type}</span>
+                <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(e.ts)}</span>
+              </div>
+              <div className="font-mono text-xs text-muted-foreground">Token #{e.token_id}</div>
+              <div className="grid gap-1 text-xs">
+                <div className="flex gap-2 min-w-0">
+                  <span className="shrink-0 text-muted-foreground">From</span>
+                  <span className="font-mono break-all">{e.from_address || "—"}</span>
+                </div>
+                <div className="flex gap-2 min-w-0">
+                  <span className="shrink-0 text-muted-foreground">To</span>
+                  <span className="font-mono break-all">{e.to_address || "—"}</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="shrink-0 text-muted-foreground">Price</span>
+                  <span className="tabular-nums font-medium">{formatNumber(e.price)} {e.currency}</span>
+                </div>
+              </div>
+            </li>
+          ))}
+          {!events.isLoading && (events.data ?? []).length === 0 ? (
+            <li className="px-4 py-8 text-center text-sm text-muted-foreground">No activity recorded yet.</li>
+          ) : null}
+        </ul>
+
+        {/* sm+: horizontal slide to keep all columns readable */}
+        <div className="hidden table-scroll sm:block">
+          <table className="w-full min-w-160 text-sm">
+            <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                  No activity recorded yet.
-                </td>
+                <th className="px-4 py-3">Event</th>
+                <th className="px-4 py-3">Token</th>
+                <th className="px-4 py-3">From</th>
+                <th className="px-4 py-3">To</th>
+                <th className="px-4 py-3 text-right">Price</th>
+                <th className="px-4 py-3">When</th>
               </tr>
-            ) : null}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(events.data ?? []).map((e: any) => (
+                <tr key={e.id} className="border-t border-border">
+                  <td className="px-4 py-3 capitalize">{e.event_type}</td>
+                  <td className="px-4 py-3 font-mono text-xs">#{e.token_id}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{shortAddress(e.from_address)}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{shortAddress(e.to_address)}</td>
+                  <td className="px-4 py-3 text-right tabular-nums whitespace-nowrap">{formatNumber(e.price)} {e.currency}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(e.ts)}</td>
+                </tr>
+              ))}
+              {!events.isLoading && (events.data ?? []).length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    No activity recorded yet.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

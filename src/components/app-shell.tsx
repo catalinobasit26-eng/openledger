@@ -11,6 +11,7 @@ const navItems = [
   { to: "/explorer", label: "Explorer" },
   { to: "/tokens", label: "Tokens" },
   { to: "/stable", label: "OUSD" },
+  { to: "/stake", label: "Stake" },
   { to: "/nft", label: "NFTs" },
   { to: "/merchants", label: "Merchants" },
   { to: "/analytics", label: "Analytics" },
@@ -40,7 +41,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       {isNavigating ? <RouteProgressBar /> : null}
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3 sm:px-6">
           <Link to="/" className="shrink-0"><BrandLogo /></Link>
           <nav className="hidden md:flex items-center gap-1">
@@ -98,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ) : null}
           </div>
         </div>
-        <nav className="md:hidden border-t border-border bg-background overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav className="md:hidden border-t border-border bg-background overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden">
           <div className="flex items-center gap-1 px-3 py-2 w-max">
             {navItems.map((n) => {
               const active = n.to === "/" ? pathname === "/" : pathname.startsWith(n.to);
@@ -111,7 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </nav>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-10 min-w-0 overflow-x-clip">{children}</main>
       <footer className="mt-16 border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

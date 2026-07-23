@@ -33,9 +33,15 @@ export function SourceBadge({ source }: { source: string | null | undefined }) {
 }
 
 export function TypeBadge({ type }: { type: string | null | undefined }) {
+  const t = (type ?? "").toLowerCase();
+  const label = (type ?? "").replace("_", " ");
+  const cls =
+    t === "stake"
+      ? "border-primary/30 bg-primary/10 text-primary"
+      : "border-border bg-muted/60 text-muted-foreground";
   return (
-    <span className="inline-flex items-center rounded-md border border-border bg-muted/60 px-1.5 py-0.5 text-[10px] font-medium capitalize text-muted-foreground">
-      {(type ?? "").replace("_", " ")}
+    <span className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium capitalize ${cls}`}>
+      {label}
     </span>
   );
 }
