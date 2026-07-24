@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/", label: "Dashboard" },
   { to: "/explorer", label: "Explorer" },
+  { to: "/pi", label: "Pi Testnet" },
   { to: "/tokens", label: "Tokens" },
   { to: "/stable", label: "OUSD" },
   { to: "/stake", label: "Stake" },
