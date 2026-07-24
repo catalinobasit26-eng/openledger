@@ -34,11 +34,15 @@ export function SourceBadge({ source }: { source: string | null | undefined }) {
 
 export function TypeBadge({ type }: { type: string | null | undefined }) {
   const t = (type ?? "").toLowerCase();
-  const label = (type ?? "").replace("_", " ");
+  const label = (type ?? "").replace(/_/g, " ");
   const cls =
-    t === "stake"
+    t === "stake" || t === "stake_claim"
       ? "border-primary/30 bg-primary/10 text-primary"
-      : "border-border bg-muted/60 text-muted-foreground";
+      : t === "topup" || t === "deposit"
+        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+        : t === "swap"
+          ? "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+          : "border-border bg-muted/60 text-muted-foreground";
   return (
     <span className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium capitalize ${cls}`}>
       {label}

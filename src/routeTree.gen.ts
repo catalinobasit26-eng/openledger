@@ -29,6 +29,7 @@ import { Route as NftSlugRouteImport } from './routes/nft.$slug'
 import { Route as MerchantsIdRouteImport } from './routes/merchants.$id'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as PiTxHashRouteImport } from './routes/pi.tx.$hash'
+import { Route as PiOpKeyRouteImport } from './routes/pi.op.$key'
 import { Route as ApiPublicTransactionsRouteImport } from './routes/api/public/transactions'
 import { Route as ApiPublicAnalyticsRouteImport } from './routes/api/public/analytics'
 import { Route as ApiPublicWalletAddressRouteImport } from './routes/api/public/wallet.$address'
@@ -36,6 +37,7 @@ import { Route as ApiPublicTransactionHashRouteImport } from './routes/api/publi
 import { Route as ApiPublicTokenSymbolRouteImport } from './routes/api/public/token.$symbol'
 import { Route as ApiPublicPiTransactionsRouteImport } from './routes/api/public/pi/transactions'
 import { Route as ApiPublicPiPaymentsRouteImport } from './routes/api/public/pi/payments'
+import { Route as ApiPublicPiOperationsRouteImport } from './routes/api/public/pi/operations'
 import { Route as ApiPublicPiAccountRouteImport } from './routes/api/public/pi/account'
 import { Route as ApiPublicNftSlugRouteImport } from './routes/api/public/nft.$slug'
 import { Route as ApiPublicMerchantIdRouteImport } from './routes/api/public/merchant.$id'
@@ -43,6 +45,7 @@ import { Route as ApiPublicLedgerRecordRouteImport } from './routes/api/public/l
 import { Route as ApiPublicLedgerBulkRouteImport } from './routes/api/public/ledger.bulk'
 import { Route as ApiPublicHooksSyncAllRouteImport } from './routes/api/public/hooks/sync-all'
 import { Route as ApiPublicPiTransactionHashRouteImport } from './routes/api/public/pi/transaction.$hash'
+import { Route as ApiPublicPiOperationKeyRouteImport } from './routes/api/public/pi/operation.$key'
 import { Route as ApiPublicNftSlugCoverRouteImport } from './routes/api/public/nft.$slug.cover'
 
 const StakeRoute = StakeRouteImport.update({
@@ -144,6 +147,11 @@ const PiTxHashRoute = PiTxHashRouteImport.update({
   path: '/pi/tx/$hash',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PiOpKeyRoute = PiOpKeyRouteImport.update({
+  id: '/pi/op/$key',
+  path: '/pi/op/$key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTransactionsRoute = ApiPublicTransactionsRouteImport.update({
   id: '/api/public/transactions',
   path: '/api/public/transactions',
@@ -178,6 +186,11 @@ const ApiPublicPiTransactionsRoute = ApiPublicPiTransactionsRouteImport.update({
 const ApiPublicPiPaymentsRoute = ApiPublicPiPaymentsRouteImport.update({
   id: '/api/public/pi/payments',
   path: '/api/public/pi/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPiOperationsRoute = ApiPublicPiOperationsRouteImport.update({
+  id: '/api/public/pi/operations',
+  path: '/api/public/pi/operations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPiAccountRoute = ApiPublicPiAccountRouteImport.update({
@@ -216,6 +229,11 @@ const ApiPublicPiTransactionHashRoute =
     path: '/api/public/pi/transaction/$hash',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicPiOperationKeyRoute = ApiPublicPiOperationKeyRouteImport.update({
+  id: '/api/public/pi/operation/$key',
+  path: '/api/public/pi/operation/$key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicNftSlugCoverRoute = ApiPublicNftSlugCoverRouteImport.update({
   id: '/cover',
   path: '/cover',
@@ -243,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/tokens/': typeof TokensIndexRoute
   '/api/public/analytics': typeof ApiPublicAnalyticsRoute
   '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/pi/op/$key': typeof PiOpKeyRoute
   '/pi/tx/$hash': typeof PiTxHashRoute
   '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
@@ -250,12 +269,14 @@ export interface FileRoutesByFullPath {
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
   '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/pi/account': typeof ApiPublicPiAccountRoute
+  '/api/public/pi/operations': typeof ApiPublicPiOperationsRoute
   '/api/public/pi/payments': typeof ApiPublicPiPaymentsRoute
   '/api/public/pi/transactions': typeof ApiPublicPiTransactionsRoute
   '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
   '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
   '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
   '/api/public/nft/$slug/cover': typeof ApiPublicNftSlugCoverRoute
+  '/api/public/pi/operation/$key': typeof ApiPublicPiOperationKeyRoute
   '/api/public/pi/transaction/$hash': typeof ApiPublicPiTransactionHashRoute
 }
 export interface FileRoutesByTo {
@@ -279,6 +300,7 @@ export interface FileRoutesByTo {
   '/tokens': typeof TokensIndexRoute
   '/api/public/analytics': typeof ApiPublicAnalyticsRoute
   '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/pi/op/$key': typeof PiOpKeyRoute
   '/pi/tx/$hash': typeof PiTxHashRoute
   '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
@@ -286,12 +308,14 @@ export interface FileRoutesByTo {
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
   '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/pi/account': typeof ApiPublicPiAccountRoute
+  '/api/public/pi/operations': typeof ApiPublicPiOperationsRoute
   '/api/public/pi/payments': typeof ApiPublicPiPaymentsRoute
   '/api/public/pi/transactions': typeof ApiPublicPiTransactionsRoute
   '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
   '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
   '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
   '/api/public/nft/$slug/cover': typeof ApiPublicNftSlugCoverRoute
+  '/api/public/pi/operation/$key': typeof ApiPublicPiOperationKeyRoute
   '/api/public/pi/transaction/$hash': typeof ApiPublicPiTransactionHashRoute
 }
 export interface FileRoutesById {
@@ -317,6 +341,7 @@ export interface FileRoutesById {
   '/tokens/': typeof TokensIndexRoute
   '/api/public/analytics': typeof ApiPublicAnalyticsRoute
   '/api/public/transactions': typeof ApiPublicTransactionsRoute
+  '/pi/op/$key': typeof PiOpKeyRoute
   '/pi/tx/$hash': typeof PiTxHashRoute
   '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
@@ -324,12 +349,14 @@ export interface FileRoutesById {
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
   '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/pi/account': typeof ApiPublicPiAccountRoute
+  '/api/public/pi/operations': typeof ApiPublicPiOperationsRoute
   '/api/public/pi/payments': typeof ApiPublicPiPaymentsRoute
   '/api/public/pi/transactions': typeof ApiPublicPiTransactionsRoute
   '/api/public/token/$symbol': typeof ApiPublicTokenSymbolRoute
   '/api/public/transaction/$hash': typeof ApiPublicTransactionHashRoute
   '/api/public/wallet/$address': typeof ApiPublicWalletAddressRoute
   '/api/public/nft/$slug/cover': typeof ApiPublicNftSlugCoverRoute
+  '/api/public/pi/operation/$key': typeof ApiPublicPiOperationKeyRoute
   '/api/public/pi/transaction/$hash': typeof ApiPublicPiTransactionHashRoute
 }
 export interface FileRouteTypes {
@@ -355,6 +382,7 @@ export interface FileRouteTypes {
     | '/tokens/'
     | '/api/public/analytics'
     | '/api/public/transactions'
+    | '/pi/op/$key'
     | '/pi/tx/$hash'
     | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
@@ -362,12 +390,14 @@ export interface FileRouteTypes {
     | '/api/public/merchant/$id'
     | '/api/public/nft/$slug'
     | '/api/public/pi/account'
+    | '/api/public/pi/operations'
     | '/api/public/pi/payments'
     | '/api/public/pi/transactions'
     | '/api/public/token/$symbol'
     | '/api/public/transaction/$hash'
     | '/api/public/wallet/$address'
     | '/api/public/nft/$slug/cover'
+    | '/api/public/pi/operation/$key'
     | '/api/public/pi/transaction/$hash'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -391,6 +421,7 @@ export interface FileRouteTypes {
     | '/tokens'
     | '/api/public/analytics'
     | '/api/public/transactions'
+    | '/pi/op/$key'
     | '/pi/tx/$hash'
     | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
@@ -398,12 +429,14 @@ export interface FileRouteTypes {
     | '/api/public/merchant/$id'
     | '/api/public/nft/$slug'
     | '/api/public/pi/account'
+    | '/api/public/pi/operations'
     | '/api/public/pi/payments'
     | '/api/public/pi/transactions'
     | '/api/public/token/$symbol'
     | '/api/public/transaction/$hash'
     | '/api/public/wallet/$address'
     | '/api/public/nft/$slug/cover'
+    | '/api/public/pi/operation/$key'
     | '/api/public/pi/transaction/$hash'
   id:
     | '__root__'
@@ -428,6 +461,7 @@ export interface FileRouteTypes {
     | '/tokens/'
     | '/api/public/analytics'
     | '/api/public/transactions'
+    | '/pi/op/$key'
     | '/pi/tx/$hash'
     | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
@@ -435,12 +469,14 @@ export interface FileRouteTypes {
     | '/api/public/merchant/$id'
     | '/api/public/nft/$slug'
     | '/api/public/pi/account'
+    | '/api/public/pi/operations'
     | '/api/public/pi/payments'
     | '/api/public/pi/transactions'
     | '/api/public/token/$symbol'
     | '/api/public/transaction/$hash'
     | '/api/public/wallet/$address'
     | '/api/public/nft/$slug/cover'
+    | '/api/public/pi/operation/$key'
     | '/api/public/pi/transaction/$hash'
   fileRoutesById: FileRoutesById
 }
@@ -465,6 +501,7 @@ export interface RootRouteChildren {
   TokensIndexRoute: typeof TokensIndexRoute
   ApiPublicAnalyticsRoute: typeof ApiPublicAnalyticsRoute
   ApiPublicTransactionsRoute: typeof ApiPublicTransactionsRoute
+  PiOpKeyRoute: typeof PiOpKeyRoute
   PiTxHashRoute: typeof PiTxHashRoute
   ApiPublicHooksSyncAllRoute: typeof ApiPublicHooksSyncAllRoute
   ApiPublicLedgerBulkRoute: typeof ApiPublicLedgerBulkRoute
@@ -472,11 +509,13 @@ export interface RootRouteChildren {
   ApiPublicMerchantIdRoute: typeof ApiPublicMerchantIdRoute
   ApiPublicNftSlugRoute: typeof ApiPublicNftSlugRouteWithChildren
   ApiPublicPiAccountRoute: typeof ApiPublicPiAccountRoute
+  ApiPublicPiOperationsRoute: typeof ApiPublicPiOperationsRoute
   ApiPublicPiPaymentsRoute: typeof ApiPublicPiPaymentsRoute
   ApiPublicPiTransactionsRoute: typeof ApiPublicPiTransactionsRoute
   ApiPublicTokenSymbolRoute: typeof ApiPublicTokenSymbolRoute
   ApiPublicTransactionHashRoute: typeof ApiPublicTransactionHashRoute
   ApiPublicWalletAddressRoute: typeof ApiPublicWalletAddressRoute
+  ApiPublicPiOperationKeyRoute: typeof ApiPublicPiOperationKeyRoute
   ApiPublicPiTransactionHashRoute: typeof ApiPublicPiTransactionHashRoute
 }
 
@@ -622,6 +661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PiTxHashRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pi/op/$key': {
+      id: '/pi/op/$key'
+      path: '/pi/op/$key'
+      fullPath: '/pi/op/$key'
+      preLoaderRoute: typeof PiOpKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/transactions': {
       id: '/api/public/transactions'
       path: '/api/public/transactions'
@@ -671,6 +717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPiPaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/pi/operations': {
+      id: '/api/public/pi/operations'
+      path: '/api/public/pi/operations'
+      fullPath: '/api/public/pi/operations'
+      preLoaderRoute: typeof ApiPublicPiOperationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/pi/account': {
       id: '/api/public/pi/account'
       path: '/api/public/pi/account'
@@ -718,6 +771,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/pi/transaction/$hash'
       fullPath: '/api/public/pi/transaction/$hash'
       preLoaderRoute: typeof ApiPublicPiTransactionHashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/pi/operation/$key': {
+      id: '/api/public/pi/operation/$key'
+      path: '/api/public/pi/operation/$key'
+      fullPath: '/api/public/pi/operation/$key'
+      preLoaderRoute: typeof ApiPublicPiOperationKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/nft/$slug/cover': {
@@ -773,6 +833,7 @@ const rootRouteChildren: RootRouteChildren = {
   TokensIndexRoute: TokensIndexRoute,
   ApiPublicAnalyticsRoute: ApiPublicAnalyticsRoute,
   ApiPublicTransactionsRoute: ApiPublicTransactionsRoute,
+  PiOpKeyRoute: PiOpKeyRoute,
   PiTxHashRoute: PiTxHashRoute,
   ApiPublicHooksSyncAllRoute: ApiPublicHooksSyncAllRoute,
   ApiPublicLedgerBulkRoute: ApiPublicLedgerBulkRoute,
@@ -780,11 +841,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMerchantIdRoute: ApiPublicMerchantIdRoute,
   ApiPublicNftSlugRoute: ApiPublicNftSlugRouteWithChildren,
   ApiPublicPiAccountRoute: ApiPublicPiAccountRoute,
+  ApiPublicPiOperationsRoute: ApiPublicPiOperationsRoute,
   ApiPublicPiPaymentsRoute: ApiPublicPiPaymentsRoute,
   ApiPublicPiTransactionsRoute: ApiPublicPiTransactionsRoute,
   ApiPublicTokenSymbolRoute: ApiPublicTokenSymbolRoute,
   ApiPublicTransactionHashRoute: ApiPublicTransactionHashRoute,
   ApiPublicWalletAddressRoute: ApiPublicWalletAddressRoute,
+  ApiPublicPiOperationKeyRoute: ApiPublicPiOperationKeyRoute,
   ApiPublicPiTransactionHashRoute: ApiPublicPiTransactionHashRoute,
 }
 export const routeTree = rootRouteImport
