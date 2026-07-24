@@ -19,15 +19,54 @@ export function StatusBadge({ status }: { status: string | null | undefined }) {
   );
 }
 
-export function SourceBadge({ source }: { source: string | null | undefined }) {
-  const isPro = source === "openpay_pro";
+export type LedgerNetwork = "mainnet" | "testnet";
+
+/** Map ledger source → network. OpenPay / Pro / NFT are mainnet; unknown stays unset. */
+export function networkFromSource(source: string | null | undefined): LedgerNetwork | null {
+  const s = (source ?? "").toLowerCase();
+  if (s === "openpay" || s === "openpay_pro" || s === "openpay_nft") return "mainnet";
+  if (s.includes("testnet") || s.endsWith("_test")) return "testnet";
+  return null;
+}
+
+export function NetworkBadge({
+  network,
+  source,
+}: {
+  network?: LedgerNetwork | null;
+  source?: string | null;
+}) {
+  const n = network ?? networkFromSource(source);
+  if (!n) return null;
+  const isMain = n === "mainnet";
   return (
     <span
       className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${
-        isPro ? "border-primary/30 bg-primary/10 text-primary" : "border-border bg-muted text-muted-foreground"
+        isMain
+          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+          : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+      }`}
+      title={isMain ? "Mainnet transaction" : "Testnet transaction"}
+    >
+      {isMain ? "Mainnet" : "Testnet"}
+    </span>
+  );
+}
+
+export function SourceBadge({ source }: { source: string | null | undefined }) {
+  const s = (source ?? "").toLowerCase();
+  const isPro = s === "openpay_pro";
+  const isNft = s === "openpay_nft";
+  const label = isPro ? "OpenPay Pro" : isNft ? "OpenPay NFT" : "OpenPay";
+  return (
+    <span
+      className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase ${
+        isPro || isNft
+          ? "border-primary/30 bg-primary/10 text-primary"
+          : "border-border bg-muted text-muted-foreground"
       }`}
     >
-      {isPro ? "OpenPay Pro" : "OpenPay"}
+      {label}
     </span>
   );
 }

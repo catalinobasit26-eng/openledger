@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import type { CSSProperties, KeyboardEvent, MouseEvent } from "react";
 import { shortAddress, shortHash, formatAmount, timeAgo } from "@/lib/format";
-import { StatusBadge, SourceBadge, TypeBadge } from "./badges";
+import { StatusBadge, SourceBadge, TypeBadge, NetworkBadge } from "./badges";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export interface TxRow {
@@ -77,6 +77,7 @@ function TxMobileCards({ rows }: { rows: TxRow[] }) {
             <div className="flex flex-wrap items-center gap-1.5">
               <TypeBadge type={r.type} />
               <SourceBadge source={r.source} />
+              <NetworkBadge source={r.source} />
               <StatusBadge status={r.status} />
             </div>
             <div className="flex items-center gap-2 text-xs min-w-0">
@@ -214,7 +215,10 @@ export function TxTable({
                   {formatAmount(r.amount, r.currency)}
                 </td>
                 <td className="px-4 py-3">
-                  <SourceBadge source={r.source} />
+                  <div className="flex flex-wrap items-center gap-1">
+                    <SourceBadge source={r.source} />
+                    <NetworkBadge source={r.source} />
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={r.status} />

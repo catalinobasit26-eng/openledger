@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { CopyButton } from "@/components/copy-button";
-import { StatusBadge, SourceBadge, TypeBadge, VerifyBadge } from "@/components/badges";
+import { StatusBadge, SourceBadge, TypeBadge, VerifyBadge, NetworkBadge } from "@/components/badges";
 import { PageLoader } from "@/components/page-loader";
 import { formatAmount, formatNumber, fullDate, shortHash, timeAgo } from "@/lib/format";
 import { isDataImageUrl, sanitizeMetadataImages, toImageSrc } from "@/lib/media";
@@ -65,6 +65,7 @@ function TxDetailPage() {
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <StatusBadge status={tx.status} />
           <SourceBadge source={tx.source} />
+          <NetworkBadge source={tx.source} />
           <TypeBadge type={tx.type} />
           <VerifyBadge verified={tx.verified} />
           <CopyButton value={tx.hash} />

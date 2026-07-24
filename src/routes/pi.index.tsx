@@ -6,7 +6,7 @@ import { z } from "zod";
 import { CopyButton } from "@/components/copy-button";
 import { PageLoader } from "@/components/page-loader";
 import { StatCard } from "@/components/stat-card";
-import { TypeBadge } from "@/components/badges";
+import { NetworkBadge, TypeBadge } from "@/components/badges";
 import {
   assetLabel,
   creditBalance,
@@ -162,9 +162,7 @@ function PiExplorerPage() {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs uppercase tracking-wider text-muted-foreground">Pi Block Explorer</span>
-            <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
-              Testnet
-            </span>
+            <NetworkBadge network="testnet" />
             <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
               OUSD · OpenPay
             </span>
@@ -440,6 +438,7 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
                   >
                     {inbound ? "In" : "Out"}
                   </span>
+                  <NetworkBadge network="testnet" />
                   <StatusDot ok={p.transaction_successful} />
                 </div>
                 <div className="flex items-center gap-2 text-xs min-w-0">
@@ -519,7 +518,10 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
                     {formatNumber(p.amount)} {assetLabel(p)}
                   </td>
                   <td className="px-4 py-3">
-                    <StatusDot ok={p.transaction_successful} />
+                    <div className="flex flex-wrap items-center gap-1">
+                      <NetworkBadge network="testnet" />
+                      <StatusDot ok={p.transaction_successful} />
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(p.created_at)}</td>
                   <td className="sticky right-0 z-10 bg-card px-3 py-3 text-right shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.12)] group-hover:bg-muted/80">
@@ -567,6 +569,7 @@ function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
                 <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(tx.created_at)}</span>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-xs">
+                <NetworkBadge network="testnet" />
                 <StatusDot ok={tx.successful} />
                 <span className="text-muted-foreground">Ledger #{formatInt(tx.ledger)}</span>
                 <span className="text-muted-foreground">{tx.operation_count} op(s)</span>
@@ -627,7 +630,10 @@ function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
                   {tx.memo || "—"}
                 </td>
                 <td className="px-4 py-3">
-                  <StatusDot ok={tx.successful} />
+                  <div className="flex flex-wrap items-center gap-1">
+                    <NetworkBadge network="testnet" />
+                    <StatusDot ok={tx.successful} />
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(tx.created_at)}</td>
                 <td className="sticky right-0 z-10 bg-card px-3 py-3 text-right shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.12)] group-hover:bg-muted/80">
@@ -735,6 +741,7 @@ function OperationsTable({
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <TypeBadge type={kind} />
+                      <NetworkBadge network="testnet" />
                       <OpsStatus status={op.status} />
                     </div>
                     <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(op.occurred_at)}</span>
@@ -813,7 +820,10 @@ function OperationsTable({
                       {op.note || "—"}
                     </td>
                     <td className="px-4 py-3">
-                      <OpsStatus status={op.status} />
+                      <div className="flex flex-wrap items-center gap-1">
+                        <NetworkBadge network="testnet" />
+                        <OpsStatus status={op.status} />
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
                       {timeAgo(op.occurred_at)}

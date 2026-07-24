@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { NetworkBadge } from "@/components/badges";
 import { CopyButton } from "@/components/copy-button";
 import { PageLoader } from "@/components/page-loader";
 import {
@@ -73,9 +74,7 @@ function PiTxDetailPage() {
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">Pi Transaction</span>
-          <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
-            Testnet
-          </span>
+          <NetworkBadge network="testnet" />
         </div>
         <div className="mt-1 flex items-start gap-2">
           <h1 className="break-all font-mono text-lg sm:text-xl">{tx.hash}</h1>
@@ -128,6 +127,7 @@ function PiTxDetailPage() {
                   <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium uppercase tracking-wider">
                     {op.type || "operation"}
                   </span>
+                  <NetworkBadge network="testnet" />
                   <StatusPill ok={op.transaction_successful !== false} />
                   <span className="text-xs text-muted-foreground">{timeAgo(op.created_at)}</span>
                 </div>

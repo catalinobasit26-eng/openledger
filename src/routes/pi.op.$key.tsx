@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { TypeBadge } from "@/components/badges";
+import { NetworkBadge, TypeBadge } from "@/components/badges";
 import { CopyButton } from "@/components/copy-button";
 import { PageLoader } from "@/components/page-loader";
 import {
@@ -88,9 +88,7 @@ function PiOpDetailPage() {
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">OpenLedger Operation</span>
-          <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
-            Testnet
-          </span>
+          <NetworkBadge network="testnet" />
           <TypeBadge type={kind} />
         </div>
         <h1 className="mt-1 text-2xl font-bold tracking-tight tabular-nums">
