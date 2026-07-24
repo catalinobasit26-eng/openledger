@@ -2,6 +2,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { Loader2, Search } from "lucide-react";
 import { useState, useTransition } from "react";
 
+const TX_HASH_RE = /^[0-9a-fA-F]{64}$/;
+const STELLAR_ACCOUNT_RE = /^G[A-Z2-7]{55}$/;
+
 export function SearchBar({ size = "md" }: { size?: "md" | "lg" }) {
   const [q, setQ] = useState("");
   const [pending, startTransition] = useTransition();
@@ -11,6 +14,15 @@ export function SearchBar({ size = "md" }: { size?: "md" | "lg" }) {
     const v = q.trim();
     if (!v) return;
     startTransition(() => {
+      // Exact ledger / Horizon hash → open transaction detail directly
+      if (TX_HASH_RE.test(v)) {
+        navigate({ to: "/tx/$hash", params: { hash: v.toLowerCase() } });
+        return;
+      }
+      if (STELLAR_ACCOUNT_RE.test(v)) {
+        navigate({ to: "/wallet/$address", params: { address: v } });
+        return;
+      }
       navigate({ to: "/explorer", search: { q: v } });
     });
   };

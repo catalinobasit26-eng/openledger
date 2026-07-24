@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, Database, FileText, ShieldAlert, Activity } from "lucide-react";
 
@@ -144,7 +144,19 @@ function AdminPage() {
                     <tr key={a.id} className="border-t border-border">
                       <td className="px-4 py-3"><StatusBadge status={a.severity} /></td>
                       <td className="px-4 py-3 text-sm wrap-break-word">{a.reason}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-primary whitespace-nowrap">{a.transaction_hash ? shortHash(a.transaction_hash, 8, 6) : "—"}</td>
+                      <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">
+                        {a.transaction_hash ? (
+                          <Link
+                            to="/tx/$hash"
+                            params={{ hash: a.transaction_hash }}
+                            className="text-primary hover:underline"
+                          >
+                            {shortHash(a.transaction_hash, 8, 6)}
+                          </Link>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-xs">{a.resolved ? "Resolved" : "Open"}</td>
                       <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(a.created_at)}</td>
                     </tr>

@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { SearchBar } from "@/components/search-bar";
@@ -9,6 +10,7 @@ import { TxTable } from "@/components/tx-table";
 import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
 
 const PAGE_SIZE = 50;
+const TX_HASH_RE = /^[0-9a-fA-F]{64}$/;
 
 const searchSchema = z.object({
   q: z.string().optional().catch(""),
@@ -33,6 +35,13 @@ function ExplorerPage() {
   const query = (q ?? "").trim();
   const currentPage = Math.max(1, Number(page ?? 1));
   const offset = (currentPage - 1) * PAGE_SIZE;
+
+  // Paste a full hash into Explorer → jump straight to the detail page
+  useEffect(() => {
+    if (TX_HASH_RE.test(query)) {
+      void navigate({ to: "/tx/$hash", params: { hash: query.toLowerCase() } });
+    }
+  }, [query, navigate]);
 
   const total = useQuery({
     queryKey: ["ledger-total"],

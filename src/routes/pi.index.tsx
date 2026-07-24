@@ -341,6 +341,8 @@ function PiExplorerPage() {
 }
 
 function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
+  const navigate = useNavigate();
+
   if (!rows.length) {
     return (
       <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
@@ -349,49 +351,62 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
     );
   }
 
+  const openTx = (hash: string) => {
+    void navigate({ to: "/pi/tx/$hash", params: { hash } });
+  };
+
   return (
     <div className="rounded-xl border border-border bg-card">
       <ul className="divide-y divide-border sm:hidden">
         {rows.map((p) => {
           const inbound = p.to === focus;
           return (
-            <li key={p.id} className="space-y-2 px-4 py-3">
-              <div className="flex items-start justify-between gap-2">
-                <Link
-                  to="/pi/tx/$hash"
-                  params={{ hash: p.transaction_hash }}
-                  className="font-mono text-xs text-primary hover:underline break-all"
-                >
-                  {shortHash(p.transaction_hash, 10, 8)}
-                </Link>
-                <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(p.created_at)}</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                <span
-                  className={cn(
-                    "rounded-md px-1.5 py-0.5 font-medium",
-                    inbound ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-                  )}
-                >
-                  {inbound ? "In" : "Out"}
-                </span>
-                <StatusDot ok={p.transaction_successful} />
-              </div>
-              <div className="flex items-center gap-2 text-xs min-w-0">
-                <span className="font-mono text-muted-foreground truncate">{shortAddress(p.from)}</span>
-                <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
-                <span className="font-mono text-muted-foreground truncate">{shortAddress(p.to)}</span>
-              </div>
-              <div className="text-sm font-semibold tabular-nums">
-                {formatNumber(p.amount)} {assetLabel(p)}
-              </div>
+            <li key={p.id}>
+              <Link
+                to="/pi/tx/$hash"
+                params={{ hash: p.transaction_hash }}
+                className="block space-y-2 px-4 py-3 transition hover:bg-muted/40"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-mono text-xs text-primary break-all">
+                    {shortHash(p.transaction_hash, 10, 8)}
+                  </span>
+                  <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(p.created_at)}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                  <span
+                    className={cn(
+                      "rounded-md px-1.5 py-0.5 font-medium",
+                      inbound
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+                    )}
+                  >
+                    {inbound ? "In" : "Out"}
+                  </span>
+                  <StatusDot ok={p.transaction_successful} />
+                </div>
+                <div className="flex items-center gap-2 text-xs min-w-0">
+                  <span className="font-mono text-muted-foreground truncate">{shortAddress(p.from)}</span>
+                  <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  <span className="font-mono text-muted-foreground truncate">{shortAddress(p.to)}</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm font-semibold tabular-nums">
+                    {formatNumber(p.amount)} {assetLabel(p)}
+                  </div>
+                  <span className="shrink-0 rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
+                    View →
+                  </span>
+                </div>
+              </Link>
             </li>
           );
         })}
       </ul>
 
       <div className="table-scroll hidden sm:block">
-        <table className="w-full min-w-180 text-sm">
+        <table className="w-full min-w-5xl text-sm">
           <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Tx Hash</th>
@@ -402,21 +417,30 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
               <th className="px-4 py-3 font-medium text-right">Amount</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Age</th>
+              <th className="sticky right-0 z-10 bg-muted/95 px-3 py-3 font-medium text-right shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.15)] backdrop-blur-sm">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((p) => {
               const inbound = p.to === focus;
               return (
-                <tr key={p.id} className="border-t border-border hover:bg-muted/30">
-                  <td className="px-4 py-3">
-                    <Link
-                      to="/pi/tx/$hash"
-                      params={{ hash: p.transaction_hash }}
-                      className="font-mono text-xs text-primary hover:underline"
-                    >
-                      {shortHash(p.transaction_hash, 8, 6)}
-                    </Link>
+                <tr
+                  key={p.id}
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => openTx(p.transaction_hash)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openTx(p.transaction_hash);
+                    }
+                  }}
+                  className="border-t border-border hover:bg-muted/30 cursor-pointer group"
+                >
+                  <td className="px-4 py-3 font-mono text-xs text-primary">
+                    {shortHash(p.transaction_hash, 8, 6)}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -442,6 +466,11 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
                     <StatusDot ok={p.transaction_successful} />
                   </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(p.created_at)}</td>
+                  <td className="sticky right-0 z-10 bg-card px-3 py-3 text-right shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.12)] group-hover:bg-muted/80">
+                    <span className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary whitespace-nowrap">
+                      View
+                    </span>
+                  </td>
                 </tr>
               );
             })}
@@ -453,6 +482,8 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
 }
 
 function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
+  const navigate = useNavigate();
+
   if (!rows.length) {
     return (
       <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
@@ -461,37 +492,46 @@ function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
     );
   }
 
+  const openTx = (hash: string) => {
+    void navigate({ to: "/pi/tx/$hash", params: { hash } });
+  };
+
   return (
     <div className="rounded-xl border border-border bg-card">
       <ul className="divide-y divide-border sm:hidden">
         {rows.map((tx) => (
-          <li key={tx.hash} className="space-y-2 px-4 py-3">
-            <div className="flex items-start justify-between gap-2">
-              <Link
-                to="/pi/tx/$hash"
-                params={{ hash: tx.hash }}
-                className="font-mono text-xs text-primary hover:underline break-all"
-              >
-                {shortHash(tx.hash, 10, 8)}
-              </Link>
-              <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(tx.created_at)}</span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <StatusDot ok={tx.successful} />
-              <span className="text-muted-foreground">Ledger #{formatInt(tx.ledger)}</span>
-              <span className="text-muted-foreground">{tx.operation_count} op(s)</span>
-            </div>
-            {tx.memo ? (
-              <div className="truncate text-xs text-muted-foreground">
-                Memo: <span className="font-mono text-foreground">{tx.memo}</span>
+          <li key={tx.hash}>
+            <Link
+              to="/pi/tx/$hash"
+              params={{ hash: tx.hash }}
+              className="block space-y-2 px-4 py-3 transition hover:bg-muted/40"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="font-mono text-xs text-primary break-all">{shortHash(tx.hash, 10, 8)}</span>
+                <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(tx.created_at)}</span>
               </div>
-            ) : null}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <StatusDot ok={tx.successful} />
+                <span className="text-muted-foreground">Ledger #{formatInt(tx.ledger)}</span>
+                <span className="text-muted-foreground">{tx.operation_count} op(s)</span>
+              </div>
+              {tx.memo ? (
+                <div className="truncate text-xs text-muted-foreground">
+                  Memo: <span className="font-mono text-foreground">{tx.memo}</span>
+                </div>
+              ) : null}
+              <div className="flex justify-end">
+                <span className="rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
+                  View →
+                </span>
+              </div>
+            </Link>
           </li>
         ))}
       </ul>
 
       <div className="table-scroll hidden sm:block">
-        <table className="w-full min-w-180 text-sm">
+        <table className="w-full min-w-5xl text-sm">
           <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Tx Hash</th>
@@ -501,20 +541,27 @@ function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
               <th className="px-4 py-3 font-medium">Memo</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Age</th>
+              <th className="sticky right-0 z-10 bg-muted/95 px-3 py-3 font-medium text-right shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.15)] backdrop-blur-sm">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((tx) => (
-              <tr key={tx.hash} className="border-t border-border hover:bg-muted/30">
-                <td className="px-4 py-3">
-                  <Link
-                    to="/pi/tx/$hash"
-                    params={{ hash: tx.hash }}
-                    className="font-mono text-xs text-primary hover:underline"
-                  >
-                    {shortHash(tx.hash, 8, 6)}
-                  </Link>
-                </td>
+              <tr
+                key={tx.hash}
+                role="link"
+                tabIndex={0}
+                onClick={() => openTx(tx.hash)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openTx(tx.hash);
+                  }
+                }}
+                className="border-t border-border hover:bg-muted/30 cursor-pointer group"
+              >
+                <td className="px-4 py-3 font-mono text-xs text-primary">{shortHash(tx.hash, 8, 6)}</td>
                 <td className="px-4 py-3 font-mono text-xs">#{formatInt(tx.ledger)}</td>
                 <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                   {shortAddress(tx.source_account)}
@@ -527,6 +574,11 @@ function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
                   <StatusDot ok={tx.successful} />
                 </td>
                 <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{timeAgo(tx.created_at)}</td>
+                <td className="sticky right-0 z-10 bg-card px-3 py-3 text-right shadow-[-8px_0_12px_-8px_rgba(0,0,0,0.12)] group-hover:bg-muted/80">
+                  <span className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary whitespace-nowrap">
+                    View
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
