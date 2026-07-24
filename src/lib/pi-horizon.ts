@@ -2,9 +2,46 @@
 
 export const PI_TESTNET_HORIZON = "https://api.testnet.minepi.com";
 
-/** OpenPay OUSD treasury / settlement account on Pi Testnet. */
+/** OpenPay OUSD settlement account on Pi Testnet. */
 export const OPENPAY_TESTNET_ACCOUNT =
   "GCJPFL6MPMZ7CWHNYNEAOKRZNIJXKKMNIFJEVJMJHN25JWM5A634XPAW";
+
+/** OpenPay OUSD treasury / liquidity wallet on Pi Testnet. */
+export const OPENPAY_TESTNET_TREASURY =
+  "GDSXE723WPHZ5RGIJCSYXTPKSOIGPTSXE4RF5U3JTNGTCHXON7ZVD4LJ";
+
+export type PiWatchedWallet = {
+  id: string;
+  label: string;
+  shortLabel: string;
+  description: string;
+};
+
+/** Watched OpenPay wallets on Pi Testnet (Horizon). */
+export const OPENPAY_PI_WALLETS: PiWatchedWallet[] = [
+  {
+    id: OPENPAY_TESTNET_ACCOUNT,
+    label: "Settlement",
+    shortLabel: "Settlement",
+    description: "OpenPay OUSD settlement account",
+  },
+  {
+    id: OPENPAY_TESTNET_TREASURY,
+    label: "OUSD Treasury",
+    shortLabel: "Treasury",
+    description: "OpenPay OUSD treasury / liquidity wallet",
+  },
+];
+
+export function resolvePiWallet(accountId: string | null | undefined): PiWatchedWallet {
+  const id = (accountId ?? "").trim();
+  return OPENPAY_PI_WALLETS.find((w) => w.id === id) ?? OPENPAY_PI_WALLETS[0]!;
+}
+
+export function isOpenPayPiWallet(accountId: string | null | undefined): boolean {
+  if (!accountId) return false;
+  return OPENPAY_PI_WALLETS.some((w) => w.id === accountId);
+}
 
 export const PI_STROOPS_PER_UNIT = 10_000_000;
 
@@ -75,6 +112,31 @@ export function nativeBalance(account: PiAccount | null | undefined): number {
   if (!account) return 0;
   const row = account.balances.find((b) => b.asset_type === "native");
   return row ? Number(row.balance) : 0;
+}
+
+/** Credit-asset balance by code (e.g. OUSD). Ignores liquidity pool shares. */
+export function creditBalance(account: PiAccount | null | undefined, assetCode: string): number {
+  if (!account) return 0;
+  const code = assetCode.toUpperCase();
+  const row = account.balances.find(
+    (b) =>
+      (b.asset_type === "credit_alphanum4" || b.asset_type === "credit_alphanum12") &&
+      (b.asset_code ?? "").toUpperCase() === code,
+  );
+  return row ? Number(row.balance) : 0;
+}
+
+/** Non-zero credit balances for display (excludes LP shares + zero rows). */
+export function notableCreditBalances(account: PiAccount | null | undefined, limit = 6): PiBalance[] {
+  if (!account) return [];
+  return account.balances
+    .filter(
+      (b) =>
+        (b.asset_type === "credit_alphanum4" || b.asset_type === "credit_alphanum12") &&
+        Number(b.balance) > 0,
+    )
+    .sort((a, b) => Number(b.balance) - Number(a.balance))
+    .slice(0, limit);
 }
 
 export function assetLabel(p: { asset_type: string; asset_code?: string }): string {

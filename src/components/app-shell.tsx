@@ -12,6 +12,7 @@ const navItems = [
   { to: "/", label: "Dashboard" },
   { to: "/explorer", label: "Explorer" },
   { to: "/pi", label: "Pi Testnet" },
+  { to: "/pro", label: "OpenPay Pro" },
   { to: "/tokens", label: "Tokens" },
   { to: "/stable", label: "OUSD" },
   { to: "/stake", label: "Stake" },

@@ -9,10 +9,13 @@ import { StatCard } from "@/components/stat-card";
 import { TypeBadge } from "@/components/badges";
 import {
   assetLabel,
+  creditBalance,
   cursorFromHref,
   nativeBalance,
-  OPENPAY_TESTNET_ACCOUNT,
+  notableCreditBalances,
+  OPENPAY_PI_WALLETS,
   PI_TESTNET_HORIZON,
+  resolvePiWallet,
   type PiAccount,
   type PiHorizonPage,
   type PiPayment,
@@ -26,12 +29,13 @@ import {
   type OpenLedgerEntry,
   type OpenLedgerFeed,
 } from "@/lib/openledger-api";
-import { formatAmount, formatInt, formatNumber, fullDate, shortAddress, shortHash, timeAgo } from "@/lib/format";
+import { formatAmount, formatInt, formatNumber, shortAddress, shortHash, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const OPS_PAGE_SIZE = 50;
 
 const searchSchema = z.object({
+  wallet: z.string().optional().catch(undefined),
   tab: z.enum(["payments", "transactions", "operations"]).optional().catch("payments"),
   cursor: z.string().optional().catch(undefined),
   offset: z.coerce.number().int().min(0).optional().catch(0),
@@ -62,9 +66,10 @@ async function getJson<T>(url: string): Promise<T> {
 }
 
 function PiExplorerPage() {
-  const { tab = "payments", cursor, offset: offsetRaw } = Route.useSearch();
+  const { wallet: walletParam, tab = "payments", cursor, offset: offsetRaw } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const accountId = OPENPAY_TESTNET_ACCOUNT;
+  const wallet = resolvePiWallet(walletParam);
+  const accountId = wallet.id;
   const opsOffset = Math.max(0, Number(offsetRaw ?? 0));
   const isHorizonTab = tab === "payments" || tab === "transactions";
 
@@ -116,20 +121,31 @@ function PiExplorerPage() {
   const hasOlderOps = opsCount >= OPS_PAGE_SIZE;
   const hasNewerOps = opsOffset > 0;
   const balance = nativeBalance(account.data);
+  const ousdBalance = creditBalance(account.data, "OUSD");
+  const credits = notableCreditBalances(account.data, 5);
   const horizonAccountUrl = `${PI_TESTNET_HORIZON}/accounts/${accountId}`;
 
+  const setWallet = (id: string) =>
+    navigate({
+      to: "/pi",
+      search: { wallet: id, tab, cursor: undefined, offset: 0 },
+    });
+
   const setTab = (next: "payments" | "transactions" | "operations") =>
-    navigate({ to: "/pi/", search: { tab: next, cursor: undefined, offset: 0 } });
+    navigate({
+      to: "/pi",
+      search: (prev) => ({ ...prev, tab: next, cursor: undefined, offset: 0 }),
+    });
 
   const goCursor = (c: string | null | undefined) =>
     navigate({
-      to: "/pi/",
+      to: "/pi",
       search: (prev) => ({ ...prev, cursor: c || undefined }),
     });
 
   const goOpsOffset = (next: number) =>
     navigate({
-      to: "/pi/",
+      to: "/pi",
       search: (prev) => ({ ...prev, offset: Math.max(0, next) }),
     });
 
@@ -153,10 +169,36 @@ function PiExplorerPage() {
               OUSD · OpenPay
             </span>
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">OpenPay Testnet Account</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight">OpenPay · {wallet.label}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Live chain activity for the OpenPay OUSD settlement wallet on Pi Network Testnet (1 Test-PI ≈ 1 OUSD).
+            {wallet.description} on Pi Network Testnet (
+            <a
+              href={horizonAccountUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Horizon
+            </a>
+            ).
           </p>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {OPENPAY_PI_WALLETS.map((w) => (
+              <button
+                key={w.id}
+                type="button"
+                onClick={() => setWallet(w.id)}
+                className={cn(
+                  "rounded-md border px-2.5 py-1 text-xs font-medium transition",
+                  w.id === accountId
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {w.shortLabel}
+              </button>
+            ))}
+          </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <code className="break-all rounded-md bg-muted px-2.5 py-1.5 font-mono text-xs sm:text-sm">
               {accountId}
@@ -190,9 +232,15 @@ function PiExplorerPage() {
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
-          label="Balance"
-          value={`${formatNumber(balance)} Test-PI`}
-          sub="Native · ≈ OUSD peg"
+          label="OUSD"
+          value={formatNumber(ousdBalance)}
+          sub="Credit asset on Pi Testnet"
+          loading={account.isLoading}
+        />
+        <StatCard
+          label="Test-PI"
+          value={formatNumber(balance)}
+          sub="Native balance"
           loading={account.isLoading}
         />
         <StatCard
@@ -202,18 +250,26 @@ function PiExplorerPage() {
           loading={account.isLoading}
         />
         <StatCard
-          label="Sequence"
-          value={account.data ? shortHash(account.data.sequence, 6, 4) : "—"}
-          sub={account.data ? fullDate(account.data.last_modified_time) : undefined}
-          loading={account.isLoading}
-        />
-        <StatCard
           label="Subentries"
           value={formatInt(account.data?.subentry_count ?? 0)}
           sub={`${account.data?.signers?.length ?? 0} signer(s)`}
           loading={account.isLoading}
         />
       </div>
+
+      {credits.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {credits.map((b) => (
+            <span
+              key={`${b.asset_code}-${b.asset_issuer}`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs"
+            >
+              <span className="font-medium text-muted-foreground">{b.asset_code}</span>
+              <span className="font-semibold tabular-nums">{formatNumber(b.balance)}</span>
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap gap-1 border-b border-border pb-px">
         {(

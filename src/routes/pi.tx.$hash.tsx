@@ -8,7 +8,7 @@ import { PageLoader } from "@/components/page-loader";
 import {
   assetLabel,
   feeInPi,
-  OPENPAY_TESTNET_ACCOUNT,
+  isOpenPayPiWallet,
   PI_TESTNET_HORIZON,
   type PiPayment,
   type PiTransaction,
@@ -51,7 +51,7 @@ function PiTxDetailPage() {
   if (isError || !data?.transaction) {
     return (
       <div className="space-y-4">
-        <Link to="/pi/" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+        <Link to="/pi" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Pi Explorer
         </Link>
         <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
@@ -68,7 +68,7 @@ function PiTxDetailPage() {
   return (
     <div className="space-y-6">
       <div>
-        <Link to="/pi/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+        <Link to="/pi" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-3.5 w-3.5" /> Pi Testnet Explorer
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -162,11 +162,15 @@ function PiTxDetailPage() {
 }
 
 function AccountLink({ address }: { address: string }) {
-  const isOpenPay = address === OPENPAY_TESTNET_ACCOUNT;
+  const isOpenPay = isOpenPayPiWallet(address);
   return (
     <div className="flex flex-wrap items-center gap-1.5 min-w-0">
       {isOpenPay ? (
-        <Link to="/pi/" className="font-mono text-xs text-primary hover:underline break-all">
+        <Link
+          to="/pi"
+          search={{ wallet: address, tab: "payments", cursor: undefined, offset: 0 }}
+          className="font-mono text-xs text-primary hover:underline break-all"
+        >
           {address}
         </Link>
       ) : (
