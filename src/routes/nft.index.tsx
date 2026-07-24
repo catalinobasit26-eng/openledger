@@ -123,10 +123,10 @@ function NftIndex() {
   });
 
   const setTab = (next: "collections" | "activity" | "listings") =>
-    navigate({ to: "/nft/", search: (prev) => ({ ...prev, tab: next }) });
+    navigate({ to: "/nft", search: (prev) => ({ ...prev, tab: next }) });
 
   const setKind = (next: ActivityKind) =>
-    navigate({ to: "/nft/", search: (prev) => ({ ...prev, tab: "activity", kind: next }) });
+    navigate({ to: "/nft", search: (prev) => ({ ...prev, tab: "activity", kind: next }) });
 
   const s = stats.data;
   const volumeOusd = Number(s?.total_volume?.OUSD ?? 0);
@@ -645,7 +645,7 @@ function ListingsSection({
             const thumb = nftItemThumb(l.item);
             return (
               <div key={l.id} className="overflow-hidden rounded-xl border border-border bg-card">
-                <div className="aspect-[4/3] bg-muted">
+                <div className="aspect-4/3 bg-muted">
                   {thumb ? (
                     <img src={thumb} alt="" className="h-full w-full object-cover" loading="lazy" />
                   ) : (
