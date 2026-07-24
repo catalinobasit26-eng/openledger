@@ -40,6 +40,10 @@ import { Route as ApiPublicPiPaymentsRouteImport } from './routes/api/public/pi/
 import { Route as ApiPublicPiOperationsRouteImport } from './routes/api/public/pi/operations'
 import { Route as ApiPublicPiAccountRouteImport } from './routes/api/public/pi/account'
 import { Route as ApiPublicNftSlugRouteImport } from './routes/api/public/nft.$slug'
+import { Route as ApiPublicNftMarketStatsRouteImport } from './routes/api/public/nft-market/stats'
+import { Route as ApiPublicNftMarketListingsRouteImport } from './routes/api/public/nft-market/listings'
+import { Route as ApiPublicNftMarketCollectionsRouteImport } from './routes/api/public/nft-market/collections'
+import { Route as ApiPublicNftMarketActivityRouteImport } from './routes/api/public/nft-market/activity'
 import { Route as ApiPublicMerchantIdRouteImport } from './routes/api/public/merchant.$id'
 import { Route as ApiPublicLedgerRecordRouteImport } from './routes/api/public/ledger.record'
 import { Route as ApiPublicLedgerBulkRouteImport } from './routes/api/public/ledger.bulk'
@@ -203,6 +207,29 @@ const ApiPublicNftSlugRoute = ApiPublicNftSlugRouteImport.update({
   path: '/api/public/nft/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNftMarketStatsRoute = ApiPublicNftMarketStatsRouteImport.update({
+  id: '/api/public/nft-market/stats',
+  path: '/api/public/nft-market/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicNftMarketListingsRoute =
+  ApiPublicNftMarketListingsRouteImport.update({
+    id: '/api/public/nft-market/listings',
+    path: '/api/public/nft-market/listings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicNftMarketCollectionsRoute =
+  ApiPublicNftMarketCollectionsRouteImport.update({
+    id: '/api/public/nft-market/collections',
+    path: '/api/public/nft-market/collections',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicNftMarketActivityRoute =
+  ApiPublicNftMarketActivityRouteImport.update({
+    id: '/api/public/nft-market/activity',
+    path: '/api/public/nft-market/activity',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicMerchantIdRoute = ApiPublicMerchantIdRouteImport.update({
   id: '/api/public/merchant/$id',
   path: '/api/public/merchant/$id',
@@ -267,6 +294,10 @@ export interface FileRoutesByFullPath {
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
+  '/api/public/nft-market/activity': typeof ApiPublicNftMarketActivityRoute
+  '/api/public/nft-market/collections': typeof ApiPublicNftMarketCollectionsRoute
+  '/api/public/nft-market/listings': typeof ApiPublicNftMarketListingsRoute
+  '/api/public/nft-market/stats': typeof ApiPublicNftMarketStatsRoute
   '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/pi/account': typeof ApiPublicPiAccountRoute
   '/api/public/pi/operations': typeof ApiPublicPiOperationsRoute
@@ -306,6 +337,10 @@ export interface FileRoutesByTo {
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
+  '/api/public/nft-market/activity': typeof ApiPublicNftMarketActivityRoute
+  '/api/public/nft-market/collections': typeof ApiPublicNftMarketCollectionsRoute
+  '/api/public/nft-market/listings': typeof ApiPublicNftMarketListingsRoute
+  '/api/public/nft-market/stats': typeof ApiPublicNftMarketStatsRoute
   '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/pi/account': typeof ApiPublicPiAccountRoute
   '/api/public/pi/operations': typeof ApiPublicPiOperationsRoute
@@ -347,6 +382,10 @@ export interface FileRoutesById {
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
+  '/api/public/nft-market/activity': typeof ApiPublicNftMarketActivityRoute
+  '/api/public/nft-market/collections': typeof ApiPublicNftMarketCollectionsRoute
+  '/api/public/nft-market/listings': typeof ApiPublicNftMarketListingsRoute
+  '/api/public/nft-market/stats': typeof ApiPublicNftMarketStatsRoute
   '/api/public/nft/$slug': typeof ApiPublicNftSlugRouteWithChildren
   '/api/public/pi/account': typeof ApiPublicPiAccountRoute
   '/api/public/pi/operations': typeof ApiPublicPiOperationsRoute
@@ -388,6 +427,10 @@ export interface FileRouteTypes {
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
     | '/api/public/merchant/$id'
+    | '/api/public/nft-market/activity'
+    | '/api/public/nft-market/collections'
+    | '/api/public/nft-market/listings'
+    | '/api/public/nft-market/stats'
     | '/api/public/nft/$slug'
     | '/api/public/pi/account'
     | '/api/public/pi/operations'
@@ -427,6 +470,10 @@ export interface FileRouteTypes {
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
     | '/api/public/merchant/$id'
+    | '/api/public/nft-market/activity'
+    | '/api/public/nft-market/collections'
+    | '/api/public/nft-market/listings'
+    | '/api/public/nft-market/stats'
     | '/api/public/nft/$slug'
     | '/api/public/pi/account'
     | '/api/public/pi/operations'
@@ -467,6 +514,10 @@ export interface FileRouteTypes {
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
     | '/api/public/merchant/$id'
+    | '/api/public/nft-market/activity'
+    | '/api/public/nft-market/collections'
+    | '/api/public/nft-market/listings'
+    | '/api/public/nft-market/stats'
     | '/api/public/nft/$slug'
     | '/api/public/pi/account'
     | '/api/public/pi/operations'
@@ -507,6 +558,10 @@ export interface RootRouteChildren {
   ApiPublicLedgerBulkRoute: typeof ApiPublicLedgerBulkRoute
   ApiPublicLedgerRecordRoute: typeof ApiPublicLedgerRecordRoute
   ApiPublicMerchantIdRoute: typeof ApiPublicMerchantIdRoute
+  ApiPublicNftMarketActivityRoute: typeof ApiPublicNftMarketActivityRoute
+  ApiPublicNftMarketCollectionsRoute: typeof ApiPublicNftMarketCollectionsRoute
+  ApiPublicNftMarketListingsRoute: typeof ApiPublicNftMarketListingsRoute
+  ApiPublicNftMarketStatsRoute: typeof ApiPublicNftMarketStatsRoute
   ApiPublicNftSlugRoute: typeof ApiPublicNftSlugRouteWithChildren
   ApiPublicPiAccountRoute: typeof ApiPublicPiAccountRoute
   ApiPublicPiOperationsRoute: typeof ApiPublicPiOperationsRoute
@@ -738,6 +793,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicNftSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/nft-market/stats': {
+      id: '/api/public/nft-market/stats'
+      path: '/api/public/nft-market/stats'
+      fullPath: '/api/public/nft-market/stats'
+      preLoaderRoute: typeof ApiPublicNftMarketStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/nft-market/listings': {
+      id: '/api/public/nft-market/listings'
+      path: '/api/public/nft-market/listings'
+      fullPath: '/api/public/nft-market/listings'
+      preLoaderRoute: typeof ApiPublicNftMarketListingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/nft-market/collections': {
+      id: '/api/public/nft-market/collections'
+      path: '/api/public/nft-market/collections'
+      fullPath: '/api/public/nft-market/collections'
+      preLoaderRoute: typeof ApiPublicNftMarketCollectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/nft-market/activity': {
+      id: '/api/public/nft-market/activity'
+      path: '/api/public/nft-market/activity'
+      fullPath: '/api/public/nft-market/activity'
+      preLoaderRoute: typeof ApiPublicNftMarketActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/merchant/$id': {
       id: '/api/public/merchant/$id'
       path: '/api/public/merchant/$id'
@@ -839,6 +922,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicLedgerBulkRoute: ApiPublicLedgerBulkRoute,
   ApiPublicLedgerRecordRoute: ApiPublicLedgerRecordRoute,
   ApiPublicMerchantIdRoute: ApiPublicMerchantIdRoute,
+  ApiPublicNftMarketActivityRoute: ApiPublicNftMarketActivityRoute,
+  ApiPublicNftMarketCollectionsRoute: ApiPublicNftMarketCollectionsRoute,
+  ApiPublicNftMarketListingsRoute: ApiPublicNftMarketListingsRoute,
+  ApiPublicNftMarketStatsRoute: ApiPublicNftMarketStatsRoute,
   ApiPublicNftSlugRoute: ApiPublicNftSlugRouteWithChildren,
   ApiPublicPiAccountRoute: ApiPublicPiAccountRoute,
   ApiPublicPiOperationsRoute: ApiPublicPiOperationsRoute,
