@@ -36,7 +36,7 @@ export type ProLedgerEntriesResponse = {
   feed?: "live" | "mirrored";
 };
 
-export type ProLedgerEntryType = "send" | "receive" | "buy" | "sell" | "swap" | "mint";
+export type ProLedgerEntryType = "send" | "receive" | "buy" | "sell" | "swap" | "mint" | "reward";
 
 export type ProLedgerCreds = {
   baseUrl: string;
@@ -131,6 +131,7 @@ async function proGetLive<T>(
     headers: {
       Accept: "application/json",
       "x-api-key": creds.apiKey,
+      Authorization: `Bearer ${creds.apiKey}`,
     },
     signal: signal ?? AbortSignal.timeout(15_000),
   });
@@ -194,6 +195,7 @@ const LOCAL_TYPE_FILTER: Record<string, string[]> = {
   sell: ["sell", "withdrawal"],
   swap: ["swap"],
   mint: ["mint", "nft_mint"],
+  reward: ["reward", "deposit", "payment"],
 };
 
 async function fetchMirroredStats(): Promise<ProLedgerStats> {

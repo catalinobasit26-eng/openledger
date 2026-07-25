@@ -7,7 +7,7 @@ import { pickCollectionImageUrl, sanitizeMetadataImages } from "@/lib/media";
 
 const PRO_TYPE_MAP: Record<string, TxType> = {
   send: "transfer", receive: "transfer", buy: "deposit",
-  sell: "withdrawal", swap: "swap", mint: "nft_mint",
+  sell: "withdrawal", swap: "swap", mint: "nft_mint", reward: "deposit",
 };
 
 function mapProEntry(item: any): Record<string, any> {
@@ -70,11 +70,52 @@ function mapOpenPay(item: any): Record<string, any> {
   };
 }
 
+const OPENPAY_PRO_LEDGER_HOST = "https://openpaypromainnet.lovable.app";
+
+/** Preview / lovableproject hosts redirect to auth and return HTTP 406 for ledger API calls. */
+function resolveOpenPayProBase(baseUrl: string | null | undefined): string {
+  const envBase = (process.env.OPENPAY_PRO_LEDGER_BASE || process.env.OPENPAY_PRO_BASE_URL || "")
+    .trim()
+    .replace(/\/$/, "")
+    .replace(/\/api\/public\/ledger$/i, "");
+  if (envBase) return envBase;
+
+  const raw = (baseUrl || "").trim().replace(/\/$/, "").replace(/\/api\/public\/ledger$/i, "");
+  if (!raw) return OPENPAY_PRO_LEDGER_HOST;
+
+  try {
+    const host = new URL(raw).hostname.toLowerCase();
+    const isBrokenPreview =
+      host.includes("lovableproject.com") ||
+      host.startsWith("id-preview--") ||
+      (host.endsWith(".lovable.app") && host !== "openpaypromainnet.lovable.app");
+    if (isBrokenPreview) return OPENPAY_PRO_LEDGER_HOST;
+  } catch {
+    return OPENPAY_PRO_LEDGER_HOST;
+  }
+
+  return raw;
+}
+
+function resolveOpenPayProApiKey(apiKey: string | null | undefined): string {
+  return (
+    process.env.OPENPAY_PRO_LEDGER_API_KEY ||
+    process.env.OPENPAY_LEDGER_KEY ||
+    process.env.OPENPAY_PRO_API_KEY ||
+    apiKey ||
+    ""
+  );
+}
+
 async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
-  const base = baseUrl.replace(/\/$/, "");
+  const base = resolveOpenPayProBase(baseUrl);
+  const key = resolveOpenPayProApiKey(apiKey);
   const items: any[] = [];
   const headers: Record<string, string> = { accept: "application/json" };
-  if (apiKey) headers["x-api-key"] = apiKey;
+  if (key) {
+    headers["x-api-key"] = key;
+    headers.Authorization = `Bearer ${key}`;
+  }
   let cursor: string | null = null;
   for (let i = 0; i < 20; i++) {
     const u = new URL(`${base}/api/public/ledger/entries`);
@@ -270,15 +311,28 @@ export async function runSync(slug: string) {
     .from("integrations").select("*").eq("slug", slug).maybeSingle();
   if (ierr) throw new Error(ierr.message);
   if (!integ) throw new Error("Integration not found");
-  if (!integ.base_url) throw new Error("base_url is required before syncing");
-  if (slug !== "openpay" && slug !== "openpay_nft" && !integ.api_key) throw new Error("api_key is required before syncing");
-  if (!integ.enabled) throw new Error("Integration is disabled");
+  if (!integ.base_url && slug !== "openpay_pro") throw new Error("base_url is required before syncing");
 
-  const since = integ.last_sync_at ?? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const proBase = slug === "openpay_pro" ? resolveOpenPayProBase(integ.base_url) : "";
+  const proKey = slug === "openpay_pro" ? resolveOpenPayProApiKey(integ.api_key) : "";
+
+  if (slug === "openpay_pro") {
+    if (!proKey) throw new Error("api_key is required before syncing (set Admin API key or OPENPAY_LEDGER_KEY)");
+  } else if (slug !== "openpay" && slug !== "openpay_nft" && !integ.api_key) {
+    throw new Error("api_key is required before syncing");
+  }
+  if (!integ.enabled) throw new Error("Integration is disabled");
+  if (slug !== "openpay_pro" && !integ.base_url) throw new Error("base_url is required before syncing");
+
+  // After an error, backfill from scratch so the since cursor doesn't skip history.
+  const since =
+    integ.last_sync_status === "error" || !integ.last_sync_at
+      ? ""
+      : integ.last_sync_at;
 
   let items: any[] = [];
   try {
-    if (slug === "openpay_pro") items = await fetchOpenPayPro(integ.base_url, integ.api_key ?? "", since);
+    if (slug === "openpay_pro") items = await fetchOpenPayPro(proBase, proKey, since);
     else if (slug === "openpay_nft") {
       await syncNftCollections(integ.base_url, supabaseAdmin);
       items = await fetchOpenPayNft(integ.base_url, since);
@@ -319,6 +373,12 @@ export async function runSync(slug: string) {
   }
 
   await supabaseAdmin.from("integrations").update({
+    ...(slug === "openpay_pro"
+      ? {
+          base_url: proBase,
+          ...(proKey && proKey !== integ.api_key ? { api_key: proKey } : {}),
+        }
+      : {}),
     last_sync_at: new Date().toISOString(),
     last_sync_status: failed === 0 ? "ok" : ok === 0 ? "error" : "partial",
     last_sync_error: errors[0] ?? null,

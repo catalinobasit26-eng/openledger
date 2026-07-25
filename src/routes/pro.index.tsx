@@ -15,7 +15,7 @@ import { z } from "zod";
 import { CopyButton } from "@/components/copy-button";
 import { PageLoader } from "@/components/page-loader";
 import { StatCard } from "@/components/stat-card";
-import { StatusBadge, TypeBadge } from "@/components/badges";
+import { NetworkBadge, StatusBadge, TypeBadge } from "@/components/badges";
 import {
   OPENPAY_PRO_APP_URL,
   OPENPAY_PRO_LEDGER_BASE_DEFAULT,
@@ -27,7 +27,7 @@ import {
 import { formatAmount, formatInt, formatUsd, fullDate, shortAddress, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const TYPE_OPTIONS = ["all", "send", "receive", "buy", "sell", "swap", "mint"] as const;
+const TYPE_OPTIONS = ["all", "send", "receive", "buy", "sell", "swap", "mint", "reward"] as const;
 
 const searchSchema = z.object({
   cursor: z.string().optional().catch(undefined),
@@ -115,6 +115,7 @@ function ProLedgerPage() {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">Public Ledger</span>
+              <NetworkBadge network="mainnet" />
               <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
                 OpenPay Pro
               </span>
@@ -133,8 +134,8 @@ function ProLedgerPage() {
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight">OpenPay Pro Ledger</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Append-only record of every OpenPay Pro transaction — mirrored from{" "}
-              <code className="text-xs">ledger_entries</code> and available via API for OpenLedger sync.
+              Append-only record of every OpenPay Pro transaction (send, receive, buy, sell, swap, mint, reward) —
+              mirrored from <code className="text-xs">ledger_entries</code> and available via API for OpenLedger sync.
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
               <a
@@ -210,7 +211,8 @@ function ProLedgerPage() {
           <h2 className="text-sm font-semibold">API Endpoints</h2>
         </div>
         <p className="text-xs text-muted-foreground">
-          Auth: send header <code className="text-[11px]">x-api-key: YOUR_KEY</code>. Proxied here so the key stays
+          Auth: header <code className="text-[11px]">x-api-key: YOUR_KEY</code> or{" "}
+          <code className="text-[11px]">Authorization: Bearer YOUR_KEY</code>. Proxied here so the key stays
           server-side.
         </p>
         <ul className="space-y-2 font-mono text-[11px] sm:text-xs">
@@ -363,6 +365,7 @@ function ProLedgerPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="font-mono text-xs text-muted-foreground">#{row.sequence}</span>
+                        <NetworkBadge network="mainnet" />
                         <TypeBadge type={row.type} />
                         <StatusBadge status={row.status} />
                       </div>
@@ -397,7 +400,10 @@ function EntryRow({ entry }: { entry: ProLedgerEntry }) {
     >
       <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground">#{entry.sequence}</td>
       <td className="px-3 py-2.5">
-        <TypeBadge type={entry.type} />
+        <div className="flex flex-wrap items-center gap-1.5">
+          <TypeBadge type={entry.type} />
+          <NetworkBadge network="mainnet" />
+        </div>
       </td>
       <td className="px-3 py-2.5">
         <div className="font-medium tabular-nums">{formatAmount(entry.amount, entry.asset || "OUSD")}</div>

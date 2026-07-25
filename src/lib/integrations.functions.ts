@@ -51,6 +51,7 @@ const PRO_TYPE_MAP: Record<string, TxType> = {
   sell: "withdrawal",
   swap: "swap",
   mint: "nft_mint",
+  reward: "deposit",
   stake: "stake",
 };
 
@@ -112,7 +113,7 @@ function mapGeneric(item: any, source: SourcePlatform): Record<string, any> {
 async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
   const base = baseUrl.replace(/\/$/, "");
   const items: any[] = [];
-  const headers = { "x-api-key": apiKey, accept: "application/json" };
+  const headers = { "x-api-key": apiKey, Authorization: `Bearer ${apiKey}`, accept: "application/json" };
   let cursor: string | null = null;
   const maxPages = 20;
   for (let i = 0; i < maxPages; i++) {

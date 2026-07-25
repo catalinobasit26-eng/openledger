@@ -4,7 +4,7 @@ import { z } from "zod";
 import { fetchProLedgerEntries } from "@/lib/openpay-pro-ledger";
 
 const typeSchema = z
-  .enum(["send", "receive", "buy", "sell", "swap", "mint"])
+  .enum(["send", "receive", "buy", "sell", "swap", "mint", "reward"])
   .optional()
   .catch(undefined);
 

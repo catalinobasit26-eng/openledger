@@ -49,9 +49,23 @@ function IntegrationCard({ integ }: { integ: Integration }) {
 
   const save = useMutation({
     mutationFn: async () => {
+      const credentialsChanged =
+        baseUrl !== (integ.base_url ?? "") || apiKey !== (integ.api_key ?? "");
       const { error } = await supabase
         .from("integrations")
-        .update({ base_url: baseUrl, api_key: apiKey, enabled })
+        .update({
+          base_url: baseUrl,
+          api_key: apiKey,
+          enabled,
+          ...(credentialsChanged
+            ? {
+                last_sync_at: null,
+                last_sync_error: null,
+                last_sync_status: null,
+                last_sync_count: 0,
+              }
+            : {}),
+        })
         .eq("id", integ.id);
       if (error) throw new Error(error.message);
     },
@@ -99,9 +113,20 @@ function IntegrationCard({ integ }: { integ: Integration }) {
           <input
             value={baseUrl}
             onChange={(e) => setBaseUrl(e.target.value)}
-            placeholder="https://example.com"
+            placeholder={
+              integ.slug === "openpay_pro"
+                ? "https://openpaypromainnet.lovable.app"
+                : "https://example.com"
+            }
             className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           />
+          {integ.slug === "openpay_pro" && (
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Use the published host <code>https://openpaypromainnet.lovable.app</code> (not a
+              lovableproject / id-preview URL). Sync calls{" "}
+              <code>/api/public/ledger/entries</code> with header <code>x-api-key</code>.
+            </p>
+          )}
         </label>
         <label className="text-xs">
           <span className="text-muted-foreground">API Key</span>
@@ -110,7 +135,11 @@ function IntegrationCard({ integ }: { integ: Integration }) {
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               type={showKey ? "text" : "password"}
-              placeholder="sk_live_..."
+            placeholder={
+              integ.slug === "openpay_pro"
+                ? "olk_..."
+                : "sk_live_..."
+            }
               className="w-full rounded-md border border-border bg-background px-3 py-2 font-mono text-sm"
             />
             <button

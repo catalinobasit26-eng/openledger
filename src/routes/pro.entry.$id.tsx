@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 import { CopyButton } from "@/components/copy-button";
 import { PageLoader } from "@/components/page-loader";
-import { StatusBadge, TypeBadge } from "@/components/badges";
+import { NetworkBadge, StatusBadge, TypeBadge } from "@/components/badges";
 import {
   OPENPAY_PRO_APP_URL,
   type ProLedgerEntry,
@@ -65,6 +65,7 @@ function ProEntryDetailPage() {
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">Ledger entry</span>
+          <NetworkBadge network="mainnet" />
           <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
             OpenPay Pro
           </span>
