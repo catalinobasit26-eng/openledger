@@ -53,7 +53,12 @@ function ledgerRoot(baseUrl: string): string {
 }
 
 function envProKey(): string {
-  return process.env.OPENPAY_PRO_LEDGER_API_KEY || process.env.OPENPAY_PRO_API_KEY || "";
+  return (
+    process.env.OPENPAY_PRO_LEDGER_API_KEY ||
+    process.env.OPENPAY_LEDGER_KEY ||
+    process.env.OPENPAY_PRO_API_KEY ||
+    ""
+  );
 }
 
 function envProBase(): string {
