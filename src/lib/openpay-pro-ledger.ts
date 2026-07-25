@@ -188,15 +188,54 @@ function mapLocalRow(row: {
   };
 }
 
-const LOCAL_TYPE_FILTER: Record<string, string[]> = {
-  send: ["send", "transfer"],
-  receive: ["receive", "transfer"],
-  buy: ["buy", "deposit"],
-  sell: ["sell", "withdrawal"],
-  swap: ["swap"],
-  mint: ["mint", "nft_mint"],
-  reward: ["reward", "deposit", "payment"],
+/** OpenLedger `tx_type` enum values that Pro ledger types map into when mirrored. */
+const VALID_TX_TYPES = new Set([
+  "payment",
+  "transfer",
+  "swap",
+  "nft_mint",
+  "nft_sale",
+  "merchant_payment",
+  "withdrawal",
+  "deposit",
+  "refund",
+  "stake",
+]);
+
+/**
+ * Pro API type → local mirror filter.
+ * Never put Pro-only labels (send/receive/buy/…) into `.eq("type", …)` — they are not in `tx_type`.
+ * Disambiguate subtypes (send vs receive, buy vs reward) via metadata.original_type.
+ */
+const MIRROR_TYPE_FILTER: Record<
+  string,
+  { dbTypes: string[]; originalTypes: string[] }
+> = {
+  send: { dbTypes: ["transfer"], originalTypes: ["send"] },
+  receive: { dbTypes: ["transfer"], originalTypes: ["receive"] },
+  buy: { dbTypes: ["deposit"], originalTypes: ["buy"] },
+  sell: { dbTypes: ["withdrawal"], originalTypes: ["sell"] },
+  swap: { dbTypes: ["swap"], originalTypes: ["swap"] },
+  mint: { dbTypes: ["nft_mint"], originalTypes: ["mint"] },
+  reward: { dbTypes: ["deposit", "payment"], originalTypes: ["reward"] },
 };
+
+function rowMatchesProType(
+  row: { type: string; metadata?: unknown },
+  proType: string,
+): boolean {
+  const mapped = MIRROR_TYPE_FILTER[proType];
+  if (!mapped) return true;
+  const m = meta(row);
+  const original =
+    typeof m.original_type === "string" ? m.original_type.toLowerCase() : "";
+  if (original) return mapped.originalTypes.includes(original);
+  // Legacy rows without original_type: match on stored enum only when unambiguous.
+  const t = (row.type || "").toLowerCase();
+  if (proType === "send" || proType === "receive") return false;
+  if (proType === "buy" || proType === "reward") return false;
+  return mapped.dbTypes.includes(t);
+}
 
 async function fetchMirroredStats(): Promise<ProLedgerStats> {
   const sb = pubClient();
@@ -242,29 +281,79 @@ async function fetchMirroredEntries(opts: {
   const limit = Math.min(500, Math.max(1, opts.limit ?? 100));
   const offset = Math.max(0, Number(opts.cursor || 0) || 0);
   const sb = pubClient();
+  const typeFilter = opts.type && MIRROR_TYPE_FILTER[opts.type] ? MIRROR_TYPE_FILTER[opts.type] : null;
+  // Oversample when we must post-filter by Pro subtype (send/receive/buy/reward).
+  const needsPostFilter = Boolean(
+    typeFilter && (opts.type === "send" || opts.type === "receive" || opts.type === "buy" || opts.type === "reward"),
+  );
+  const fetchCount = needsPostFilter ? Math.min(500, Math.max(limit * 4, limit)) : limit;
 
   let q = sb
     .from("ledger_transactions")
     .select("id, hash, block_number, from_address, to_address, amount, currency, type, status, ts, external_ref, metadata")
     .eq("source", "openpay_pro")
     .order("ts", { ascending: false })
-    .range(offset, offset + limit - 1);
+    .range(offset, offset + fetchCount - 1);
 
   if (opts.asset) q = q.ilike("currency", opts.asset);
   if (opts.since) q = q.gte("ts", opts.since);
   if (opts.address) {
     q = q.or(`from_address.eq.${opts.address},to_address.eq.${opts.address}`);
   }
-  if (opts.type && LOCAL_TYPE_FILTER[opts.type]) {
-    // Prefer original Pro type in metadata when present; also match mapped local types.
-    const types = LOCAL_TYPE_FILTER[opts.type];
-    q = q.or(types.map((t) => `type.eq.${t}`).join(","));
+  if (typeFilter) {
+    const dbTypes = typeFilter.dbTypes.filter((t) => VALID_TX_TYPES.has(t));
+    if (dbTypes.length === 1) q = q.eq("type", dbTypes[0]!);
+    else if (dbTypes.length > 1) q = q.in("type", dbTypes);
+
+    // Prefer metadata.original_type when PostgREST can filter JSON (send/receive/etc.).
+    if (typeFilter.originalTypes.length === 1) {
+      q = q.filter("metadata->>original_type", "eq", typeFilter.originalTypes[0]!);
+    }
   }
 
   const { data, error } = await q;
-  if (error) throw new Error(error.message);
+  if (error) {
+    // Fallback if JSON path filter isn't supported: enum-only query + client filter.
+    if (typeFilter && /original_type|metadata|operator/i.test(error.message)) {
+      let q2 = sb
+        .from("ledger_transactions")
+        .select("id, hash, block_number, from_address, to_address, amount, currency, type, status, ts, external_ref, metadata")
+        .eq("source", "openpay_pro")
+        .order("ts", { ascending: false })
+        .range(offset, offset + fetchCount - 1);
+      if (opts.asset) q2 = q2.ilike("currency", opts.asset);
+      if (opts.since) q2 = q2.gte("ts", opts.since);
+      if (opts.address) {
+        q2 = q2.or(`from_address.eq.${opts.address},to_address.eq.${opts.address}`);
+      }
+      const dbTypes = typeFilter.dbTypes.filter((t) => VALID_TX_TYPES.has(t));
+      if (dbTypes.length === 1) q2 = q2.eq("type", dbTypes[0]!);
+      else if (dbTypes.length > 1) q2 = q2.in("type", dbTypes);
 
-  const rows = (data ?? []).map(mapLocalRow);
+      const retry = await q2;
+      if (retry.error) throw new Error(retry.error.message);
+      const filtered = (retry.data ?? [])
+        .filter((row) => rowMatchesProType(row, opts.type!))
+        .slice(0, limit)
+        .map(mapLocalRow);
+      return {
+        count: filtered.length,
+        next_cursor: filtered.length >= limit ? String(offset + limit) : null,
+        data: filtered,
+        feed: "mirrored",
+      };
+    }
+    throw new Error(error.message);
+  }
+
+  let rows = (data ?? []).map(mapLocalRow);
+  if (opts.type && typeFilter) {
+    rows = rows.filter((row) => {
+      const t = (row.type || "").toLowerCase();
+      return t === opts.type || typeFilter.originalTypes.includes(t);
+    });
+  }
+  rows = rows.slice(0, limit);
   const next_cursor = rows.length >= limit ? String(offset + limit) : null;
 
   return {
