@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   ArrowRight,
-  BookOpen,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
@@ -12,7 +11,6 @@ import {
 } from "lucide-react";
 import { z } from "zod";
 
-import { CopyButton } from "@/components/copy-button";
 import { PageLoader } from "@/components/page-loader";
 import { StatCard } from "@/components/stat-card";
 import { NetworkBadge, StatusBadge, TypeBadge } from "@/components/badges";
@@ -204,33 +202,6 @@ function ProLedgerPage() {
           loading={entries.isLoading}
         />
       </div>
-
-      <section className="space-y-3 rounded-xl border border-border bg-card/40 p-4">
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold">API Endpoints</h2>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Auth: header <code className="text-[11px]">x-api-key: YOUR_KEY</code> or{" "}
-          <code className="text-[11px]">Authorization: Bearer YOUR_KEY</code>. Proxied here so the key stays
-          server-side.
-        </p>
-        <ul className="space-y-2 font-mono text-[11px] sm:text-xs">
-          {[
-            ["GET", `${PUBLIC_BASE}/entries`],
-            ["GET", `${PUBLIC_BASE}/entries/{id_or_sequence}`],
-            ["GET", `${PUBLIC_BASE}/stats`],
-          ].map(([method, url]) => (
-            <li key={url} className="flex flex-wrap items-center gap-2 break-all">
-              <span className="rounded bg-primary/10 px-1.5 py-0.5 font-sans text-[10px] font-semibold text-primary">
-                {method}
-              </span>
-              <span className="text-muted-foreground">{url}</span>
-              <CopyButton value={url} />
-            </li>
-          ))}
-        </ul>
-      </section>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
         <div className="flex flex-wrap gap-1.5">
