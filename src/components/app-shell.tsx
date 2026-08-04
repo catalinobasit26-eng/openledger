@@ -66,7 +66,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="md:hidden rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                className="lg:hidden rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
@@ -138,13 +138,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/" className="shrink-0">
             <BrandLogo />
           </Link>
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5">
             {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 className={cn(
-                  "rounded-md px-3 py-1.5 text-sm transition",
+                  "rounded-md px-2.5 py-1.5 text-[13px] transition",
                   isActive(n.to)
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
