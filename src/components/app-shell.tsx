@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu, Moon, Sun, LogOut, Shield } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { Menu, Moon, Sun, LogOut, Shield, Search } from "lucide-react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { BrandLogo } from "./brand-logo";
 import { RouteProgressBar } from "./page-loader";
+import { CommandPalette, useCommandPaletteHotkey } from "./command-palette";
 import { useTheme } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -20,7 +21,9 @@ const navItems = [
   { to: "/nft", label: "NFTs" },
   { to: "/merchants", label: "Merchants" },
   { to: "/analytics", label: "Analytics" },
+  { to: "/watchlist", label: "Watchlist" },
 ] as const;
+
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle } = useTheme();
