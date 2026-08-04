@@ -30,6 +30,8 @@ export const Route = createFileRoute("/")({
 });
 
 function DashboardPage() {
+  useLedgerRealtime();
+
   const stats = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
