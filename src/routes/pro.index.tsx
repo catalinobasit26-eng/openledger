@@ -34,8 +34,15 @@ const searchSchema = z.object({
   address: z.string().optional().catch(""),
 });
 
+type ProSearch = {
+  cursor?: string;
+  type?: (typeof TYPE_OPTIONS)[number];
+  asset?: string;
+  address?: string;
+};
+
 export const Route = createFileRoute("/pro/")({
-  validateSearch: searchSchema,
+  validateSearch: (s: Record<string, unknown>): ProSearch => searchSchema.parse(s) as ProSearch,
   head: () => ({
     meta: [
       { title: "OpenPay Pro Ledger — OpenLedger" },

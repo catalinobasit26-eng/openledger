@@ -41,8 +41,15 @@ const searchSchema = z.object({
   offset: z.coerce.number().int().min(0).optional().catch(0),
 });
 
+type PiSearch = {
+  wallet?: string;
+  tab?: "payments" | "transactions" | "operations";
+  cursor?: string;
+  offset?: number;
+};
+
 export const Route = createFileRoute("/pi/")({
-  validateSearch: searchSchema,
+  validateSearch: (s: Record<string, unknown>): PiSearch => searchSchema.parse(s) as PiSearch,
   head: () => ({
     meta: [
       { title: "Pi Testnet Explorer — OpenPay OUSD — OpenLedger" },

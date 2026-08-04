@@ -37,8 +37,13 @@ const searchSchema = z.object({
   kind: z.enum(["all", "mints", "sales", "auctions", "gifts"]).optional().catch("all"),
 });
 
+type NftSearch = {
+  tab?: "collections" | "activity" | "listings";
+  kind?: ActivityKind;
+};
+
 export const Route = createFileRoute("/nft/")({
-  validateSearch: searchSchema,
+  validateSearch: (s: Record<string, unknown>): NftSearch => searchSchema.parse(s) as NftSearch,
   head: () => ({
     meta: [
       { title: "NFTs — OpenLedger" },

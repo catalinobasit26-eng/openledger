@@ -104,7 +104,7 @@ export const Route = createFileRoute("/api/public/nft/$slug/cover")({
           });
         }
 
-        return new Response(new Blob([parsed.bytes], { type: parsed.mime }), {
+        return new Response(new Blob([parsed.bytes.slice().buffer as ArrayBuffer], { type: parsed.mime }), {
           status: 200,
           headers: {
             "Content-Type": parsed.mime,
