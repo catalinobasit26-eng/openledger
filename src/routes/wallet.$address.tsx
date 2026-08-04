@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { CopyButton } from "@/components/copy-button";
 import { StatCard } from "@/components/stat-card";
 import { TxTable } from "@/components/tx-table";
-import { formatInt, fullDate, timeAgo } from "@/lib/format";
+import { WatchButton } from "@/components/watch-button";
+import { ExportButton } from "@/components/export-button";
+import { formatInt, formatNumber, fullDate, timeAgo } from "@/lib/format";
 
 export const Route = createFileRoute("/wallet/$address")({
   head: ({ params }) => ({
