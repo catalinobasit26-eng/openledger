@@ -41,8 +41,15 @@ const searchSchema = z.object({
   offset: z.coerce.number().int().min(0).optional().catch(0),
 });
 
+type PiSearch = {
+  wallet?: string;
+  tab?: "payments" | "transactions" | "operations";
+  cursor?: string;
+  offset?: number;
+};
+
 export const Route = createFileRoute("/pi/")({
-  validateSearch: searchSchema,
+  validateSearch: (s: Record<string, unknown>): PiSearch => searchSchema.parse(s) as PiSearch,
   head: () => ({
     meta: [
       { title: "Pi Testnet Explorer — OpenPay OUSD — OpenLedger" },
@@ -133,20 +140,20 @@ function PiExplorerPage() {
 
   const setTab = (next: "payments" | "transactions" | "operations") =>
     navigate({
-      to: "/pi",
-      search: (prev) => ({ ...prev, tab: next, cursor: undefined, offset: 0 }),
+      to: ".",
+      search: (prev: PiSearch) => ({ ...prev, tab: next, cursor: undefined, offset: 0 }),
     });
 
   const goCursor = (c: string | null | undefined) =>
     navigate({
-      to: "/pi",
-      search: (prev) => ({ ...prev, cursor: c || undefined }),
+      to: ".",
+      search: (prev: PiSearch) => ({ ...prev, cursor: c || undefined }),
     });
 
   const goOpsOffset = (next: number) =>
     navigate({
-      to: "/pi",
-      search: (prev) => ({ ...prev, offset: Math.max(0, next) }),
+      to: ".",
+      search: (prev: PiSearch) => ({ ...prev, offset: Math.max(0, next) }),
     });
 
   if (account.isLoading && !account.data) {

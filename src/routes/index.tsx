@@ -9,6 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
 import { SearchBar } from "@/components/search-bar";
 import { TxTable } from "@/components/tx-table";
+import { LiveTicker } from "@/components/live-ticker";
+import { ExportButton } from "@/components/export-button";
+import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
 import { ChartSkeleton, PieSkeleton } from "@/components/chart-skeleton";
 import { formatInt, formatUsd } from "@/lib/format";
 import { isCurrencySwapNote, isStakeTx } from "@/lib/tx-classify";
@@ -27,6 +30,8 @@ export const Route = createFileRoute("/")({
 });
 
 function DashboardPage() {
+  useLedgerRealtime();
+
   const stats = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
@@ -205,14 +210,15 @@ function DashboardPage() {
         ))}
       </section>
 
+      {/* Bento: volume + live stream + type mix + source split */}
       <section className="grid gap-4 lg:grid-cols-3">
         <div
-          className="lg:col-span-2 rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/20 animate-fade-up"
+          className="panel panel-hover lg:col-span-2 p-5 animate-fade-up"
           style={{ "--fade-delay": "640ms" } as CSSProperties}
         >
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold">Daily Volume (14d)</h2>
-            <div className="text-xs text-muted-foreground">All sources</div>
+            <ExportButton rows={(daily.data ?? []) as any} filename="openledger-daily-14d" label="CSV" />
           </div>
           <div className="h-64">
             {daily.isLoading ? (
@@ -236,9 +242,14 @@ function DashboardPage() {
             )}
           </div>
         </div>
+
+        <div className="animate-fade-up lg:row-span-2" style={{ "--fade-delay": "700ms" } as CSSProperties}>
+          <LiveTicker limit={14} className="h-full max-h-[34rem]" />
+        </div>
+
         <div
-          className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/20 animate-fade-up"
-          style={{ "--fade-delay": "720ms" } as CSSProperties}
+          className="panel panel-hover p-5 animate-fade-up"
+          style={{ "--fade-delay": "760ms" } as CSSProperties}
         >
           <h2 className="mb-4 text-sm font-semibold">Transaction Types</h2>
           <div className="h-64">
@@ -267,41 +278,45 @@ function DashboardPage() {
             )}
           </div>
         </div>
-      </section>
 
-      <section
-        className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/20 animate-fade-up"
-        style={{ "--fade-delay": "800ms" } as CSSProperties}
-      >
-        <h2 className="mb-4 text-sm font-semibold">OpenPay vs OpenPay Pro — daily transactions</h2>
-        <div className="h-64">
-          {daily.isLoading ? (
-            <ChartSkeleton bars={10} />
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={daily.data ?? []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} />
-                <YAxis stroke="var(--muted-foreground)" fontSize={11} />
-                <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="OpenPay" stackId="a" fill="var(--primary)" isAnimationActive animationDuration={850} />
-                <Bar dataKey="Pro" stackId="a" fill="var(--chart-2)" isAnimationActive animationDuration={850} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
+        <div
+          className="panel panel-hover p-5 animate-fade-up"
+          style={{ "--fade-delay": "800ms" } as CSSProperties}
+        >
+          <h2 className="mb-4 text-sm font-semibold">OpenPay vs Pro — daily transactions</h2>
+          <div className="h-64">
+            {daily.isLoading ? (
+              <ChartSkeleton bars={10} />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={daily.data ?? []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} />
+                  <YAxis stroke="var(--muted-foreground)" fontSize={11} />
+                  <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="OpenPay" stackId="a" fill="var(--primary)" isAnimationActive animationDuration={850} />
+                  <Bar dataKey="Pro" stackId="a" fill="var(--chart-2)" isAnimationActive animationDuration={850} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
       </section>
 
       <section className="animate-fade-up" style={{ "--fade-delay": "880ms" } as CSSProperties}>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Latest Transactions</h2>
-          <Link to="/explorer" className="text-xs font-medium text-primary transition hover:underline">
-            View all →
-          </Link>
+        <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          <h2 className="truncate text-sm font-semibold">Latest Transactions</h2>
+          <div className="flex shrink-0 items-center gap-2">
+            <ExportButton rows={(recent.data ?? []) as any} filename="openledger-latest-tx" label="CSV" />
+            <Link to="/explorer" className="text-xs font-medium text-primary transition hover:underline">
+              View all →
+            </Link>
+          </div>
         </div>
         <TxTable rows={(recent.data ?? []) as any} dense loading={recent.isLoading} />
       </section>
+
 
       <section
         className="rounded-xl border border-border bg-card p-5 animate-fade-up"

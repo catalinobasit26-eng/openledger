@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as StakeRouteImport } from './routes/stake'
 import { Route as StableRouteImport } from './routes/stable'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -57,6 +58,11 @@ import { Route as ApiPublicPiTransactionHashRouteImport } from './routes/api/pub
 import { Route as ApiPublicPiOperationKeyRouteImport } from './routes/api/public/pi/operation.$key'
 import { Route as ApiPublicNftSlugCoverRouteImport } from './routes/api/public/nft.$slug.cover'
 
+const WatchlistRoute = WatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StakeRoute = StakeRouteImport.update({
   id: '/stake',
   path: '/stake',
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
   '/stake': typeof StakeRoute
+  '/watchlist': typeof WatchlistRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
   '/stake': typeof StakeRoute
+  '/watchlist': typeof WatchlistRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
@@ -404,6 +412,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stable': typeof StableRoute
   '/stake': typeof StakeRoute
+  '/watchlist': typeof WatchlistRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/merchants/$id': typeof MerchantsIdRoute
   '/nft/$slug': typeof NftSlugRoute
@@ -454,6 +463,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/stable'
     | '/stake'
+    | '/watchlist'
     | '/admin'
     | '/merchants/$id'
     | '/nft/$slug'
@@ -502,6 +512,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/stable'
     | '/stake'
+    | '/watchlist'
     | '/admin'
     | '/merchants/$id'
     | '/nft/$slug'
@@ -551,6 +562,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/stable'
     | '/stake'
+    | '/watchlist'
     | '/_authenticated/admin'
     | '/merchants/$id'
     | '/nft/$slug'
@@ -601,6 +613,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StableRoute: typeof StableRoute
   StakeRoute: typeof StakeRoute
+  WatchlistRoute: typeof WatchlistRoute
   MerchantsIdRoute: typeof MerchantsIdRoute
   NftSlugRoute: typeof NftSlugRoute
   TokensSymbolRoute: typeof TokensSymbolRoute
@@ -640,6 +653,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/watchlist': {
+      id: '/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stake': {
       id: '/stake'
       path: '/stake'
@@ -1015,6 +1035,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StableRoute: StableRoute,
   StakeRoute: StakeRoute,
+  WatchlistRoute: WatchlistRoute,
   MerchantsIdRoute: MerchantsIdRoute,
   NftSlugRoute: NftSlugRoute,
   TokensSymbolRoute: TokensSymbolRoute,
@@ -1054,13 +1075,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -34,8 +34,15 @@ const searchSchema = z.object({
   address: z.string().optional().catch(""),
 });
 
+type ProSearch = {
+  cursor?: string;
+  type?: (typeof TYPE_OPTIONS)[number];
+  asset?: string;
+  address?: string;
+};
+
 export const Route = createFileRoute("/pro/")({
-  validateSearch: searchSchema,
+  validateSearch: (s: Record<string, unknown>): ProSearch => searchSchema.parse(s) as ProSearch,
   head: () => ({
     meta: [
       { title: "OpenPay Pro Ledger — OpenLedger" },
@@ -211,8 +218,8 @@ function ProLedgerPage() {
               type="button"
               onClick={() =>
                 navigate({
-                  to: "/pro",
-                  search: (prev) => ({ ...prev, type: t, cursor: undefined }),
+                  to: ".",
+                  search: (prev: ProSearch) => ({ ...prev, type: t, cursor: undefined }),
                 })
               }
               className={cn(
@@ -266,8 +273,8 @@ function ProLedgerPage() {
               disabled={!cursor || entries.isFetching}
               onClick={() =>
                 navigate({
-                  to: "/pro",
-                  search: (prev) => ({ ...prev, cursor: undefined }),
+                  to: ".",
+                  search: (prev: ProSearch) => ({ ...prev, cursor: undefined }),
                 })
               }
               className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium disabled:opacity-40"
@@ -279,8 +286,8 @@ function ProLedgerPage() {
               disabled={!nextCursor || entries.isFetching}
               onClick={() =>
                 navigate({
-                  to: "/pro",
-                  search: (prev) => ({ ...prev, cursor: nextCursor ?? undefined }),
+                  to: ".",
+                  search: (prev: ProSearch) => ({ ...prev, cursor: nextCursor ?? undefined }),
                 })
               }
               className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium disabled:opacity-40"

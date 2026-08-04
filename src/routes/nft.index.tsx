@@ -37,8 +37,13 @@ const searchSchema = z.object({
   kind: z.enum(["all", "mints", "sales", "auctions", "gifts"]).optional().catch("all"),
 });
 
+type NftSearch = {
+  tab?: "collections" | "activity" | "listings";
+  kind?: ActivityKind;
+};
+
 export const Route = createFileRoute("/nft/")({
-  validateSearch: searchSchema,
+  validateSearch: (s: Record<string, unknown>): NftSearch => searchSchema.parse(s) as NftSearch,
   head: () => ({
     meta: [
       { title: "NFTs — OpenLedger" },
@@ -123,10 +128,10 @@ function NftIndex() {
   });
 
   const setTab = (next: "collections" | "activity" | "listings") =>
-    navigate({ to: "/nft", search: (prev) => ({ ...prev, tab: next }) });
+    navigate({ to: ".", search: (prev: NftSearch) => ({ ...prev, tab: next }) });
 
   const setKind = (next: ActivityKind) =>
-    navigate({ to: "/nft", search: (prev) => ({ ...prev, tab: "activity", kind: next }) });
+    navigate({ to: ".", search: (prev: NftSearch) => ({ ...prev, tab: "activity", kind: next }) });
 
   const s = stats.data;
   const volumeOusd = Number(s?.total_volume?.OUSD ?? 0);

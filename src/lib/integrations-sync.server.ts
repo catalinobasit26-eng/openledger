@@ -334,9 +334,9 @@ export async function runSync(slug: string) {
   try {
     if (slug === "openpay_pro") items = await fetchOpenPayPro(proBase, proKey, since);
     else if (slug === "openpay_nft") {
-      await syncNftCollections(integ.base_url, supabaseAdmin);
-      items = await fetchOpenPayNft(integ.base_url, since);
-    } else items = await fetchOpenPay(integ.base_url, integ.api_key ?? "", since);
+      await syncNftCollections(integ.base_url ?? "", supabaseAdmin);
+      items = await fetchOpenPayNft(integ.base_url ?? "", since);
+    } else items = await fetchOpenPay(integ.base_url ?? "", integ.api_key ?? "", since);
   } catch (e: any) {
     await supabaseAdmin.from("integrations").update({
       last_sync_at: new Date().toISOString(),

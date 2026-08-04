@@ -1,8 +1,9 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu, Moon, Sun, LogOut, Shield } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { Menu, Moon, Sun, LogOut, Shield, Search } from "lucide-react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { BrandLogo } from "./brand-logo";
 import { RouteProgressBar } from "./page-loader";
+import { CommandPalette, useCommandPaletteHotkey } from "./command-palette";
 import { useTheme } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -20,7 +21,9 @@ const navItems = [
   { to: "/nft", label: "NFTs" },
   { to: "/merchants", label: "Merchants" },
   { to: "/analytics", label: "Analytics" },
+  { to: "/watchlist", label: "Watchlist" },
 ] as const;
+
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle } = useTheme();
@@ -29,6 +32,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cmdOpen, setCmdOpen] = useState(false);
+  useCommandPaletteHotkey(useCallback(() => setCmdOpen(true), []));
+
 
   useEffect(() => {
     let mounted = true;
@@ -53,6 +59,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
+      <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} />
       {isNavigating ? <RouteProgressBar /> : null}
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6">
@@ -60,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="md:hidden rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                className="lg:hidden rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
@@ -132,13 +139,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/" className="shrink-0">
             <BrandLogo />
           </Link>
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5">
             {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 className={cn(
-                  "rounded-md px-3 py-1.5 text-sm transition",
+                  "rounded-md px-2.5 py-1.5 text-[13px] transition",
                   isActive(n.to)
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -149,6 +156,19 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCmdOpen(true)}
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+              aria-label="Search OpenLedger"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Search…</span>
+              <kbd className="hidden rounded border border-border bg-muted px-1 font-mono text-[10px] sm:inline">
+                ⌘K
+              </kbd>
+            </button>
+
             <button
               type="button"
               onClick={toggle}
