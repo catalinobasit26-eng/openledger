@@ -154,6 +154,19 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
+              onClick={() => setCmdOpen(true)}
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+              aria-label="Search OpenLedger"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Search…</span>
+              <kbd className="hidden rounded border border-border bg-muted px-1 font-mono text-[10px] sm:inline">
+                ⌘K
+              </kbd>
+            </button>
+
+            <button
+              type="button"
               onClick={toggle}
               aria-label="Toggle theme"
               className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
