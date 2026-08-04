@@ -211,7 +211,7 @@ function ProLedgerPage() {
               type="button"
               onClick={() =>
                 navigate({
-                  to: "/pro",
+                  to: ".",
                   search: (prev) => ({ ...prev, type: t, cursor: undefined }),
                 })
               }
@@ -266,7 +266,7 @@ function ProLedgerPage() {
               disabled={!cursor || entries.isFetching}
               onClick={() =>
                 navigate({
-                  to: "/pro",
+                  to: ".",
                   search: (prev) => ({ ...prev, cursor: undefined }),
                 })
               }
@@ -279,7 +279,7 @@ function ProLedgerPage() {
               disabled={!nextCursor || entries.isFetching}
               onClick={() =>
                 navigate({
-                  to: "/pro",
+                  to: ".",
                   search: (prev) => ({ ...prev, cursor: nextCursor ?? undefined }),
                 })
               }

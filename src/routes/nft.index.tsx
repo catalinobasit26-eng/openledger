@@ -123,10 +123,10 @@ function NftIndex() {
   });
 
   const setTab = (next: "collections" | "activity" | "listings") =>
-    navigate({ to: "/nft", search: (prev) => ({ ...prev, tab: next }) });
+    navigate({ to: ".", search: (prev) => ({ ...prev, tab: next }) });
 
   const setKind = (next: ActivityKind) =>
-    navigate({ to: "/nft", search: (prev) => ({ ...prev, tab: "activity", kind: next }) });
+    navigate({ to: ".", search: (prev) => ({ ...prev, tab: "activity", kind: next }) });
 
   const s = stats.data;
   const volumeOusd = Number(s?.total_volume?.OUSD ?? 0);
