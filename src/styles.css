@@ -166,11 +166,16 @@
   html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01", "ss03";
     min-height: 100%;
   }
   body {
     overflow-x: clip;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
   }
   .mono { font-family: var(--font-mono); }
 }
@@ -190,6 +195,46 @@
   background: var(--muted);
   color: var(--muted-foreground);
 }
+
+@utility panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow-panel);
+}
+
+@utility panel-hover {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  &:hover {
+    border-color: color-mix(in oklch, var(--primary) 35%, transparent);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+@utility grid-etch {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--foreground) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 7%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    background-color: color-mix(in oklch, var(--primary) 14%, transparent);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    background-color: transparent;
+  }
+}
+
+@utility animate-row-in {
+  animation: row-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 
 @keyframes fade-up {
   from {
