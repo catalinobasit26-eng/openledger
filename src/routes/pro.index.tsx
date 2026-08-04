@@ -219,7 +219,7 @@ function ProLedgerPage() {
               onClick={() =>
                 navigate({
                   to: ".",
-                  search: (prev) => ({ ...prev, type: t, cursor: undefined }),
+                  search: (prev: ProSearch) => ({ ...prev, type: t, cursor: undefined }),
                 })
               }
               className={cn(
@@ -274,7 +274,7 @@ function ProLedgerPage() {
               onClick={() =>
                 navigate({
                   to: ".",
-                  search: (prev) => ({ ...prev, cursor: undefined }),
+                  search: (prev: ProSearch) => ({ ...prev, cursor: undefined }),
                 })
               }
               className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium disabled:opacity-40"
@@ -287,7 +287,7 @@ function ProLedgerPage() {
               onClick={() =>
                 navigate({
                   to: ".",
-                  search: (prev) => ({ ...prev, cursor: nextCursor ?? undefined }),
+                  search: (prev: ProSearch) => ({ ...prev, cursor: nextCursor ?? undefined }),
                 })
               }
               className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium disabled:opacity-40"

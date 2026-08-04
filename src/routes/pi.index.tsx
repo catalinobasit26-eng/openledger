@@ -141,19 +141,19 @@ function PiExplorerPage() {
   const setTab = (next: "payments" | "transactions" | "operations") =>
     navigate({
       to: ".",
-      search: (prev) => ({ ...prev, tab: next, cursor: undefined, offset: 0 }),
+      search: (prev: PiSearch) => ({ ...prev, tab: next, cursor: undefined, offset: 0 }),
     });
 
   const goCursor = (c: string | null | undefined) =>
     navigate({
       to: ".",
-      search: (prev) => ({ ...prev, cursor: c || undefined }),
+      search: (prev: PiSearch) => ({ ...prev, cursor: c || undefined }),
     });
 
   const goOpsOffset = (next: number) =>
     navigate({
       to: ".",
-      search: (prev) => ({ ...prev, offset: Math.max(0, next) }),
+      search: (prev: PiSearch) => ({ ...prev, offset: Math.max(0, next) }),
     });
 
   if (account.isLoading && !account.data) {
