@@ -578,6 +578,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_nft_collection_cover: { Args: { _slug: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -586,6 +587,21 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      list_nft_collections: {
+        Args: never
+        Returns: {
+          creator_address: string
+          description: string
+          floor_price: number
+          id: string
+          image_url: string
+          name: string
+          owners: number
+          slug: string
+          total_supply: number
+          volume: number
+        }[]
+      }
       record_transaction: {
         Args: {
           p_amount: number
