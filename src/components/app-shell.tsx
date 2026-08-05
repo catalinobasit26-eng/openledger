@@ -98,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </SheetHeader>
               <nav className="flex-1 overflow-y-auto px-3 py-3">
                 <ul className="space-y-1">
-                  {navItems.map((n) => (
+                  {allNavItems.map((n) => (
                     <li key={n.to}>
                       <Link
                         to={n.to}
