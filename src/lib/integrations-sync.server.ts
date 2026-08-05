@@ -107,7 +107,33 @@ function resolveOpenPayProApiKey(apiKey: string | null | undefined): string {
   );
 }
 
+/** Turn upstream failures into an explanation an admin can act on. */
+async function upstreamError(res: Response, url: string): Promise<Error> {
+  const host = (() => {
+    try {
+      return new URL(url).host;
+    } catch {
+      return url;
+    }
+  })();
+  const body = (await res.text().catch(() => "")).slice(0, 200);
+  if (res.status === 530 || /1016|1000|1001/.test(body)) {
+    return new Error(
+      `Upstream host ${host} is unreachable (HTTP 530 / Cloudflare 1016 — origin DNS error). ` +
+        `The source API is offline or its URL changed; update the Base URL for this integration.`,
+    );
+  }
+  if (res.status === 401 || res.status === 403) {
+    return new Error(`Upstream rejected the API key (HTTP ${res.status}). Check the API key for ${host}.`);
+  }
+  if (res.status === 404) {
+    return new Error(`Endpoint not found on ${host} (HTTP 404). Check the Base URL path.`);
+  }
+  return new Error(`HTTP ${res.status}: ${body}`);
+}
+
 async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
+
   const base = resolveOpenPayProBase(baseUrl);
   const key = resolveOpenPayProApiKey(apiKey);
   const items: any[] = [];
@@ -123,7 +149,7 @@ async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
     if (cursor) u.searchParams.set("cursor", cursor);
     else if (since) u.searchParams.set("since", since);
     const res = await fetch(u.toString(), { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    if (!res.ok) throw await upstreamError(res, u.toString());
     const body: any = await res.json();
     const data: any[] = Array.isArray(body?.data) ? body.data : [];
     items.push(...data);
@@ -145,7 +171,7 @@ async function fetchOpenPay(baseUrl: string, apiKey: string, since: string) {
     if (cursor) u.searchParams.set("cursor", cursor);
     else if (since) u.searchParams.set("since", since);
     const res = await fetch(u.toString(), { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    if (!res.ok) throw await upstreamError(res, u.toString());
     const body: any = await res.json();
     const data: any[] = Array.isArray(body?.data) ? body.data
       : Array.isArray(body?.events) ? body.events
@@ -189,7 +215,7 @@ async function fetchOpenPayNft(baseUrl: string, since: string) {
         await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
         continue;
       }
-      throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+      throw await upstreamError(res, u.toString());
     }
     if (!body) break; // upstream exhausted; stop gracefully with what we have
     const data: any[] = Array.isArray(body?.activity) ? body.activity
