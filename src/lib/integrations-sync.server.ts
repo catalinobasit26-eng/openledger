@@ -149,7 +149,7 @@ async function fetchOpenPayPro(baseUrl: string, apiKey: string, since: string) {
     if (cursor) u.searchParams.set("cursor", cursor);
     else if (since) u.searchParams.set("since", since);
     const res = await fetch(u.toString(), { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    if (!res.ok) throw await upstreamError(res, u.toString());
     const body: any = await res.json();
     const data: any[] = Array.isArray(body?.data) ? body.data : [];
     items.push(...data);
@@ -171,7 +171,7 @@ async function fetchOpenPay(baseUrl: string, apiKey: string, since: string) {
     if (cursor) u.searchParams.set("cursor", cursor);
     else if (since) u.searchParams.set("since", since);
     const res = await fetch(u.toString(), { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+    if (!res.ok) throw await upstreamError(res, u.toString());
     const body: any = await res.json();
     const data: any[] = Array.isArray(body?.data) ? body.data
       : Array.isArray(body?.events) ? body.events
@@ -215,7 +215,7 @@ async function fetchOpenPayNft(baseUrl: string, since: string) {
         await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
         continue;
       }
-      throw new Error(`HTTP ${res.status}: ${(await res.text().catch(() => "")).slice(0, 200)}`);
+      throw await upstreamError(res, url);
     }
     if (!body) break; // upstream exhausted; stop gracefully with what we have
     const data: any[] = Array.isArray(body?.activity) ? body.activity
