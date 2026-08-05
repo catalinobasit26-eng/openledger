@@ -1,5 +1,12 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu, Moon, Sun, LogOut, Shield, Search } from "lucide-react";
+import { Menu, Moon, Sun, LogOut, Shield, Search, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { BrandLogo } from "./brand-logo";
 import { RouteProgressBar } from "./page-loader";
