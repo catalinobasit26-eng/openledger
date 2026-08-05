@@ -33,7 +33,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useCommandPaletteHotkey(useCallback(() => setCmdOpen(true), []));
+
 
 
   useEffect(() => {
