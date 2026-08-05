@@ -255,7 +255,19 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-10 min-w-0 overflow-x-clip">{children}</main>
       <footer className="mt-16 border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            <div>
+              <div className="mb-2 text-sm font-semibold text-foreground">OpenPay Pro</div>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
+                <li><a href="https://openpaypro4378.pinet.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenPay Pro · Pi Browser</a></li>
+                <li><a href="https://openpaypro.space/website" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Website</a></li>
+                <li><a href="https://openpaypro.space/openusd" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenUSD ($OUSD)</a></li>
+                <li><a href="https://openpaypro.space/about" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">About OpenPay Pro</a></li>
+                <li><a href="https://openpaypro.space/blog" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Blog</a></li>
+                <li><a href="https://openpaypro.space/wiki" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Wiki</a></li>
+              </ul>
+            </div>
+
             <div>
               <div className="mb-2 text-sm font-semibold text-foreground">OpenPay Ecosystem</div>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
