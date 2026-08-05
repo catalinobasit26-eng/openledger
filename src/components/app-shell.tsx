@@ -60,7 +60,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} />
-      {isNavigating ? <RouteProgressBar /> : null}
+      {mounted && isNavigating ? <RouteProgressBar /> : null}
+
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
