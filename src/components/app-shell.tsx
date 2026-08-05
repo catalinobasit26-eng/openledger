@@ -12,17 +12,23 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/", label: "Dashboard" },
   { to: "/explorer", label: "Explorer" },
-  { to: "/pi", label: "Pi Testnet" },
-  { to: "/pro", label: "OpenPay Pro" },
   { to: "/tokens", label: "Tokens" },
-  { to: "/stable", label: "OUSD" },
-  { to: "/stake", label: "Stake" },
-  { to: "/kyc", label: "KYC" },
   { to: "/nft", label: "NFTs" },
   { to: "/merchants", label: "Merchants" },
   { to: "/analytics", label: "Analytics" },
+] as const;
+
+const moreNavItems = [
+  { to: "/pi", label: "Pi Testnet" },
+  { to: "/pro", label: "OpenPay Pro" },
+  { to: "/stable", label: "OUSD" },
+  { to: "/stake", label: "Stake" },
+  { to: "/kyc", label: "KYC" },
   { to: "/watchlist", label: "Watchlist" },
 ] as const;
+
+const allNavItems = [...navItems, ...moreNavItems];
+
 
 
 export function AppShell({ children }: { children: ReactNode }) {
