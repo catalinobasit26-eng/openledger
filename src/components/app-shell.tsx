@@ -1,5 +1,12 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu, Moon, Sun, LogOut, Shield, Search } from "lucide-react";
+import { Menu, Moon, Sun, LogOut, Shield, Search, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { BrandLogo } from "./brand-logo";
 import { RouteProgressBar } from "./page-loader";
@@ -12,17 +19,23 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/", label: "Dashboard" },
   { to: "/explorer", label: "Explorer" },
-  { to: "/pi", label: "Pi Testnet" },
-  { to: "/pro", label: "OpenPay Pro" },
   { to: "/tokens", label: "Tokens" },
-  { to: "/stable", label: "OUSD" },
-  { to: "/stake", label: "Stake" },
-  { to: "/kyc", label: "KYC" },
   { to: "/nft", label: "NFTs" },
   { to: "/merchants", label: "Merchants" },
   { to: "/analytics", label: "Analytics" },
+] as const;
+
+const moreNavItems = [
+  { to: "/pi", label: "Pi Testnet" },
+  { to: "/pro", label: "OpenPay Pro" },
+  { to: "/stable", label: "OUSD" },
+  { to: "/stake", label: "Stake" },
+  { to: "/kyc", label: "KYC" },
   { to: "/watchlist", label: "Watchlist" },
 ] as const;
+
+const allNavItems = [...navItems, ...moreNavItems];
+
 
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -85,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </SheetHeader>
               <nav className="flex-1 overflow-y-auto px-3 py-3">
                 <ul className="space-y-1">
-                  {navItems.map((n) => (
+                  {allNavItems.map((n) => (
                     <li key={n.to}>
                       <Link
                         to={n.to}
@@ -143,22 +156,47 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/" className="shrink-0">
             <BrandLogo />
           </Link>
-          <nav className="hidden lg:flex items-center gap-0.5">
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 className={cn(
-                  "rounded-md px-2.5 py-1.5 text-[13px] transition",
+                  "whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-tight transition",
                   isActive(n.to)
-                    ? "bg-primary/10 text-primary font-medium"
+                    ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 {n.label}
               </Link>
             ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={cn(
+                  "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-tight outline-none transition",
+                  moreNavItems.some((n) => isActive(n.to))
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                More <ChevronDown className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {moreNavItems.map((n) => (
+                  <DropdownMenuItem key={n.to} asChild>
+                    <Link
+                      to={n.to}
+                      className={cn("cursor-pointer text-[13px]", isActive(n.to) && "text-primary font-medium")}
+                    >
+                      {n.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
+
           <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
@@ -217,7 +255,19 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-10 min-w-0 overflow-x-clip">{children}</main>
       <footer className="mt-16 border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            <div>
+              <div className="mb-2 text-sm font-semibold text-foreground">OpenPay Pro</div>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
+                <li><a href="https://openpaypro4378.pinet.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenPay Pro · Pi Browser</a></li>
+                <li><a href="https://openpaypro.space/website" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Website</a></li>
+                <li><a href="https://openpaypro.space/openusd" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">OpenUSD ($OUSD)</a></li>
+                <li><a href="https://openpaypro.space/about" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">About OpenPay Pro</a></li>
+                <li><a href="https://openpaypro.space/blog" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Blog</a></li>
+                <li><a href="https://openpaypro.space/wiki" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Wiki</a></li>
+              </ul>
+            </div>
+
             <div>
               <div className="mb-2 text-sm font-semibold text-foreground">OpenPay Ecosystem</div>
               <ul className="space-y-1.5 text-xs text-muted-foreground">

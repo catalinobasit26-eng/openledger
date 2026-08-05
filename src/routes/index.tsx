@@ -351,6 +351,33 @@ function DashboardPage() {
             />
           ))}
         </div>
+
+        <div className="mt-6 mb-4 flex items-center gap-2 border-t border-border pt-5">
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </span>
+          <h3 className="text-sm font-semibold">Get Started — OpenPay Pro</h3>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { href: "https://openpaypro4378.pinet.com", label: "OpenPay Pro", sub: "Launch in Pi Browser" },
+            { href: "https://openpaypro.space/website", label: "Website", sub: "openpaypro.space" },
+            { href: "https://openpaypro.space/openusd", label: "OpenUSD ($OUSD)", sub: "Stablecoin overview" },
+            { href: "https://openpaypro.space/about", label: "About OpenPay Pro", sub: "What we build" },
+            { href: "https://openpaypro.space/blog", label: "Blog", sub: "Product updates" },
+            { href: "https://openpaypro.space/wiki", label: "Wiki", sub: "Docs & guides" },
+          ].map((card, i) => (
+            <EcosystemCard
+              key={card.href}
+              href={card.href}
+              label={card.label}
+              sub={card.sub}
+              icon={<ExternalLink className="h-4 w-4" />}
+              style={{ "--fade-delay": `${1440 + i * 40}ms` } as CSSProperties}
+            />
+          ))}
+        </div>
+
       </section>
     </div>
   );
