@@ -215,7 +215,7 @@ async function fetchOpenPayNft(baseUrl: string, since: string) {
         await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
         continue;
       }
-      throw await upstreamError(res, url);
+      throw await upstreamError(res, u.toString());
     }
     if (!body) break; // upstream exhausted; stop gracefully with what we have
     const data: any[] = Array.isArray(body?.activity) ? body.activity
