@@ -30,6 +30,7 @@ import { Route as TokensSymbolRouteImport } from './routes/tokens.$symbol'
 import { Route as NftSlugRouteImport } from './routes/nft.$slug'
 import { Route as MerchantsIdRouteImport } from './routes/merchants.$id'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as TxRefRefRouteImport } from './routes/tx.ref.$ref'
 import { Route as ProEntryIdRouteImport } from './routes/pro.entry.$id'
 import { Route as PiTxHashRouteImport } from './routes/pi.tx.$hash'
 import { Route as PiOpKeyRouteImport } from './routes/pi.op.$key'
@@ -50,6 +51,7 @@ import { Route as ApiPublicNftMarketListingsRouteImport } from './routes/api/pub
 import { Route as ApiPublicNftMarketCollectionsRouteImport } from './routes/api/public/nft-market/collections'
 import { Route as ApiPublicNftMarketActivityRouteImport } from './routes/api/public/nft-market/activity'
 import { Route as ApiPublicMerchantIdRouteImport } from './routes/api/public/merchant.$id'
+import { Route as ApiPublicLedgerResolveRouteImport } from './routes/api/public/ledger.resolve'
 import { Route as ApiPublicLedgerRecordRouteImport } from './routes/api/public/ledger.record'
 import { Route as ApiPublicLedgerBulkRouteImport } from './routes/api/public/ledger.bulk'
 import { Route as ApiPublicHooksSyncAllRouteImport } from './routes/api/public/hooks/sync-all'
@@ -162,6 +164,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const TxRefRefRoute = TxRefRefRouteImport.update({
+  id: '/tx/ref/$ref',
+  path: '/tx/ref/$ref',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProEntryIdRoute = ProEntryIdRouteImport.update({
   id: '/pro/entry/$id',
   path: '/pro/entry/$id',
@@ -266,6 +273,11 @@ const ApiPublicMerchantIdRoute = ApiPublicMerchantIdRouteImport.update({
   path: '/api/public/merchant/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicLedgerResolveRoute = ApiPublicLedgerResolveRouteImport.update({
+  id: '/api/public/ledger/resolve',
+  path: '/api/public/ledger/resolve',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicLedgerRecordRoute = ApiPublicLedgerRecordRouteImport.update({
   id: '/api/public/ledger/record',
   path: '/api/public/ledger/record',
@@ -329,9 +341,11 @@ export interface FileRoutesByFullPath {
   '/pi/op/$key': typeof PiOpKeyRoute
   '/pi/tx/$hash': typeof PiTxHashRoute
   '/pro/entry/$id': typeof ProEntryIdRoute
+  '/tx/ref/$ref': typeof TxRefRefRoute
   '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
+  '/api/public/ledger/resolve': typeof ApiPublicLedgerResolveRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
   '/api/public/nft-market/activity': typeof ApiPublicNftMarketActivityRoute
   '/api/public/nft-market/collections': typeof ApiPublicNftMarketCollectionsRoute
@@ -378,9 +392,11 @@ export interface FileRoutesByTo {
   '/pi/op/$key': typeof PiOpKeyRoute
   '/pi/tx/$hash': typeof PiTxHashRoute
   '/pro/entry/$id': typeof ProEntryIdRoute
+  '/tx/ref/$ref': typeof TxRefRefRoute
   '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
+  '/api/public/ledger/resolve': typeof ApiPublicLedgerResolveRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
   '/api/public/nft-market/activity': typeof ApiPublicNftMarketActivityRoute
   '/api/public/nft-market/collections': typeof ApiPublicNftMarketCollectionsRoute
@@ -429,9 +445,11 @@ export interface FileRoutesById {
   '/pi/op/$key': typeof PiOpKeyRoute
   '/pi/tx/$hash': typeof PiTxHashRoute
   '/pro/entry/$id': typeof ProEntryIdRoute
+  '/tx/ref/$ref': typeof TxRefRefRoute
   '/api/public/hooks/sync-all': typeof ApiPublicHooksSyncAllRoute
   '/api/public/ledger/bulk': typeof ApiPublicLedgerBulkRoute
   '/api/public/ledger/record': typeof ApiPublicLedgerRecordRoute
+  '/api/public/ledger/resolve': typeof ApiPublicLedgerResolveRoute
   '/api/public/merchant/$id': typeof ApiPublicMerchantIdRoute
   '/api/public/nft-market/activity': typeof ApiPublicNftMarketActivityRoute
   '/api/public/nft-market/collections': typeof ApiPublicNftMarketCollectionsRoute
@@ -480,9 +498,11 @@ export interface FileRouteTypes {
     | '/pi/op/$key'
     | '/pi/tx/$hash'
     | '/pro/entry/$id'
+    | '/tx/ref/$ref'
     | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
+    | '/api/public/ledger/resolve'
     | '/api/public/merchant/$id'
     | '/api/public/nft-market/activity'
     | '/api/public/nft-market/collections'
@@ -529,9 +549,11 @@ export interface FileRouteTypes {
     | '/pi/op/$key'
     | '/pi/tx/$hash'
     | '/pro/entry/$id'
+    | '/tx/ref/$ref'
     | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
+    | '/api/public/ledger/resolve'
     | '/api/public/merchant/$id'
     | '/api/public/nft-market/activity'
     | '/api/public/nft-market/collections'
@@ -579,9 +601,11 @@ export interface FileRouteTypes {
     | '/pi/op/$key'
     | '/pi/tx/$hash'
     | '/pro/entry/$id'
+    | '/tx/ref/$ref'
     | '/api/public/hooks/sync-all'
     | '/api/public/ledger/bulk'
     | '/api/public/ledger/record'
+    | '/api/public/ledger/resolve'
     | '/api/public/merchant/$id'
     | '/api/public/nft-market/activity'
     | '/api/public/nft-market/collections'
@@ -629,9 +653,11 @@ export interface RootRouteChildren {
   PiOpKeyRoute: typeof PiOpKeyRoute
   PiTxHashRoute: typeof PiTxHashRoute
   ProEntryIdRoute: typeof ProEntryIdRoute
+  TxRefRefRoute: typeof TxRefRefRoute
   ApiPublicHooksSyncAllRoute: typeof ApiPublicHooksSyncAllRoute
   ApiPublicLedgerBulkRoute: typeof ApiPublicLedgerBulkRoute
   ApiPublicLedgerRecordRoute: typeof ApiPublicLedgerRecordRoute
+  ApiPublicLedgerResolveRoute: typeof ApiPublicLedgerResolveRoute
   ApiPublicMerchantIdRoute: typeof ApiPublicMerchantIdRoute
   ApiPublicNftMarketActivityRoute: typeof ApiPublicNftMarketActivityRoute
   ApiPublicNftMarketCollectionsRoute: typeof ApiPublicNftMarketCollectionsRoute
@@ -800,6 +826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/tx/ref/$ref': {
+      id: '/tx/ref/$ref'
+      path: '/tx/ref/$ref'
+      fullPath: '/tx/ref/$ref'
+      preLoaderRoute: typeof TxRefRefRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pro/entry/$id': {
       id: '/pro/entry/$id'
       path: '/pro/entry/$id'
@@ -940,6 +973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMerchantIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/ledger/resolve': {
+      id: '/api/public/ledger/resolve'
+      path: '/api/public/ledger/resolve'
+      fullPath: '/api/public/ledger/resolve'
+      preLoaderRoute: typeof ApiPublicLedgerResolveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/ledger/record': {
       id: '/api/public/ledger/record'
       path: '/api/public/ledger/record'
@@ -1051,9 +1091,11 @@ const rootRouteChildren: RootRouteChildren = {
   PiOpKeyRoute: PiOpKeyRoute,
   PiTxHashRoute: PiTxHashRoute,
   ProEntryIdRoute: ProEntryIdRoute,
+  TxRefRefRoute: TxRefRefRoute,
   ApiPublicHooksSyncAllRoute: ApiPublicHooksSyncAllRoute,
   ApiPublicLedgerBulkRoute: ApiPublicLedgerBulkRoute,
   ApiPublicLedgerRecordRoute: ApiPublicLedgerRecordRoute,
+  ApiPublicLedgerResolveRoute: ApiPublicLedgerResolveRoute,
   ApiPublicMerchantIdRoute: ApiPublicMerchantIdRoute,
   ApiPublicNftMarketActivityRoute: ApiPublicNftMarketActivityRoute,
   ApiPublicNftMarketCollectionsRoute: ApiPublicNftMarketCollectionsRoute,
