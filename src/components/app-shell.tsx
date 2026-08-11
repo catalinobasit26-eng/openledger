@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu, Moon, Sun, LogOut, Shield, Search, ChevronDown } from "lucide-react";
+import { Menu, Moon, Sun, LogOut, Shield, Search, ChevronDown, Home, Compass, Image as ImageIcon, BarChart3, Star } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
