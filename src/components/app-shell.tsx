@@ -78,19 +78,20 @@ export function AppShell({ children }: { children: ReactNode }) {
       <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} />
       {mounted && isNavigating ? <RouteProgressBar /> : null}
 
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6">
+      <header className="sticky top-0 z-30 border-b ios-bar">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:gap-6 sm:px-6">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="lg:hidden rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                className="lg:hidden ios-icon-btn"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[min(100%,20rem)] p-0 flex flex-col">
+
               <SheetHeader className="border-b border-border px-4 py-4 text-left">
                 <SheetTitle className="text-base">
                   <BrandLogo />
