@@ -73,7 +73,7 @@ function TxDetailPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-xl border border-border bg-card p-5 space-y-3 text-sm">
+        <div className="lg:col-span-2 ios-card p-5 space-y-3 text-sm">
           <Row label="Block">
             <span className="font-mono">#{tx.block_number}</span>
             {nextBlock && (
@@ -111,7 +111,7 @@ function TxDetailPage() {
           {tx.external_ref && <Row label="External Ref"><span className="font-mono text-xs">{tx.external_ref}</span></Row>}
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-5 space-y-4 text-sm">
+        <div className="ios-card p-5 space-y-4 text-sm">
           <div className="flex items-center gap-2 text-success">
             <ShieldCheck className="h-4 w-4" />
             <span className="font-medium">Verified on hash chain</span>
@@ -131,7 +131,7 @@ function TxDetailPage() {
       </div>
 
       {hasMetadata && (
-        <div className="rounded-xl border border-border bg-card p-5">
+        <div className="ios-card p-5">
           <div className="mb-3 flex items-center justify-between">
             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Metadata</div>
             <div className="text-[10px] text-muted-foreground">Enriched fields from source event</div>

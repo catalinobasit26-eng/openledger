@@ -37,7 +37,7 @@ function MerchantsIndex() {
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {(data ?? []).map((m: any) => (
-          <Link key={m.id} to="/merchants/$id" params={{ id: m.id }} className="rounded-xl border border-border bg-card p-4 transition hover:border-primary/40">
+          <Link key={m.id} to="/merchants/$id" params={{ id: m.id }} className="ios-card p-4 transition hover:border-primary/40">
             <div className="flex items-start justify-between">
               <div>
                 <div className="font-semibold">{m.name}</div>

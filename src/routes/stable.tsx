@@ -73,7 +73,7 @@ function StablePage() {
         {pi ? null : null}
       </div>
 
-      <section className="rounded-xl border border-border bg-card p-4 sm:p-5">
+      <section className="ios-card p-4 sm:p-5">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs uppercase tracking-wider text-muted-foreground">Price · 30 days</div>
@@ -104,7 +104,7 @@ function StablePage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-border bg-card p-4 sm:p-5">
+      <section className="ios-card p-4 sm:p-5">
         <div className="text-xs uppercase tracking-wider text-muted-foreground">On-ledger volume · 30 days</div>
         <div className="mt-4 h-56 sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
@@ -128,7 +128,7 @@ function StablePage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-border bg-card p-4 sm:p-5 text-sm text-muted-foreground">
+      <section className="ios-card p-4 sm:p-5 text-sm text-muted-foreground">
         <div className="font-semibold text-foreground">About the peg</div>
         <p className="mt-2">
           OUSD is the unit of account for the OpenPay ecosystem. Its value is fixed at 1 USD, and 1 Pi is treated as 1 OUSD across the ledger.

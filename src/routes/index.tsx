@@ -319,7 +319,7 @@ function DashboardPage() {
 
 
       <section
-        className="rounded-xl border border-border bg-card p-5 animate-fade-up"
+        className="ios-card p-5 animate-fade-up"
         style={{ "--fade-delay": "960ms" } as CSSProperties}
       >
         <div className="mb-4 flex items-center gap-2">

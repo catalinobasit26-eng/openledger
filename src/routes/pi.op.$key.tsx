@@ -125,7 +125,7 @@ function PiOpDetailPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-xl border border-border bg-card p-5 space-y-4 text-sm">
+        <div className="lg:col-span-2 ios-card p-5 space-y-4 text-sm">
           <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
             <PartyCard label="From" party={entry.sender} />
             <ArrowRight className="mx-auto h-4 w-4 text-muted-foreground" />
@@ -164,7 +164,7 @@ function PiOpDetailPage() {
           ) : null}
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-5 space-y-4 text-sm">
+        <div className="ios-card p-5 space-y-4 text-sm">
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Links</div>
           {chainHash ? (
             <div className="space-y-1">

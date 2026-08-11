@@ -81,7 +81,7 @@ function NftDetail() {
         <StatCard label="Floor" value={`${formatNumber(c.floor_price)} OUSD`} />
         <StatCard label="Volume" value={`${formatNumber(c.volume)} OUSD`} />
       </div>
-      <div className="rounded-xl border border-border bg-card">
+      <div className="ios-card">
         <ul className="divide-y divide-border sm:hidden">
           {(events.data ?? []).map((e: any) => {
             const clickable = Boolean(e.tx_hash);

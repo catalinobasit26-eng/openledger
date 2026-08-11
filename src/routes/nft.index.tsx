@@ -331,7 +331,7 @@ function CollectionsSection({
                 key={c.id}
                 to="/nft/$slug"
                 params={{ slug: c.slug }}
-                className="group overflow-hidden rounded-xl border border-border bg-card transition hover:border-primary/40 hover:shadow-lg animate-fade-up"
+                className="group overflow-hidden ios-card transition hover:border-primary/40 hover:shadow-lg animate-fade-up"
               >
                 <NftCover slug={c.slug} collectionId={c.id} name={c.name} className="aspect-square transition group-hover:scale-[1.02]" />
                 <div className="p-4">
@@ -358,7 +358,7 @@ function CollectionsSection({
         ) : null}
 
         {!localLoading && !localError && view === "list" ? (
-          <div className="overflow-hidden rounded-xl border border-border bg-card animate-fade-up">
+          <div className="overflow-hidden ios-card animate-fade-up">
             <ul className="divide-y divide-border">
               {local.map((c: any) => (
                 <li key={c.id}>
@@ -407,7 +407,7 @@ function CollectionsSection({
               const thumb = nftCollectionThumb(c);
               const slug = String(c.id ?? c.code ?? "").toLowerCase();
               return (
-                <div key={c.id} className="flex gap-3 rounded-xl border border-border bg-card p-3">
+                <div key={c.id} className="flex gap-3 ios-card p-3">
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
                     {thumb ? (
                       <img src={thumb} alt="" className="h-full w-full object-cover" loading="lazy" />
@@ -504,7 +504,7 @@ function ActivitySection({
       ) : null}
 
       {!loading && !error ? (
-        <div className="rounded-xl border border-border bg-card">
+        <div className="ios-card">
           <ul className="divide-y divide-border sm:hidden">
             {rows.map((ev) => (
               <ActivityMobileCard key={ev.id} ev={ev} />
@@ -649,7 +649,7 @@ function ListingsSection({
           {rows.map((l) => {
             const thumb = nftItemThumb(l.item);
             return (
-              <div key={l.id} className="overflow-hidden rounded-xl border border-border bg-card">
+              <div key={l.id} className="overflow-hidden ios-card">
                 <div className="aspect-4/3 bg-muted">
                   {thumb ? (
                     <img src={thumb} alt="" className="h-full w-full object-cover" loading="lazy" />

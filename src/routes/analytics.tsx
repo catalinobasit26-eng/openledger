@@ -158,7 +158,7 @@ function AnalyticsPage() {
 
 function ChartCard({ title, children, loading }: { title: string; children: ReactNode; loading?: boolean }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
+    <div className="ios-card p-5">
       <h2 className="mb-4 text-sm font-semibold">{title}</h2>
       <div className="h-64">{loading ? <ChartSkeleton /> : children}</div>
     </div>
@@ -167,7 +167,7 @@ function ChartCard({ title, children, loading }: { title: string; children: Reac
 
 function TopList({ title, items }: { title: string; items: { label: string; value: string; href: string }[] }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
+    <div className="ios-card p-5">
       <h2 className="mb-3 text-sm font-semibold">{title}</h2>
       <ul className="divide-y divide-border">
         {items.map((i, idx) => (

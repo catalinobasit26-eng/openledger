@@ -406,7 +406,7 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
 
   if (!rows.length) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+      <div className="ios-card p-8 text-center text-sm text-muted-foreground">
         No payments found for this account.
       </div>
     );
@@ -417,7 +417,7 @@ function PaymentsTable({ rows, focus }: { rows: PiPayment[]; focus: string }) {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="ios-card">
       <ul className="divide-y divide-border sm:hidden">
         {rows.map((p) => {
           const inbound = p.to === focus;
@@ -551,7 +551,7 @@ function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
 
   if (!rows.length) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+      <div className="ios-card p-8 text-center text-sm text-muted-foreground">
         No transactions found for this account.
       </div>
     );
@@ -562,7 +562,7 @@ function TransactionsTable({ rows }: { rows: PiTransaction[] }) {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="ios-card">
       <ul className="divide-y divide-border sm:hidden">
         {rows.map((tx) => (
           <li key={tx.hash}>
@@ -709,7 +709,7 @@ function OperationsTable({
 
   if (!rows.length) {
     return (
-      <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+      <div className="ios-card p-8 text-center text-sm text-muted-foreground">
         No OpenLedger operations found.
       </div>
     );
@@ -733,7 +733,7 @@ function OperationsTable({
         </div>
       )}
 
-      <div className="rounded-xl border border-border bg-card">
+      <div className="ios-card">
         <ul className="divide-y divide-border sm:hidden">
           {rows.map((op, i) => {
             const kind = classifyOpenLedgerNote(op.note);
