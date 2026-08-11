@@ -36,6 +36,14 @@ const moreNavItems = [
 
 const allNavItems = [...navItems, ...moreNavItems];
 
+const tabItems = [
+  { to: "/", label: "Home", icon: Home },
+  { to: "/explorer", label: "Explorer", icon: Compass },
+  { to: "/nft", label: "NFTs", icon: ImageIcon },
+  { to: "/analytics", label: "Stats", icon: BarChart3 },
+  { to: "/watchlist", label: "Watch", icon: Star },
+] as const;
+
 
 
 export function AppShell({ children }: { children: ReactNode }) {
