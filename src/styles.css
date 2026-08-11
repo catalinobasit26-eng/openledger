@@ -51,7 +51,7 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.875rem;
   --background: oklch(0.99 0.003 250);
   --foreground: oklch(0.18 0.04 264);
   --card: oklch(1 0 0);
@@ -89,6 +89,9 @@
   --surface-1: oklch(1 0 0);
   --surface-2: oklch(0.975 0.006 250);
   --gradient-navy: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
+  --radius-ios: 1.25rem;
+  --shadow-ios: 0 1px 1px oklch(0.18 0.04 264 / 4%), 0 6px 16px -8px oklch(0.18 0.04 264 / 12%), 0 24px 48px -28px oklch(0.18 0.04 264 / 18%);
+  --shadow-ios-lift: 0 2px 4px oklch(0.18 0.04 264 / 6%), 0 12px 28px -10px oklch(0.18 0.04 264 / 18%), 0 36px 64px -32px oklch(0.18 0.04 264 / 26%);
   --shadow-panel: 0 1px 2px oklch(0.18 0.04 264 / 6%), 0 8px 28px -18px oklch(0.18 0.04 264 / 26%);
   --shadow-lift: 0 2px 6px oklch(0.18 0.04 264 / 8%), 0 18px 42px -22px oklch(0.18 0.04 264 / 32%);
 
@@ -139,6 +142,9 @@
   --surface-1: oklch(0.17 0.024 264);
   --surface-2: oklch(0.21 0.026 264);
   --gradient-navy: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
+  --radius-ios: 1.25rem;
+  --shadow-ios: 0 1px 1px oklch(0 0 0 / 35%), 0 8px 20px -10px oklch(0 0 0 / 55%), 0 28px 56px -30px oklch(0 0 0 / 70%);
+  --shadow-ios-lift: 0 2px 6px oklch(0 0 0 / 45%), 0 16px 34px -12px oklch(0 0 0 / 60%), 0 40px 72px -34px oklch(0 0 0 / 78%);
   --shadow-panel: 0 1px 2px oklch(0 0 0 / 40%), 0 10px 30px -20px oklch(0 0 0 / 70%);
   --shadow-lift: 0 2px 8px oklch(0 0 0 / 45%), 0 22px 48px -24px oklch(0 0 0 / 75%);
 
