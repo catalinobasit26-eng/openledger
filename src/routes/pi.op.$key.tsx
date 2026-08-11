@@ -59,7 +59,7 @@ function PiOpDetailPage() {
     return (
       <div className="space-y-4">
         <Link
-          to="/pi/"
+          to="/pi"
           search={{ tab: "operations", cursor: undefined, offset: 0 }}
           className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
         >
@@ -80,7 +80,7 @@ function PiOpDetailPage() {
     <div className="space-y-6">
       <div>
         <Link
-          to="/pi/"
+          to="/pi"
           search={{ tab: "operations", cursor: undefined, offset: 0 }}
           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
