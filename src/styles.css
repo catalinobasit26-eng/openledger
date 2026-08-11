@@ -196,20 +196,44 @@
   color: var(--muted-foreground);
 }
 
+@utility ios-card {
+  position: relative;
+  border-radius: var(--radius-ios);
+  background: color-mix(in oklch, var(--card) 82%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  box-shadow: var(--shadow-ios);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease;
+}
+
 @utility panel {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--card);
-  box-shadow: var(--shadow-panel);
+  border-radius: var(--radius-ios);
+  background: color-mix(in oklch, var(--card) 82%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  box-shadow: var(--shadow-ios);
 }
 
 @utility panel-hover {
-  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease;
   &:hover {
-    border-color: color-mix(in oklch, var(--primary) 35%, transparent);
-    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+    border-color: color-mix(in oklch, var(--primary) 28%, transparent);
+    box-shadow: var(--shadow-ios-lift);
+  }
+  &:active {
+    transform: scale(0.99);
   }
 }
+
 
 @utility grid-etch {
   background-image:
