@@ -24,7 +24,7 @@ function TableSkeleton({ dense, rows = 6 }: { dense?: boolean; rows?: number }) 
     <div className="ios-card overflow-hidden animate-fade-up">
       <div className="table-scroll">
         <table className="w-full min-w-5xl text-sm">
-          <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+          <thead className="bg-foreground/4 text-left text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Tx Hash</th>
               <th className="px-4 py-3 font-medium">Type</th>
@@ -117,7 +117,7 @@ export function TxTable({
 
   if (!rows.length) {
     return (
-      <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground animate-fade-up">
+      <div className="ios-card border-dashed p-10 text-center text-sm text-muted-foreground animate-fade-up">
         No transactions found.
       </div>
     );
@@ -139,7 +139,7 @@ export function TxTable({
       <TxMobileCards rows={rows} />
       <div className="hidden table-scroll sm:block">
         <table className="w-full min-w-5xl text-sm">
-          <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+          <thead className="bg-foreground/4 text-left text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Tx Hash</th>
               <th className="px-4 py-3 font-medium">Type</th>
@@ -164,7 +164,7 @@ export function TxTable({
                 tabIndex={0}
                 onClick={() => openTx(r.hash)}
                 onKeyDown={(e) => onRowKey(e, r.hash)}
-                className="border-t border-border transition-colors duration-200 hover:bg-muted/30 animate-fade-up cursor-pointer group"
+                className="ios-list-row border-t border-border/70 animate-fade-up cursor-pointer group"
                 style={{ "--fade-delay": `${80 + i * 35}ms` } as CSSProperties}
               >
                 <td className="px-4 py-3">

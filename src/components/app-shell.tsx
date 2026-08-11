@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Menu, Moon, Sun, LogOut, Shield, Search, ChevronDown } from "lucide-react";
+import { Menu, Moon, Sun, LogOut, Shield, Search, ChevronDown, Home, Compass, Image as ImageIcon, BarChart3, Star } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,14 @@ const moreNavItems = [
 ] as const;
 
 const allNavItems = [...navItems, ...moreNavItems];
+
+const tabItems = [
+  { to: "/", label: "Home", icon: Home },
+  { to: "/explorer", label: "Explorer", icon: Compass },
+  { to: "/nft", label: "NFTs", icon: ImageIcon },
+  { to: "/analytics", label: "Stats", icon: BarChart3 },
+  { to: "/watchlist", label: "Watch", icon: Star },
+] as const;
 
 
 
@@ -78,19 +86,20 @@ export function AppShell({ children }: { children: ReactNode }) {
       <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} />
       {mounted && isNavigating ? <RouteProgressBar /> : null}
 
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6">
+      <header className="sticky top-0 z-30 border-b ios-bar">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:gap-6 sm:px-6">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="lg:hidden rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                className="lg:hidden ios-icon-btn"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[min(100%,20rem)] p-0 flex flex-col">
+
               <SheetHeader className="border-b border-border px-4 py-4 text-left">
                 <SheetTitle className="text-base">
                   <BrandLogo />
@@ -156,16 +165,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/" className="shrink-0">
             <BrandLogo />
           </Link>
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex ios-segment">
             {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 className={cn(
-                  "whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-tight transition",
-                  isActive(n.to)
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  "ios-segment-item whitespace-nowrap",
+                  isActive(n.to) && "ios-segment-active",
                 )}
               >
                 {n.label}
@@ -174,20 +181,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={cn(
-                  "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-tight outline-none transition",
-                  moreNavItems.some((n) => isActive(n.to))
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  "ios-segment-item inline-flex items-center gap-1 whitespace-nowrap outline-none",
+                  moreNavItems.some((n) => isActive(n.to)) && "ios-segment-active",
                 )}
               >
                 More <ChevronDown className="h-3.5 w-3.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-48 rounded-2xl">
                 {moreNavItems.map((n) => (
                   <DropdownMenuItem key={n.to} asChild>
                     <Link
                       to={n.to}
-                      className={cn("cursor-pointer text-[13px]", isActive(n.to) && "text-primary font-medium")}
+                      className={cn("cursor-pointer rounded-xl text-[13px]", isActive(n.to) && "text-primary font-medium")}
                     >
                       {n.label}
                     </Link>
@@ -197,33 +202,29 @@ export function AppShell({ children }: { children: ReactNode }) {
             </DropdownMenu>
           </nav>
 
-          <div className="ml-auto flex items-center gap-2">
+
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setCmdOpen(true)}
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+              className="ios-capsule inline-flex items-center gap-2 border border-transparent bg-foreground/5 px-3 py-2 text-xs text-muted-foreground transition hover:bg-foreground/9 hover:text-foreground"
               aria-label="Search OpenLedger"
             >
               <Search className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Search…</span>
-              <kbd className="hidden rounded border border-border bg-muted px-1 font-mono text-[10px] sm:inline">
+              <kbd className="hidden rounded-full bg-background/70 px-1.5 font-mono text-[10px] sm:inline">
                 ⌘K
               </kbd>
             </button>
 
-            <button
-              type="button"
-              onClick={toggle}
-              aria-label="Toggle theme"
-              className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
-            >
+            <button type="button" onClick={toggle} aria-label="Toggle theme" className="ios-icon-btn">
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             {email ? (
               <>
                 <Link
                   to="/admin"
-                  className="hidden sm:inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                  className="ios-capsule hidden sm:inline-flex items-center gap-1 bg-foreground/5 px-3 py-2 text-xs font-medium text-foreground hover:bg-foreground/9"
                 >
                   <Shield className="h-3.5 w-3.5" /> Admin
                 </Link>
@@ -233,7 +234,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     await supabase.auth.signOut();
                     navigate({ to: "/" });
                   }}
-                  className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                  className="ios-icon-btn"
                   aria-label="Sign out"
                 >
                   <LogOut className="h-4 w-4" />
@@ -244,15 +245,45 @@ export function AppShell({ children }: { children: ReactNode }) {
                 href="https://www.openpy.space/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="ios-capsule hidden sm:inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90"
               >
                 Sign in
               </a>
             ) : null}
           </div>
+
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-10 min-w-0 overflow-x-clip">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-24 lg:pb-10 min-w-0 overflow-x-clip">{children}</main>
+
+      {/* iOS-style bottom tab bar (mobile) */}
+      <nav
+        aria-label="Primary"
+        className="fixed inset-x-0 bottom-0 z-30 border-t ios-bar lg:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <ul className="mx-auto grid max-w-md grid-cols-5">
+          {tabItems.map((t) => {
+            const Icon = t.icon;
+            const active = isActive(t.to);
+            return (
+              <li key={t.to}>
+                <Link
+                  to={t.to}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5 px-1 py-2 text-[10px] font-medium transition",
+                    active ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  <Icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
+                  {t.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
       <footer className="mt-16 border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">

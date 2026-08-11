@@ -45,7 +45,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-display: var(--font-sans);
   --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 }
@@ -89,7 +89,7 @@
   --surface-1: oklch(1 0 0);
   --surface-2: oklch(0.975 0.006 250);
   --gradient-navy: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
-  --radius-ios: 1.25rem;
+  --radius-ios: 1.375rem;
   --shadow-ios: 0 1px 1px oklch(0.18 0.04 264 / 4%), 0 6px 16px -8px oklch(0.18 0.04 264 / 12%), 0 24px 48px -28px oklch(0.18 0.04 264 / 18%);
   --shadow-ios-lift: 0 2px 4px oklch(0.18 0.04 264 / 6%), 0 12px 28px -10px oklch(0.18 0.04 264 / 18%), 0 36px 64px -32px oklch(0.18 0.04 264 / 26%);
   --shadow-panel: 0 1px 2px oklch(0.18 0.04 264 / 6%), 0 8px 28px -18px oklch(0.18 0.04 264 / 26%);
@@ -142,7 +142,7 @@
   --surface-1: oklch(0.17 0.024 264);
   --surface-2: oklch(0.21 0.026 264);
   --gradient-navy: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
-  --radius-ios: 1.25rem;
+  --radius-ios: 1.375rem;
   --shadow-ios: 0 1px 1px oklch(0 0 0 / 35%), 0 8px 20px -10px oklch(0 0 0 / 55%), 0 28px 56px -30px oklch(0 0 0 / 70%);
   --shadow-ios-lift: 0 2px 6px oklch(0 0 0 / 45%), 0 16px 34px -12px oklch(0 0 0 / 60%), 0 40px 72px -34px oklch(0 0 0 / 78%);
   --shadow-panel: 0 1px 2px oklch(0 0 0 / 40%), 0 10px 30px -20px oklch(0 0 0 / 70%);
@@ -205,25 +205,134 @@
 @utility ios-card {
   position: relative;
   border-radius: var(--radius-ios);
-  background: color-mix(in oklch, var(--card) 82%, transparent);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  background: color-mix(in oklch, var(--card) 78%, transparent);
+  backdrop-filter: saturate(180%) blur(24px);
   border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
   box-shadow: var(--shadow-ios);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.35s ease;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, white 55%, transparent) 0%,
+      transparent 42%
+    );
+    opacity: 0.5;
+  }
+}
+
+.dark .ios-card::before {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, white 10%, transparent) 0%,
+    transparent 40%
+  );
+  opacity: 0.7;
 }
 
 @utility panel {
   border-radius: var(--radius-ios);
-  background: color-mix(in oklch, var(--card) 82%, transparent);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  background: color-mix(in oklch, var(--card) 78%, transparent);
+  backdrop-filter: saturate(180%) blur(24px);
   border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
   box-shadow: var(--shadow-ios);
 }
+
+/* iOS segmented control */
+@utility ios-segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.2rem;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+  border: 1px solid color-mix(in oklch, var(--foreground) 6%, transparent);
+}
+
+@utility ios-segment-item {
+  border-radius: 9999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--muted-foreground);
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  &:hover {
+    color: var(--foreground);
+  }
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+@utility ios-segment-active {
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow:
+    0 1px 1px color-mix(in oklch, var(--foreground) 6%, transparent),
+    0 2px 8px -3px color-mix(in oklch, var(--foreground) 22%, transparent);
+}
+
+/* iOS circular / capsule controls */
+@utility ios-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.25rem;
+  width: 2.25rem;
+  border-radius: 9999px;
+  color: var(--muted-foreground);
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  &:hover {
+    color: var(--foreground);
+    background: color-mix(in oklch, var(--foreground) 9%, transparent);
+  }
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+@utility ios-capsule {
+  border-radius: 9999px;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+/* Grouped inset list rows */
+@utility ios-list-row {
+  transition: background-color 0.2s ease;
+  &:hover {
+    background: color-mix(in oklch, var(--foreground) 3.5%, transparent);
+  }
+  &:active {
+    background: color-mix(in oklch, var(--foreground) 6%, transparent);
+  }
+}
+
+/* Frosted navigation bars */
+@utility ios-bar {
+  background: color-mix(in oklch, var(--background) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(24px);
+  border-color: color-mix(in oklch, var(--foreground) 8%, transparent);
+}
+
 
 @utility panel-hover {
   transition:

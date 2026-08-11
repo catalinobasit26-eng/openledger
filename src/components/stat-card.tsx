@@ -43,15 +43,16 @@ export function StatCard({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <div className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground min-w-0 leading-snug">
+        <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground min-w-0 leading-snug">
           {label}
         </div>
         {icon ? (
-          <div className="text-primary/80 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:text-primary">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
             {icon}
           </div>
         ) : null}
       </div>
+
       {loading ? (
         <div className="mt-2 space-y-2">
           <Skeleton className="h-7 w-24 sm:h-8" />
