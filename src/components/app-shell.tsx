@@ -157,16 +157,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/" className="shrink-0">
             <BrandLogo />
           </Link>
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex ios-segment">
             {navItems.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 className={cn(
-                  "whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-tight transition",
-                  isActive(n.to)
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  "ios-segment-item whitespace-nowrap",
+                  isActive(n.to) && "ios-segment-active",
                 )}
               >
                 {n.label}
@@ -175,20 +173,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             <DropdownMenu>
               <DropdownMenuTrigger
                 className={cn(
-                  "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium tracking-tight outline-none transition",
-                  moreNavItems.some((n) => isActive(n.to))
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  "ios-segment-item inline-flex items-center gap-1 whitespace-nowrap outline-none",
+                  moreNavItems.some((n) => isActive(n.to)) && "ios-segment-active",
                 )}
               >
                 More <ChevronDown className="h-3.5 w-3.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-48 rounded-2xl">
                 {moreNavItems.map((n) => (
                   <DropdownMenuItem key={n.to} asChild>
                     <Link
                       to={n.to}
-                      className={cn("cursor-pointer text-[13px]", isActive(n.to) && "text-primary font-medium")}
+                      className={cn("cursor-pointer rounded-xl text-[13px]", isActive(n.to) && "text-primary font-medium")}
                     >
                       {n.label}
                     </Link>
@@ -197,6 +193,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </DropdownMenuContent>
             </DropdownMenu>
           </nav>
+
 
           <div className="ml-auto flex items-center gap-2">
             <button
