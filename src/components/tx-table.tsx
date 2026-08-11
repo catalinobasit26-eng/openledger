@@ -21,7 +21,7 @@ export interface TxRow {
 function TableSkeleton({ dense, rows = 6 }: { dense?: boolean; rows?: number }) {
   const cols = dense ? 10 : 11;
   return (
-    <div className="ios-card animate-fade-up">
+    <div className="ios-card overflow-hidden animate-fade-up">
       <div className="table-scroll">
         <table className="w-full min-w-5xl text-sm">
           <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -135,7 +135,7 @@ export function TxTable({
   };
 
   return (
-    <div className="ios-card animate-fade-up">
+    <div className="ios-card overflow-hidden animate-fade-up">
       <TxMobileCards rows={rows} />
       <div className="hidden table-scroll sm:block">
         <table className="w-full min-w-5xl text-sm">
