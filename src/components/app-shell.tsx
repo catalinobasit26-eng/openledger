@@ -195,33 +195,28 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
 
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setCmdOpen(true)}
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+              className="ios-capsule inline-flex items-center gap-2 border border-transparent bg-foreground/5 px-3 py-2 text-xs text-muted-foreground transition hover:bg-foreground/9 hover:text-foreground"
               aria-label="Search OpenLedger"
             >
               <Search className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Search…</span>
-              <kbd className="hidden rounded border border-border bg-muted px-1 font-mono text-[10px] sm:inline">
+              <kbd className="hidden rounded-full bg-background/70 px-1.5 font-mono text-[10px] sm:inline">
                 ⌘K
               </kbd>
             </button>
 
-            <button
-              type="button"
-              onClick={toggle}
-              aria-label="Toggle theme"
-              className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
-            >
+            <button type="button" onClick={toggle} aria-label="Toggle theme" className="ios-icon-btn">
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             {email ? (
               <>
                 <Link
                   to="/admin"
-                  className="hidden sm:inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                  className="ios-capsule hidden sm:inline-flex items-center gap-1 bg-foreground/5 px-3 py-2 text-xs font-medium text-foreground hover:bg-foreground/9"
                 >
                   <Shield className="h-3.5 w-3.5" /> Admin
                 </Link>
@@ -231,7 +226,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     await supabase.auth.signOut();
                     navigate({ to: "/" });
                   }}
-                  className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                  className="ios-icon-btn"
                   aria-label="Sign out"
                 >
                   <LogOut className="h-4 w-4" />
@@ -242,12 +237,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 href="https://www.openpy.space/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="ios-capsule hidden sm:inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90"
               >
                 Sign in
               </a>
             ) : null}
           </div>
+
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-10 min-w-0 overflow-x-clip">{children}</main>
