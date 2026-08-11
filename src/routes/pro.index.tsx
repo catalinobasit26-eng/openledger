@@ -338,7 +338,7 @@ function ProLedgerPage() {
                   <Link
                     to="/pro/entry/$id"
                     params={{ id: row.id }}
-                    className="block rounded-xl border border-border bg-card p-3 transition hover:border-primary/40"
+                    className="block ios-card p-3 transition hover:border-primary/40"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-1.5">

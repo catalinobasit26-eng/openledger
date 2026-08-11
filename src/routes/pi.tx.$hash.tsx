@@ -93,7 +93,7 @@ function PiTxDetailPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-5 space-y-3 text-sm">
+      <div className="ios-card p-5 space-y-3 text-sm">
         <Row label="Ledger">
           <span className="font-mono">#{formatInt(tx.ledger)}</span>
         </Row>
@@ -116,13 +116,13 @@ function PiTxDetailPage() {
       <section>
         <h2 className="mb-3 text-sm font-semibold">Operations</h2>
         {ops.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
+          <div className="ios-card p-6 text-sm text-muted-foreground">
             No operations returned.
           </div>
         ) : (
           <div className="space-y-3">
             {ops.map((op) => (
-              <div key={op.id} className="rounded-xl border border-border bg-card p-4 space-y-3 text-sm">
+              <div key={op.id} className="ios-card p-4 space-y-3 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium uppercase tracking-wider">
                     {op.type || "operation"}

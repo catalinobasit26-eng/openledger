@@ -127,7 +127,7 @@ function AdminPage() {
       {isStaff && (
         <section>
           <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold"><ShieldAlert className="h-4 w-4 text-warning" /> Fraud alerts</h2>
-          <div className="rounded-xl border border-border bg-card">
+          <div className="ios-card">
             <div className="table-scroll">
               <table className="w-full min-w-140 text-sm">
                 <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -170,7 +170,7 @@ function AdminPage() {
 
       {isStaff && (
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div className="ios-card p-5">
             <h2 className="mb-3 text-sm font-semibold">Recent API calls</h2>
             <ul className="divide-y divide-border text-xs">
               {(apiLogs.data ?? []).map((l: any) => (
@@ -184,7 +184,7 @@ function AdminPage() {
               {!apiLogs.data?.length && <li className="py-4 text-center text-muted-foreground">No API calls logged yet.</li>}
             </ul>
           </div>
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div className="ios-card p-5">
             <h2 className="mb-3 text-sm font-semibold">Audit log</h2>
             <ul className="divide-y divide-border text-xs">
               {(auditLogs.data ?? []).map((l: any) => (

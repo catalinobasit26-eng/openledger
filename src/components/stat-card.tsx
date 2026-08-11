@@ -35,7 +35,7 @@ export function StatCard({
         ...(delayMs != null ? { animationDelay: `${delayMs}ms` } : null),
       }}
       className={cn(
-        "group rounded-xl border border-border bg-card p-3 sm:p-5 min-w-0",
+        "group ios-card p-3 sm:p-5 min-w-0",
         "transition-all duration-300 ease-out",
         "hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/3",
         animate && "animate-fade-up",

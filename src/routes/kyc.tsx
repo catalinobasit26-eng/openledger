@@ -150,7 +150,7 @@ function KycPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <section className="lg:col-span-2 rounded-xl border border-border bg-card p-4 sm:p-5">
+        <section className="lg:col-span-2 ios-card p-4 sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold">Daily approvals (30d)</h2>
             <div className="text-xs text-muted-foreground">{formatInt(approved30)} total</div>
@@ -193,7 +193,7 @@ function KycPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-4 sm:p-5">
+        <section className="ios-card p-4 sm:p-5">
           <h2 className="mb-4 text-sm font-semibold">Application status</h2>
           <div className="h-56 sm:h-72">
             {statusPie.length === 0 ? (
@@ -230,7 +230,7 @@ function KycPage() {
         </section>
       </div>
 
-      <section className="rounded-xl border border-border bg-card p-4 sm:p-5 text-sm text-muted-foreground">
+      <section className="ios-card p-4 sm:p-5 text-sm text-muted-foreground">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <span>
             Source:{" "}

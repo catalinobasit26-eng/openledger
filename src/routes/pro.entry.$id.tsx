@@ -147,7 +147,7 @@ function Field({
   className?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card/50 p-3">
+    <div className="ios-card/50 p-3">
       <dt className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</dt>
       <dd className={`mt-1 break-all text-sm ${mono ? "font-mono text-xs sm:text-sm" : ""} ${className ?? ""}`}>
         <span className="inline-flex max-w-full items-start gap-2">

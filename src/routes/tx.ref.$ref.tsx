@@ -43,7 +43,7 @@ function ResolveRefPage() {
 
   if (isLoading || data?.hash) return <PageLoader label="Locating transaction…" />;
   return (
-    <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
+    <div className="ios-card p-6 text-sm text-muted-foreground">
       No OpenLedger transaction found for reference <span className="font-mono text-foreground">{ref}</span>. It may
       not have been synced yet — try again in a minute.
     </div>

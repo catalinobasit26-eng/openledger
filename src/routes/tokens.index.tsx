@@ -32,7 +32,7 @@ function TokensIndex() {
         <h1 className="text-2xl font-bold tracking-tight">Tokens</h1>
         <p className="mt-1 text-sm text-muted-foreground">Tokens active on the OpenPay ecosystem.</p>
       </div>
-      <div className="rounded-xl border border-border bg-card">
+      <div className="ios-card">
         <ul className="divide-y divide-border sm:hidden">
           {(data ?? []).map((t: any) => (
             <li key={t.symbol}>

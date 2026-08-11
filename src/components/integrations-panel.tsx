@@ -87,7 +87,7 @@ function IntegrationCard({ integ }: { integ: Integration }) {
   });
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
+    <div className="ios-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-sm font-semibold">{integ.display_name}</h3>
@@ -206,7 +206,7 @@ export function IntegrationsPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
 
   if (!isSuperAdmin) {
     return (
-      <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+      <div className="ios-card p-5 text-sm text-muted-foreground">
         Integrations and ingestion configuration are only visible to super admins.
       </div>
     );
@@ -234,7 +234,7 @@ export function IntegrationsPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
         <p className="mb-4 text-xs text-muted-foreground">
           Share these URLs with the OpenPay / OpenPay Pro backends so they can push signed transactions to OpenLedger in real time.
         </p>
-        <div className="rounded-xl border border-border bg-card p-5">
+        <div className="ios-card p-5">
           {cfg.isLoading && <p className="text-xs text-muted-foreground">Loading…</p>}
           {cfg.data && (
             <div className="space-y-4 text-xs">

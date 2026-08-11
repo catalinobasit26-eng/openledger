@@ -138,7 +138,7 @@ function StakePage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-xl border border-border bg-card p-4 sm:p-5">
+        <section className="ios-card p-4 sm:p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold">Daily stake volume (30d)</h2>
             <div className="text-xs text-muted-foreground">Amount summed</div>
@@ -181,7 +181,7 @@ function StakePage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-4 sm:p-5">
+        <section className="ios-card p-4 sm:p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold">Daily stake count (30d)</h2>
             <div className="text-xs text-muted-foreground">Events / day</div>
@@ -212,7 +212,7 @@ function StakePage() {
       </div>
 
       {currencyBars.length > 0 ? (
-        <section className="rounded-xl border border-border bg-card p-4 sm:p-5">
+        <section className="ios-card p-4 sm:p-5">
           <h2 className="mb-4 text-sm font-semibold">Volume by currency</h2>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
