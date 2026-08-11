@@ -246,7 +246,36 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-10 min-w-0 overflow-x-clip">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-24 lg:pb-10 min-w-0 overflow-x-clip">{children}</main>
+
+      {/* iOS-style bottom tab bar (mobile) */}
+      <nav
+        aria-label="Primary"
+        className="fixed inset-x-0 bottom-0 z-30 border-t ios-bar lg:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <ul className="mx-auto grid max-w-md grid-cols-5">
+          {tabItems.map((t) => {
+            const Icon = t.icon;
+            const active = isActive(t.to);
+            return (
+              <li key={t.to}>
+                <Link
+                  to={t.to}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5 px-1 py-2 text-[10px] font-medium transition",
+                    active ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  <Icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
+                  {t.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
       <footer className="mt-16 border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
