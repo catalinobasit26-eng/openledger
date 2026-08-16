@@ -28,12 +28,37 @@ export const Route = createFileRoute("/api/public/ledger/resolve")({
         }
 
         const client = pub();
-        let q = client.from("ledger_transactions").select("*").limit(1);
-        q = hash ? q.eq("hash", hash) : q.eq("external_ref", ref!);
-        const { data, error } = await q.maybeSingle();
+        let data: any = null;
+        if (hash) {
+          const r = await client.from("ledger_transactions").select("*").eq("hash", hash).limit(1).maybeSingle();
+          if (r.error) return Response.json({ error: r.error.message }, { status: 500 });
+          data = r.data;
+        } else {
+          const safe = ref!.replace(/[,()*]/g, "");
+          const r = await client.from("ledger_transactions").select("*").eq("external_ref", safe).limit(1).maybeSingle();
+          if (r.error) return Response.json({ error: r.error.message }, { status: 500 });
+          data = r.data;
+          if (!data) {
+            const alt = await client
+              .from("ledger_transactions")
+              .select("*")
+              .or(
+                [
+                  `hash.eq.${safe}`,
+                  `metadata->>openpay_ledger_event_id.eq.${safe}`,
+                  `metadata->>tx_id.eq.${safe}`,
+                  `metadata->>tx_hash.eq.${safe}`,
+                ].join(","),
+              )
+              .limit(1)
+              .maybeSingle();
+            if (alt.error) return Response.json({ error: alt.error.message }, { status: 500 });
+            data = alt.data;
+          }
+        }
 
-        if (error) return Response.json({ error: error.message }, { status: 500 });
         if (!data) return Response.json({ found: false, error: "Not found" }, { status: 404 });
+
 
         const permalink = `${url.origin}/tx/${data.hash}`;
         if (wantRedirect) {

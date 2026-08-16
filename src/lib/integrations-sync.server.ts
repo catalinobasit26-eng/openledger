@@ -60,7 +60,9 @@ function mapOpenPay(item: any): Record<string, any> {
     p_external_ref: String(item.id ?? ""),
     p_metadata: {
       source_table: item.source_table, event_type: item.event_type,
+      openpay_ledger_event_id: item.metadata?.openpay_ledger_event_id ?? item.id ?? null,
       category, note: item.note, sender, receiver,
+
       sender_amount: item.sender_amount,
       sender_currency_code: item.sender_currency_code,
       receiver_amount: item.receiver_amount,
