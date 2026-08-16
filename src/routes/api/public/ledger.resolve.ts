@@ -48,7 +48,6 @@ export const Route = createFileRoute("/api/public/ledger/resolve")({
                   `metadata->>openpay_ledger_event_id.eq.${safe}`,
                   `metadata->>tx_id.eq.${safe}`,
                   `metadata->>tx_hash.eq.${safe}`,
-                  `metadata->>note.ilike.*${safe}*`,
                 ].join(","),
               )
               .limit(1)
