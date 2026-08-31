@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
 import { ChartSkeleton } from "@/components/chart-skeleton";
 import { formatInt, formatUsd, shortAddress } from "@/lib/format";
-import { isCurrencySwapNote } from "@/lib/tx-classify";
 
 export const Route = createFileRoute("/analytics")({
   head: () => ({

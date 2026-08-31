@@ -14,7 +14,6 @@ import { ExportButton } from "@/components/export-button";
 import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
 import { ChartSkeleton, PieSkeleton } from "@/components/chart-skeleton";
 import { formatInt, formatUsd } from "@/lib/format";
-import { isCurrencySwapNote, isStakeTx } from "@/lib/tx-classify";
 import { fetchKycMetrics } from "@/lib/kyc-metrics";
 
 export const Route = createFileRoute("/")({
