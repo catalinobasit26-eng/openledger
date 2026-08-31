@@ -578,6 +578,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_dashboard_stats: { Args: never; Returns: Json }
       get_nft_collection_cover: { Args: { _slug: string }; Returns: string }
       has_role: {
         Args: {
