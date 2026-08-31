@@ -227,7 +227,7 @@ function DashboardPage() {
                     isAnimationActive
                     animationDuration={800}
                   >
-                    {(typeBreakdown.data ?? []).map((entry, i) => (
+                    {(typeBreakdown.data ?? []).map((entry: { name: string; value: number }, i: number) => (
                       <Cell key={entry.name} fill={pieFill(entry.name, i)} />
                     ))}
                   </Pie>
