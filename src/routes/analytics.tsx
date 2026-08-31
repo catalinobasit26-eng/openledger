@@ -25,39 +25,23 @@ function AnalyticsPage() {
     queryKey: ["analytics-daily-30"],
     queryFn: async () => {
       const since = subDays(new Date(), 30).toISOString().slice(0, 10);
-      // analytics_daily.swaps only counts type=swap; OpenPay conversions are payments with notes.
-      const [{ data }, { data: payments }] = await Promise.all([
-        supabase.from("analytics_daily").select("*").gte("day", since).order("day", { ascending: true }),
-        supabase
-          .from("ledger_transactions")
-          .select("ts, metadata")
-          .eq("type", "payment")
-          .gte("ts", `${since}T00:00:00.000Z`)
-          .limit(5000),
-      ]);
+      const { data } = await supabase
+        .from("analytics_daily")
+        .select("*")
+        .gte("day", since)
+        .order("day", { ascending: true });
 
-      const noteSwapsByDay = new Map<string, number>();
-      for (const row of payments ?? []) {
-        if (!isCurrencySwapNote((row as any).metadata?.note)) continue;
-        const dayKey = String((row as any).ts).slice(0, 10);
-        noteSwapsByDay.set(dayKey, (noteSwapsByDay.get(dayKey) ?? 0) + 1);
-      }
-
-      return (data ?? []).map((r: any) => {
-        const dayKey = String(r.day).slice(0, 10);
-        const stored = Number(r.swaps ?? 0);
-        const fromNotes = noteSwapsByDay.get(dayKey) ?? 0;
-        return {
-          day: format(new Date(r.day), "MMM d"),
-          Transactions: r.transactions,
-          Volume: Number(r.volume),
-          NFTs: r.nft_sales,
-          // Prefer DB count once note-based backfill lands; otherwise use note detection.
-          Swaps: Math.max(stored, fromNotes),
-        };
-      });
+      return (data ?? []).map((r: any) => ({
+        day: format(new Date(r.day), "MMM d"),
+        Transactions: r.transactions,
+        Volume: Number(r.volume),
+        NFTs: r.nft_sales,
+        Swaps: Number(r.swaps ?? 0),
+      }));
     },
+    staleTime: 30_000,
   });
+
 
   const topWallets = useQuery({
     queryKey: ["top-wallets"],
