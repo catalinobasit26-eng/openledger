@@ -14,7 +14,6 @@ import { ExportButton } from "@/components/export-button";
 import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
 import { ChartSkeleton, PieSkeleton } from "@/components/chart-skeleton";
 import { formatInt, formatUsd } from "@/lib/format";
-import { isCurrencySwapNote, isStakeTx } from "@/lib/tx-classify";
 import { fetchKycMetrics } from "@/lib/kyc-metrics";
 
 export const Route = createFileRoute("/")({
@@ -35,42 +34,29 @@ function DashboardPage() {
   const stats = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
-      // Prefer select("id") for counts — select("*", { head: true }) times out on this table (PostgREST 57014).
-      const [tx, vol, wallets, nft, openpay, stakeTyped, typed, payments, transfers, kyc] = await Promise.all([
-        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }),
-        supabase.from("ledger_transactions").select("amount"),
-        supabase.from("wallets").select("address", { count: "exact", head: true }),
-        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "nft_sale"),
-        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("source", "openpay"),
-        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "stake"),
-        supabase.from("ledger_transactions").select("id", { count: "exact", head: true }).eq("type", "swap"),
-        // OpenPay labels conversions as category "other"/type payment; detect via note.
-        // Only scan payments — selecting metadata->>note across NFT rows times out (huge base64).
-        supabase.from("ledger_transactions").select("type,metadata").eq("type", "payment").limit(5000),
-        // Legacy staking rows were stored as transfers before the stake enum landed.
-        supabase.from("ledger_transactions").select("type,metadata").eq("type", "transfer").limit(2000),
+      // Single aggregate RPC — scanning 300k+ rows client-side timed out the API.
+      const [{ data, error }, kyc] = await Promise.all([
+        supabase.rpc("get_dashboard_stats" as any),
         fetchKycMetrics().catch(() => null),
       ]);
-      const totalVolume = (vol.data ?? []).reduce((acc, r: any) => acc + Number(r.amount ?? 0), 0);
-      const noteSwaps = (payments.data ?? []).filter((r: any) => isCurrencySwapNote(r.metadata?.note)).length;
-      const swaps = (typed.count ?? 0) + noteSwaps;
-      const legacyStakes =
-        (payments.data ?? []).filter((r: any) => isStakeTx(r)).length +
-        (transfers.data ?? []).filter((r: any) => isStakeTx(r)).length;
-      // stakeTyped.error is fine if the enum isn't migrated yet — fall back to legacy only.
-      const stakes = (stakeTyped.error ? 0 : (stakeTyped.count ?? 0)) + legacyStakes;
+      if (error) throw error;
+      const d: any = data ?? {};
       return {
-        totalTx: tx.count ?? 0,
-        totalVolume,
-        totalWallets: wallets.count ?? 0,
-        nftSales: nft.count ?? 0,
-        swaps,
-        openpay: openpay.count ?? 0,
-        stakes,
+        totalTx: Number(d.total_tx ?? 0),
+        totalVolume: Number(d.total_volume ?? 0),
+        totalWallets: Number(d.total_wallets ?? 0),
+        nftSales: Number(d.nft_sales ?? 0),
+        swaps: Number(d.swaps ?? 0),
+        openpay: Number(d.openpay ?? 0),
+        stakes: Number(d.stakes ?? 0),
+        typeBreakdown: (Array.isArray(d.type_breakdown) ? d.type_breakdown : [])
+          .map((r: any) => ({ name: String(r.name).replace("_", " "), value: Number(r.value) }))
+          .filter((r: any) => r.value > 0),
         kycVerified: kyc?.users?.verified ?? 0,
         kycRate: kyc?.users?.verification_rate_pct ?? 0,
       };
     },
+    staleTime: 30_000,
   });
 
   const daily = useQuery({
@@ -86,41 +72,14 @@ function DashboardPage() {
         Pro: r.openpaypro_tx,
       }));
     },
+    staleTime: 30_000,
   });
 
-  const typeBreakdown = useQuery({
-    queryKey: ["type-breakdown"],
-    queryFn: async () => {
-      // Avoid metadata->>note over NFT rows (statement timeout). Reclassify payments/transfers client-side.
-      const [{ data: types }, { data: payments }, { data: transfers }] = await Promise.all([
-        supabase.from("ledger_transactions").select("type").limit(5000),
-        supabase.from("ledger_transactions").select("type,metadata").eq("type", "payment").limit(5000),
-        supabase.from("ledger_transactions").select("type,metadata").eq("type", "transfer").limit(2000),
-      ]);
-      const counts: Record<string, number> = {};
-      (types ?? []).forEach((r: any) => {
-        counts[r.type] = (counts[r.type] ?? 0) + 1;
-      });
-      const noteSwaps = (payments ?? []).filter((r: any) => isCurrencySwapNote(r.metadata?.note)).length;
-      if (noteSwaps > 0) {
-        counts.payment = Math.max(0, (counts.payment ?? 0) - noteSwaps);
-        counts.swap = (counts.swap ?? 0) + noteSwaps;
-      }
-      const paymentStakes = (payments ?? []).filter((r: any) => isStakeTx(r)).length;
-      const transferStakes = (transfers ?? []).filter((r: any) => isStakeTx(r)).length;
-      if (paymentStakes > 0) {
-        counts.payment = Math.max(0, (counts.payment ?? 0) - paymentStakes);
-        counts.stake = (counts.stake ?? 0) + paymentStakes;
-      }
-      if (transferStakes > 0) {
-        counts.transfer = Math.max(0, (counts.transfer ?? 0) - transferStakes);
-        counts.stake = (counts.stake ?? 0) + transferStakes;
-      }
-      return Object.entries(counts)
-        .filter(([, value]) => value > 0)
-        .map(([name, value]) => ({ name: name.replace("_", " "), value }));
-    },
-  });
+  const typeBreakdown = {
+    data: stats.data?.typeBreakdown,
+    isLoading: stats.isLoading,
+  };
+
 
   const recent = useQuery({
     queryKey: ["recent-tx-dashboard"],
@@ -267,7 +226,7 @@ function DashboardPage() {
                     isAnimationActive
                     animationDuration={800}
                   >
-                    {(typeBreakdown.data ?? []).map((entry, i) => (
+                    {(typeBreakdown.data ?? []).map((entry: { name: string; value: number }, i: number) => (
                       <Cell key={entry.name} fill={pieFill(entry.name, i)} />
                     ))}
                   </Pie>
