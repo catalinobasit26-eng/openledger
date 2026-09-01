@@ -115,7 +115,8 @@ function ExplorerPage() {
         .range(offset, offset + PAGE_SIZE - 1);
       return data ?? [];
     },
-    refetchInterval: 10000,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
   });
 
   const totalCount = total.data ?? 0;
