@@ -51,7 +51,8 @@ function ExplorerPage() {
         .select("hash", { count: "exact", head: true });
       return count ?? 0;
     },
-    refetchInterval: 15_000,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
   });
 
   const txResults = useQuery({
@@ -114,7 +115,8 @@ function ExplorerPage() {
         .range(offset, offset + PAGE_SIZE - 1);
       return data ?? [];
     },
-    refetchInterval: 10000,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
   });
 
   const totalCount = total.data ?? 0;
