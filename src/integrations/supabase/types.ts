@@ -50,6 +50,18 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_dirty_days: {
+        Row: {
+          day: string
+        }
+        Insert: {
+          day: string
+        }
+        Update: {
+          day?: string
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           active: boolean
@@ -578,6 +590,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      flush_analytics_dirty_days: { Args: never; Returns: number }
       get_dashboard_stats: { Args: never; Returns: Json }
       get_nft_collection_cover: { Args: { _slug: string }; Returns: string }
       has_role: {
