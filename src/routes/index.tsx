@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, ArrowLeftRight, BadgeCheck, DollarSign, ExternalLink, Image, Layers, MessageCircle, Users, Zap } from "lucide-react";
+import { Activity, ArrowLeftRight, BadgeCheck, DollarSign, ExternalLink, Image, Layers, LayoutDashboard, ListTree, MessageCircle, Users, Zap } from "lucide-react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell, Pie, PieChart } from "recharts";
 import { format, subDays } from "date-fns";
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
@@ -15,6 +15,8 @@ import { useLedgerRealtime } from "@/hooks/use-ledger-realtime";
 import { ChartSkeleton, PieSkeleton } from "@/components/chart-skeleton";
 import { formatInt, formatUsd } from "@/lib/format";
 import { fetchKycMetrics } from "@/lib/kyc-metrics";
+import { DenseExplorerMode } from "@/components/dense-explorer-mode";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/")({
 
 function DashboardPage() {
   useLedgerRealtime();
+  const [viewMode, setViewMode] = useState<"overview" | "explorer">("overview");
 
   const stats = useQuery({
     queryKey: ["dashboard-stats"],
@@ -88,7 +91,7 @@ function DashboardPage() {
         .from("ledger_transactions")
         .select("hash,ts,source,type,from_address,to_address,amount,currency,status,block_number")
         .order("ts", { ascending: false })
-        .limit(10);
+        .limit(14);
       return data ?? [];
     },
     refetchInterval: 8000,
@@ -124,6 +127,41 @@ function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase text-muted-foreground">Display mode</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">Choose visual analytics or a dense live ledger.</p>
+        </div>
+        <div className="inline-flex rounded-md border border-border bg-muted/50 p-1" role="group" aria-label="Dashboard display mode">
+          <Button
+            type="button"
+            size="sm"
+            variant={viewMode === "overview" ? "default" : "ghost"}
+            onClick={() => setViewMode("overview")}
+            aria-pressed={viewMode === "overview"}
+          >
+            <LayoutDashboard /> <span className="hidden sm:inline">Overview</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={viewMode === "explorer" ? "default" : "ghost"}
+            onClick={() => setViewMode("explorer")}
+            aria-pressed={viewMode === "explorer"}
+          >
+            <ListTree /> <span className="hidden sm:inline">Explorer mode</span>
+          </Button>
+        </div>
+      </div>
+
+      {viewMode === "explorer" ? (
+        <DenseExplorerMode
+          stats={s ? { totalTx: s.totalTx, totalVolume: s.totalVolume, totalWallets: s.totalWallets } : undefined}
+          rows={(recent.data ?? []) as any}
+          loading={statsLoading || recent.isLoading}
+        />
+      ) : (
+        <>
       <section
         className="ios-card relative overflow-hidden bg-linear-to-br from-primary/12 via-card to-card p-6 sm:p-10 animate-fade-up"
         style={{ "--fade-delay": "0ms" } as CSSProperties}
@@ -338,6 +376,8 @@ function DashboardPage() {
         </div>
 
       </section>
+        </>
+      )}
     </div>
   );
 }
